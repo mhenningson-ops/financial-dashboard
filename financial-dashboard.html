@@ -1,0 +1,2506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Financial Dashboard — Cordoba Capital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    :root {
+      --dark-1: #080e16; --dark-2: #0d1824; --dark-3: #122030; --dark-4: #1a2c3f;
+      --gold: #cfac67; --gold-light: #e0c47a; --gold-dark: #ba995d;
+      --gold-faint: rgba(207,172,103,0.12); --gold-faint2: rgba(207,172,103,0.06);
+      --text-light: #ddd8ce; --text-muted: #7a7060; --text-dark: #0f1a24;
+      --green: #4caf7d; --green-faint: rgba(76,175,125,0.14);
+      --red: #e05c5c; --red-faint: rgba(224,92,92,0.14);
+      --blue: #5b9bd5; --orange: #e67e22; --purple: #9b59b6;
+      --btc: #f7931a; --eth: #627eea; --infra: #9b59b6;
+      --border: rgba(207,172,103,0.12);
+      --radius: 10px; --radius-sm: 6px; --radius-lg: 14px;
+    }
+
+    body { font-family: 'Inter', sans-serif; background: var(--dark-1); color: var(--text-light); line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+    h1,h2,h3,h4 { font-family: 'Playfair Display', serif; line-height: 1.15; }
+    input, select, textarea { font-family: 'Inter', sans-serif; }
+
+    /* ── HEADER ── */
+    .site-header { background: var(--dark-2); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
+    .site-header img { height: 32px; }
+    .hd { width: 1px; height: 28px; background: var(--border); margin: 0 4px; }
+    .h-name { font-family: 'Montserrat', sans-serif; font-size: 0.95rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; }
+    .h-sub { font-family: 'Montserrat', sans-serif; font-size: 0.58rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
+    .h-tool { font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+
+    /* ── TABS ── */
+    .tab-bar { background: var(--dark-2); border-bottom: 1px solid var(--border); display: flex; padding: 0 28px; gap: 4px; }
+    .tab-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 14px 20px; font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); cursor: pointer; transition: color 0.2s, border-color 0.2s; white-space: nowrap; }
+    .tab-btn:hover { color: var(--text-light); }
+    .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── LAYOUT ── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 36px 24px 80px; }
+    .page-sm { max-width: 860px; margin: 0 auto; padding: 36px 24px 80px; }
+
+    /* ── CARDS ── */
+    .card { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px 28px; }
+    .card + .card { margin-top: 20px; }
+    .card-title { font-size: 1rem; color: #fff; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    .step-pill { font-family: 'Montserrat', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; background: var(--gold); color: var(--dark-1); padding: 3px 9px; border-radius: 3px; }
+    .section-label { font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+
+    /* ── SUMMARY GRID ── */
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .kpi-section { margin-bottom: 28px; }
+    .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 12px; }
+    .kpi-row-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; opacity: 0.6; }
+    .sum-card { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; }
+    .sum-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .sum-value { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; font-weight: 700; color: #fff; }
+    .sum-value.gold { color: var(--gold); }
+    .sum-value.green { color: var(--green); }
+    .sum-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+    .sum-change { font-size: 0.78rem; font-weight: 600; margin-top: 4px; }
+    .sum-change.pos { color: var(--green); }
+    .sum-change.neg { color: var(--red); }
+
+    /* ── CHART GRID ── */
+    .chart-grid { display: grid; gap: 20px; }
+    .chart-grid-2 { grid-template-columns: 1fr 1fr; }
+    .chart-wrap { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px 28px; }
+    .chart-wrap.full { grid-column: 1 / -1; }
+    .chart-title { font-size: 0.92rem; font-weight: 600; color: #fff; margin-bottom: 4px; }
+    .chart-sub { font-size: 0.76rem; color: var(--text-muted); margin-bottom: 18px; }
+    .chart-canvas-wrap { position: relative; height: 240px; }
+    .chart-canvas-wrap.tall { height: 300px; }
+
+    .milestone-bar { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+    .ms { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; color: var(--text-muted); }
+    .ms-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── FORM ── */
+    .accordion { border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 16px; }
+    .acc-header { background: var(--dark-2); padding: 16px 22px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; user-select: none; transition: background 0.2s; }
+    .acc-header:hover { background: var(--dark-3); }
+    .acc-header.open { border-bottom: 1px solid var(--border); }
+    .acc-title { font-size: 0.88rem; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 10px; }
+    .acc-badge { font-family: 'Montserrat', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; background: var(--gold-faint); color: var(--gold); }
+    .acc-arrow { color: var(--text-muted); font-size: 0.8rem; transition: transform 0.2s; }
+    .acc-header.open .acc-arrow { transform: rotate(180deg); }
+    .acc-body { background: var(--dark-3); padding: 24px 22px; display: none; }
+    .acc-body.open { display: block; }
+
+    /* ── INPUT TABLE ── */
+    .input-table { width: 100%; border-collapse: collapse; }
+    .input-table thead th { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); text-align: left; padding: 0 10px 10px; border-bottom: 1px solid var(--border); }
+    .input-table thead th.right { text-align: right; }
+    .input-table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .input-table tbody tr:last-child { border-bottom: none; }
+    .input-table tbody td { padding: 9px 10px; font-size: 0.88rem; vertical-align: middle; }
+    .input-table tbody td.muted { color: var(--text-muted); font-size: 0.8rem; }
+    .input-table tbody td.right { text-align: right; }
+    .acct-tag { display: inline-block; font-size: 0.67rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; background: var(--gold-faint); color: var(--gold); }
+
+    input[type="number"], input[type="text"], input[type="date"], select {
+      background: var(--dark-4); border: 1px solid rgba(207,172,103,0.2); border-radius: var(--radius-sm);
+      color: #ddd8ce; font-size: 0.85rem; padding: 7px 10px;
+      transition: border-color 0.2s; width: 100%;
+    }
+    input[type="number"] { text-align: right; -moz-appearance: textfield; width: 140px; }
+    input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    input[type="number"]:focus, input[type="text"]:focus, input[type="date"]:focus, select:focus { outline: none; border-color: var(--gold); background: #1f3048; }
+    input[type="date"] { color-scheme: dark; width: 160px; }
+
+    /* Money inputs */
+    .money-input { text-align: right; width: 140px; }
+    td .money-input { width: 140px; }
+    .field .money-input { width: 100%; }
+    .comp-row .money-input { width: 100%; }
+
+    .avm-link { font-size: 0.72em; color: var(--gold); text-decoration: none; margin-left: 5px; opacity: 0.75; transition: opacity 0.15s; }
+    .avm-link:hover { opacity: 1; }
+
+    /* Annual field note */
+    .annual-note { font-size: 0.6rem; color: var(--text-muted); font-weight: 400; letter-spacing: 0; text-transform: none; }
+
+    .field-group { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; align-items: stretch; }
+    .field-group-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .field { display: flex; flex-direction: column; justify-content: space-between; gap: 5px; }
+    .field label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+
+    .sub-section { margin-bottom: 20px; }
+    .sub-section-title { font-size: 0.76rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+
+    .blended-display { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; margin-top: 14px; display: flex; align-items: center; justify-content: space-between; }
+    .blended-label { font-size: 0.74rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .blended-value { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--gold); }
+
+    .comp-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+    .comp-row label { font-size: 0.65rem; color: var(--text-muted); display: block; margin-bottom: 3px; }
+
+    /* ── BUTTONS ── */
+    .btn-primary { display: block; width: 100%; padding: 15px; background: var(--gold); color: var(--dark-1); font-family: 'Montserrat', sans-serif; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; border: none; border-radius: var(--radius); cursor: pointer; transition: background 0.2s; }
+    .btn-primary:hover { background: var(--gold-light); }
+    .btn-secondary { display: inline-block; padding: 9px 18px; background: transparent; color: var(--text-muted); font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: color 0.2s, border-color 0.2s; }
+    .btn-secondary:hover { color: var(--text-light); border-color: rgba(207,172,103,0.3); }
+    .btn-gold-outline { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: transparent; color: var(--gold); font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 600; border: 1px solid rgba(207,172,103,0.3); border-radius: var(--radius-sm); cursor: pointer; transition: background 0.2s; }
+    .btn-gold-outline:hover { background: var(--gold-faint); }
+    .btn-danger { display: inline-block; padding: 7px 14px; background: var(--red-faint); color: var(--red); font-size: 0.72rem; font-weight: 600; border: 1px solid rgba(224,92,92,0.2); border-radius: var(--radius-sm); cursor: pointer; transition: background 0.2s; }
+    .btn-danger:hover { background: rgba(224,92,92,0.25); }
+
+    /* ── STATUS ── */
+    .badge-ok { display: inline-block; padding: 2px 9px; border-radius: 3px; background: var(--green-faint); color: var(--green); font-size: 0.72rem; font-weight: 600; }
+    .badge-flag { display: inline-block; padding: 2px 9px; border-radius: 3px; background: var(--red-faint); color: var(--red); font-size: 0.72rem; font-weight: 600; }
+    .badge-buy { display: inline-block; padding: 2px 9px; border-radius: 3px; background: var(--green-faint); color: var(--green); font-size: 0.72rem; font-weight: 600; }
+    .badge-sell { display: inline-block; padding: 2px 9px; border-radius: 3px; background: var(--red-faint); color: var(--red); font-size: 0.72rem; font-weight: 600; }
+    .pos { color: var(--green); } .neg { color: var(--red); } .muted { color: var(--text-muted); }
+    .gold { color: var(--gold); }
+
+    /* ── HISTORY ── */
+    .history-grid { display: grid; gap: 16px; }
+    .hist-card { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; }
+    .hist-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .hist-q { font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+    .hist-date { font-size: 0.72rem; color: var(--text-muted); }
+    .hist-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .hist-m { }
+    .hist-m-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; }
+    .hist-m-val { font-family: 'Montserrat', sans-serif; font-size: 1.02rem; font-weight: 700; color: #fff; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align: center; padding: 60px 24px; }
+    .empty-icon { font-size: 3rem; margin-bottom: 16px; }
+    .empty-title { font-size: 1.3rem; color: #fff; margin-bottom: 8px; }
+    .empty-sub { font-size: 0.85rem; color: var(--text-muted); max-width: 400px; margin: 0 auto 24px; }
+
+    /* ── FI PROGRESS ── */
+    .fi-bar-wrap { margin-top: 8px; }
+    .fi-bar-track { background: var(--dark-3); border-radius: 4px; height: 6px; overflow: hidden; }
+    .fi-bar-fill { background: var(--gold); height: 100%; border-radius: 4px; transition: width 0.5s; }
+    .fi-bar-label { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── DIVIDER ── */
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+    /* ── NOTE ── */
+    .note { font-size: 0.72rem; color: var(--text-muted); font-style: italic; margin-top: 10px; }
+
+    /* ── METRIC TOOLTIP ── */
+    .metric-tip { position: relative; display: inline-block; cursor: help; border-bottom: 1px dashed rgba(207,172,103,0.4); }
+    .metric-tip .tip-box {
+      visibility: hidden; opacity: 0;
+      position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+      background: var(--dark-4); border: 1px solid rgba(207,172,103,0.25);
+      border-radius: var(--radius-sm); padding: 10px 13px;
+      width: 260px; font-size: 0.72rem; font-weight: 400; letter-spacing: 0;
+      text-transform: none; color: var(--text-light); line-height: 1.55;
+      text-align: left;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5); z-index: 200;
+      pointer-events: none; transition: opacity 0.15s;
+    }
+    .metric-tip .tip-box::after {
+      content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+      border: 5px solid transparent; border-top-color: rgba(207,172,103,0.25);
+    }
+    .metric-tip:hover .tip-box { visibility: visible; opacity: 1; }
+    .tip-label { font-family: 'Montserrat', sans-serif; font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 5px; }
+    .tip-formula { color: var(--text-muted); margin-bottom: 5px; font-style: italic; }
+    .tip-why { color: var(--text-light); }
+    .info-box { background: var(--gold-faint2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 20px; }
+    .info-box strong { color: var(--gold); font-weight: 600; }
+
+    /* ── RESULT SECTION ── */
+    #review-results { display: none; margin-top: 32px; }
+    .result-card { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px 28px; margin-bottom: 20px; }
+    .result-title { font-size: 0.95rem; color: #fff; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+    .result-table { width: 100%; border-collapse: collapse; }
+    .result-table thead th { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); text-align: left; padding: 0 10px 10px; border-bottom: 1px solid var(--border); }
+    .result-table thead th.right { text-align: right; }
+    .result-table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .result-table tbody tr:last-child { border-bottom: none; }
+    .result-table tbody td { padding: 9px 10px; font-size: 0.83rem; vertical-align: middle; }
+    .result-table tbody td.right { text-align: right; }
+    .acct-divider-row td { padding: 12px 10px 6px; font-family: 'Montserrat', sans-serif; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); border-top: 1px solid var(--border); }
+    .status-msg { font-size: 0.75rem; color: var(--text-muted); font-style: italic; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); margin-top: 8px; }
+    .status-msg.exec { color: var(--green); background: var(--green-faint); font-style: normal; font-weight: 500; }
+
+    @media (max-width: 768px) {
+      /* Layout */
+      .page-sm, .page { padding: 16px 14px; }
+      .chart-grid-2 { grid-template-columns: 1fr; }
+      .kpi-row { grid-template-columns: 1fr 1fr; }
+
+      /* Tab bar — scrollable */
+      .tab-bar { padding: 0 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+      .tab-bar::-webkit-scrollbar { display: none; }
+      .tab-btn { padding: 12px 10px; font-size: 0.68rem; white-space: nowrap; flex-shrink: 0; }
+
+      /* Form */
+      .field-group { grid-template-columns: 1fr; }
+      .field-group-3 { grid-template-columns: 1fr 1fr; }
+      .acc-body { padding: 16px 14px; }
+      .card { padding: 18px 16px; }
+      .result-card { padding: 18px 16px; }
+
+      /* Tables — horizontal scroll */
+      .result-table, .input-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap; }
+
+      /* History */
+      .hist-metrics { grid-template-columns: repeat(2, 1fr); }
+      .hist-card { padding: 16px; }
+
+      /* Equity breakdown — stack vertically */
+      #chart-equity-breakdown-wrap { grid-template-columns: 1fr !important; }
+
+      /* KPI section */
+      .kpi-section { margin-bottom: 20px; }
+      .sum-card { padding: 14px 16px; }
+      .sum-value { font-size: 1.25rem; }
+
+      /* Buttons */
+      .btn-gold-outline, .btn-danger, .btn-secondary { padding: 7px 10px; font-size: 0.7rem; }
+
+      /* Charts */
+      .chart-wrap { padding: 16px 14px; }
+      .chart-canvas-wrap { height: 200px; }
+      .chart-canvas-wrap.tall { height: 240px; }
+    }
+
+    @media (max-width: 480px) {
+      .kpi-row { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+      .field-group-3 { grid-template-columns: 1fr; }
+      .hist-metrics { grid-template-columns: 1fr 1fr; }
+      .hist-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .sum-value { font-size: 1.1rem; }
+
+      /* Header */
+      .h-tool { display: none; }
+      .hd { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <img src="../cordoba-capital-site/cordoba_capital_arch_1.png" alt="Cordoba Capital" />
+  <div class="hd"></div>
+  <div>
+    <div class="h-name">Cordoba Capital</div>
+    <div class="h-sub">Private Client Tools</div>
+  </div>
+  <div class="hd"></div>
+  <div class="h-tool">Financial Dashboard</div>
+</header>
+
+<!-- TABS -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
+  <button class="tab-btn" onclick="switchTab('review')">Quarterly Review</button>
+  <button class="tab-btn" onclick="switchTab('history')">History</button>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB: DASHBOARD
+═════════════════════════════════════════════ -->
+<div id="tab-dashboard" class="tab-content active">
+  <div class="page">
+
+    <!-- Empty state -->
+    <div id="dash-empty" class="empty-state" style="display:none;">
+      <div class="empty-icon">📊</div>
+      <h2 class="empty-title">No Data Yet</h2>
+      <p class="empty-sub">Complete your first quarterly review to see your dashboard come to life.</p>
+      <button class="btn-primary" style="width:auto;display:inline-block;padding:12px 28px;" onclick="switchTab('review')">Start Quarterly Review</button>
+    </div>
+
+    <!-- Dashboard content -->
+    <div id="dash-content">
+
+      <!-- Summary cards -->
+      <div class="kpi-section" id="summary-cards"></div>
+
+      <!-- FI Progress -->
+      <div class="card" style="margin-bottom:28px;" id="fi-progress-card">
+        <div class="section-label">Financial Independence Progress</div>
+        <div id="fi-progress-content"></div>
+      </div>
+
+      <!-- Chart: Portfolio Value + Projection (full width) -->
+      <div class="chart-grid" style="margin-bottom:20px;">
+        <div class="chart-wrap full">
+          <div class="chart-title">Portfolio Value Over Time</div>
+          <div class="chart-sub">Historical values + 10% annual growth projection to age 59.5 (2048)</div>
+          <div class="milestone-bar">
+            <div class="ms"><div class="ms-dot" style="background:var(--gold);"></div>Historical</div>
+            <div class="ms"><div class="ms-dot" style="background:rgba(207,172,103,0.4);border:1px dashed var(--gold);"></div>Projected (10%/yr)</div>
+            <div class="ms"><div class="ms-dot" style="background:var(--green);"></div>FI Milestone (2029)</div>
+            <div class="ms"><div class="ms-dot" style="background:var(--blue);"></div>Portfolio Drawdown (2048)</div>
+          </div>
+          <div class="chart-canvas-wrap tall"><canvas id="chart-portfolio"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Charts row 2 -->
+      <div class="chart-grid chart-grid-2" style="margin-bottom:20px;">
+        <div class="chart-wrap">
+          <div class="chart-title">Net Worth Over Time</div>
+          <div class="chart-sub">Assets minus debts + debt-free projection (2030)</div>
+          <div class="chart-canvas-wrap"><canvas id="chart-networth"></canvas></div>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-title">Annual Rental Cash Flow</div>
+          <div class="chart-sub">Actual + projected with $115K FI target at age 40</div>
+          <div class="chart-canvas-wrap"><canvas id="chart-cashflow"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Charts row 3 -->
+      <div class="chart-grid chart-grid-2" style="margin-bottom:20px;">
+        <div class="chart-wrap">
+          <div class="chart-title">Contribution vs. Market Growth</div>
+          <div class="chart-sub">How much you put in vs. how much the market added</div>
+          <div class="chart-canvas-wrap"><canvas id="chart-contrib"></canvas></div>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-title">Portfolio by Asset Class</div>
+          <div class="chart-sub">Value of each holding over time</div>
+          <div class="chart-canvas-wrap"><canvas id="chart-assetclass"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Charts row 4: Equity Breakdown donut (full width, side by side inside) -->
+      <div class="chart-grid">
+        <div class="chart-wrap full">
+          <div class="chart-title">Equity Breakdown</div>
+          <div class="chart-sub">Your actual ownership share by asset class (equity value, not gross assets)</div>
+          <div id="chart-equity-breakdown-wrap" style="display:grid;grid-template-columns:320px 1fr;gap:32px;align-items:center;margin-top:8px;">
+            <div style="position:relative;height:280px;"><canvas id="chart-equity-breakdown"></canvas></div>
+            <div>
+              <div class="chart-title" style="margin-bottom:16px;">Equity by Asset Class</div>
+              <div id="equity-breakdown-legend" style="display:flex;flex-direction:column;gap:10px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB: QUARTERLY REVIEW
+═════════════════════════════════════════════ -->
+<div id="tab-review" class="tab-content">
+  <div class="page-sm">
+
+    <div style="margin-bottom:28px;">
+      <h2 style="font-size:1.6rem;color:#fff;margin-bottom:6px;">Quarterly Review</h2>
+      <p style="font-size:0.85rem;color:var(--text-muted);">Fill out each section and click Analyze. Takes about 15–20 minutes with account logins open.</p>
+    </div>
+
+    <div class="info-box">
+      <strong>Property Valuation:</strong> Click the ↗ link next to each estimate to open the source, then enter the value. Enter 3 recent sold comps (sqft + sold price) from the comp research. The tool calculates a weighted blended value automatically. <strong>Leave any estimate blank</strong> to exclude it from the weighting.
+    </div>
+
+    <!-- META -->
+    <div class="accordion">
+      <div class="acc-header open" onclick="toggleAcc(this)">
+        <div class="acc-title">📅 &nbsp;Review Date</div>
+        <div class="acc-arrow">▼</div>
+      </div>
+      <div class="acc-body open">
+        <div class="field-group">
+          <div class="field">
+            <label>As of Date</label>
+            <input type="date" id="r_date" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PORTFOLIO -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-title">📈 &nbsp;Portfolio Holdings</div>
+        <div class="acc-arrow">▼</div>
+      </div>
+      <div class="acc-body">
+        <table class="input-table">
+          <thead><tr><th>Account</th><th>Fund</th><th class="right">Current Value</th></tr></thead>
+          <tbody>
+            <tr><td><span class="acct-tag">401(k)</span></td><td>FXAIX — Large Cap</td><td class="right"><input type="text" class="money-input" id="h_fxaix_401k" placeholder="$0.00" /></td></tr>
+            <tr><td><span class="acct-tag">Roth 401(k)</span></td><td>FXAIX — Large Cap</td><td class="right"><input type="text" class="money-input" id="h_fxaix_r401k" placeholder="$0.00" /></td></tr>
+            <tr><td><span class="acct-tag">HSA</span></td><td>FSSNX — Small Cap</td><td class="right"><input type="text" class="money-input" id="h_fssnx_hsa" placeholder="$0.00" /></td></tr>
+            <tr><td><span class="acct-tag">HSA</span></td><td>BITB — Crypto BTC</td><td class="right"><input type="text" class="money-input" id="h_bitb_hsa" placeholder="$0.00" /></td></tr>
+            <tr><td><span class="acct-tag">HSA</span></td><td>ETHA — Crypto ETH</td><td class="right"><input type="text" class="money-input" id="h_etha_hsa" placeholder="$0.00" /></td></tr>
+            <tr><td><span class="acct-tag">HSA</span></td><td>IBLC — Crypto Infra</td><td class="right"><input type="text" class="money-input" id="h_iblc_hsa" placeholder="$0.00" /></td></tr>
+            <tr><td><span class="acct-tag">Roth IRA</span></td><td>SWSSX — Small Cap</td><td class="right"><input type="text" class="money-input" id="h_swssx_ira" placeholder="$0.00" /></td></tr>
+            <tr><td><span class="acct-tag">Roth IRA</span></td><td>SWISX — Intl Developed</td><td class="right"><input type="text" class="money-input" id="h_swisx_ira" placeholder="$0.00" /></td></tr>
+            <tr><td><span class="acct-tag">Roth IRA</span></td><td>VWO — Emerging Markets</td><td class="right"><input type="text" class="money-input" id="h_vwo_ira" placeholder="$0.00" /></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CONTRIBUTIONS -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-title">💰 &nbsp;Quarterly Contributions</div>
+        <div class="acc-arrow">▼</div>
+      </div>
+      <div class="acc-body">
+        <table class="input-table">
+          <thead><tr><th>Account</th><th></th><th class="right">This Quarter (Actual)</th><th class="right">Next Quarter (Planned)</th></tr></thead>
+          <tbody>
+            <tr><td><span class="acct-tag">401(k)</span></td><td>Traditional 401(k)</td><td class="right"><input type="text" class="money-input" id="c_401k" placeholder="$0.00" /></td><td class="right"><input type="text" class="money-input" id="cn_401k" placeholder="$0.00" /></td></tr>
+            <tr><td><span class="acct-tag">Roth 401(k)</span></td><td>Roth 401(k)</td><td class="right"><input type="text" class="money-input" id="c_r401k" placeholder="$0.00" /></td><td class="right"><input type="text" class="money-input" id="cn_r401k" placeholder="$0.00" /></td></tr>
+            <tr><td><span class="acct-tag">HSA</span></td><td>Health Savings Account</td><td class="right"><input type="text" class="money-input" id="c_hsa" placeholder="$0.00" /></td><td class="right"><input type="text" class="money-input" id="cn_hsa" placeholder="$0.00" /></td></tr>
+            <tr><td><span class="acct-tag">Roth IRA</span></td><td>Roth IRA (Backdoor)</td><td class="right"><input type="text" class="money-input" id="c_ira" placeholder="$0.00" /></td><td class="right"><input type="text" class="money-input" id="cn_ira" placeholder="$0.00" /></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BRADCLIFF -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-title"><span class="acc-badge">LTR</span> &nbsp;Bradcliff St — Memphis, TN</div>
+        <div class="acc-arrow">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sub-section">
+          <div class="sub-section-title">Property Valuation</div>
+          <div class="field-group field-group-3">
+            <div class="field"><label>Sq Footage</label><input type="text" class="sqft-input" id="brad_sqft" placeholder="e.g. 1,400" /></div>
+            <div class="field">
+              <label>Zillow Estimate <a class="avm-link" href="https://www.zillow.com/homedetails/5274-Bradcliff-St-Memphis-TN-38109/42253057_zpid/" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="brad_zillow" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>Redfin Estimate <a class="avm-link" href="https://www.redfin.com/TN/Memphis/5274-Bradcliff-St-38109/home/60780027" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="brad_redfin" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>Chase Estimate <a class="avm-link" href="https://www.chase.com/personal/mortgage/calculators-resources/home-value-estimator" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="brad_chase" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>Bank of America Estimate <a class="avm-link" href="https://homevaluerealestatecenter.bankofamerica.com/" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="brad_bofa" placeholder="$0" />
+            </div>
+          </div>
+          <div class="sub-section-title" style="margin-top:16px;">Recent Sold Comps (last 90 days, similar size)</div>
+          <div class="comp-row"><div><label>Comp 1 — Sq Ft</label><input type="text" class="sqft-input" id="brad_c1_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="brad_c1_price" placeholder="$0" /></div></div>
+          <div class="comp-row"><div><label>Comp 2 — Sq Ft</label><input type="text" class="sqft-input" id="brad_c2_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="brad_c2_price" placeholder="$0" /></div></div>
+          <div class="comp-row"><div><label>Comp 3 — Sq Ft</label><input type="text" class="sqft-input" id="brad_c3_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="brad_c3_price" placeholder="$0" /></div></div>
+          <div class="blended-display"><div><div class="blended-label">Blended Estimated Value</div><div class="note" style="margin-top:2px;">Weighted: Comps 35% · Redfin 25% · Zillow 20% · Chase 10% · BofA 10% (blank estimates excluded)</div></div><div class="blended-value" id="brad_blended">—</div></div>
+          <div class="field-group" style="margin-top:14px;">
+            <div class="field"><label>Purchase Price <span class="annual-note">— One-time entry for yield-on-cost cap rate</span></label><input type="text" class="money-input" id="brad_purchase_price" placeholder="$0" /></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-section">
+          <div class="sub-section-title">Income & Expenses (Quarterly)</div>
+          <div class="field-group field-group-3">
+            <div class="field"><label>Mortgage Balance</label><input type="text" class="money-input" id="brad_mortgage" placeholder="$0" /></div>
+            <div class="field"><label>Monthly P&amp;I <span class="annual-note">— Enter monthly amount</span></label><input type="text" class="money-input" id="brad_pi" placeholder="$0 / month" /></div>
+            <div class="field"><label>Total Cash Invested <span class="annual-note">— Down pmt + closing costs</span></label><input type="text" class="money-input" id="brad_cash_invested" placeholder="$0" /></div>
+            <div class="field"><label>Gross Rent</label><input type="text" class="money-input" id="brad_rent" placeholder="$0" /></div>
+            <div class="field"><label>Months Occupied</label><input type="text" id="brad_months_occupied" placeholder="e.g. 3" style="width:100%;text-align:right;" /></div>
+            <div class="field"><label>Property Mgmt Fee</label><input type="text" class="money-input" id="brad_pm" placeholder="$0" /></div>
+            <div class="field">
+              <label>Property Tax <span class="annual-note">— Enter annual amount</span></label>
+              <input type="text" class="money-input" id="brad_tax" placeholder="$0 / year" />
+            </div>
+            <div class="field">
+              <label>Insurance <span class="annual-note">— Enter annual amount</span></label>
+              <input type="text" class="money-input" id="brad_insurance" placeholder="$0 / year" />
+            </div>
+            <div class="field"><label>Repairs & Maintenance</label><input type="text" class="money-input" id="brad_rm" placeholder="$0" /></div>
+            <div class="field"><label>Utilities</label><input type="text" class="money-input" id="brad_util" placeholder="$0" /></div>
+            <div class="field"><label>Subscriptions</label><input type="text" class="money-input" id="brad_subs" placeholder="$0" /></div>
+            <div class="field"><label>CapEx, Furniture & Appliances</label><input type="text" class="money-input" id="brad_capex" placeholder="$0" /></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEELY -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-title"><span class="acc-badge">LTR</span> &nbsp;Neely Rd — Memphis, TN</div>
+        <div class="acc-arrow">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sub-section">
+          <div class="sub-section-title">Property Valuation</div>
+          <div class="field-group field-group-3">
+            <div class="field"><label>Sq Footage</label><input type="text" class="sqft-input" id="neely_sqft" placeholder="e.g. 1,350" /></div>
+            <div class="field">
+              <label>Zillow Estimate <a class="avm-link" href="https://www.zillow.com/homes/5168-Neely-Rd-Memphis,-TN-38109_rb/42252538_zpid/" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="neely_zillow" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>Redfin Estimate <a class="avm-link" href="https://www.redfin.com/TN/Memphis/5168-Neely-Rd-38109/home/87717696" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="neely_redfin" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>Chase Estimate <a class="avm-link" href="https://www.chase.com/personal/mortgage/calculators-resources/home-value-estimator" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="neely_chase" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>Bank of America Estimate <a class="avm-link" href="https://homevaluerealestatecenter.bankofamerica.com/" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="neely_bofa" placeholder="$0" />
+            </div>
+          </div>
+          <div class="sub-section-title" style="margin-top:16px;">Recent Sold Comps</div>
+          <div class="comp-row"><div><label>Comp 1 — Sq Ft</label><input type="text" class="sqft-input" id="neely_c1_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="neely_c1_price" placeholder="$0" /></div></div>
+          <div class="comp-row"><div><label>Comp 2 — Sq Ft</label><input type="text" class="sqft-input" id="neely_c2_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="neely_c2_price" placeholder="$0" /></div></div>
+          <div class="comp-row"><div><label>Comp 3 — Sq Ft</label><input type="text" class="sqft-input" id="neely_c3_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="neely_c3_price" placeholder="$0" /></div></div>
+          <div class="blended-display"><div><div class="blended-label">Blended Estimated Value</div></div><div class="blended-value" id="neely_blended">—</div></div>
+          <div class="field-group" style="margin-top:14px;">
+            <div class="field"><label>Purchase Price <span class="annual-note">— One-time entry for yield-on-cost cap rate</span></label><input type="text" class="money-input" id="neely_purchase_price" placeholder="$0" /></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-section">
+          <div class="sub-section-title">Income & Expenses (Quarterly)</div>
+          <div class="field-group field-group-3">
+            <div class="field"><label>Total Cash Invested <span class="annual-note">— Down pmt + closing costs</span></label><input type="text" class="money-input" id="neely_cash_invested" placeholder="$0" /></div>
+            <div class="field"><label>Gross Rent</label><input type="text" class="money-input" id="neely_rent" placeholder="$0" /></div>
+            <div class="field"><label>Months Occupied</label><input type="text" id="neely_months_occupied" placeholder="e.g. 3" style="width:100%;text-align:right;" /></div>
+            <div class="field"><label>Property Mgmt Fee</label><input type="text" class="money-input" id="neely_pm" placeholder="$0" /></div>
+            <div class="field">
+              <label>Property Tax <span class="annual-note">— Enter annual amount</span></label>
+              <input type="text" class="money-input" id="neely_tax" placeholder="$0 / year" />
+            </div>
+            <div class="field">
+              <label>Insurance <span class="annual-note">— Enter annual amount</span></label>
+              <input type="text" class="money-input" id="neely_insurance" placeholder="$0 / year" />
+            </div>
+            <div class="field"><label>Repairs & Maintenance</label><input type="text" class="money-input" id="neely_rm" placeholder="$0" /></div>
+            <div class="field"><label>Utilities</label><input type="text" class="money-input" id="neely_util" placeholder="$0" /></div>
+            <div class="field"><label>Subscriptions</label><input type="text" class="money-input" id="neely_subs" placeholder="$0" /></div>
+            <div class="field"><label>CapEx, Furniture & Appliances</label><input type="text" class="money-input" id="neely_capex" placeholder="$0" /></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GREENMOUNT -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-title"><span class="acc-badge">LTR</span> &nbsp;Greenmount Ave — Memphis, TN</div>
+        <div class="acc-arrow">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sub-section">
+          <div class="sub-section-title">Property Valuation</div>
+          <div class="field-group field-group-3">
+            <div class="field"><label>Sq Footage</label><input type="text" class="sqft-input" id="green_sqft" placeholder="e.g. 1,200" /></div>
+            <div class="field">
+              <label>Zillow Estimate <a class="avm-link" href="https://www.zillow.com/homes/4277-Greenmount-Ave-Memphis,-TN-38122_rb/42183341_zpid/" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="green_zillow" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>Redfin Estimate <a class="avm-link" href="https://www.redfin.com/TN/Memphis/4277-Greenmount-Ave-38122/home/87675907" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="green_redfin" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>Chase Estimate <a class="avm-link" href="https://www.chase.com/personal/mortgage/calculators-resources/home-value-estimator" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="green_chase" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>Bank of America Estimate <a class="avm-link" href="https://homevaluerealestatecenter.bankofamerica.com/" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="green_bofa" placeholder="$0" />
+            </div>
+          </div>
+          <div class="sub-section-title" style="margin-top:16px;">Recent Sold Comps</div>
+          <div class="comp-row"><div><label>Comp 1 — Sq Ft</label><input type="text" class="sqft-input" id="green_c1_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="green_c1_price" placeholder="$0" /></div></div>
+          <div class="comp-row"><div><label>Comp 2 — Sq Ft</label><input type="text" class="sqft-input" id="green_c2_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="green_c2_price" placeholder="$0" /></div></div>
+          <div class="comp-row"><div><label>Comp 3 — Sq Ft</label><input type="text" class="sqft-input" id="green_c3_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="green_c3_price" placeholder="$0" /></div></div>
+          <div class="blended-display"><div><div class="blended-label">Blended Estimated Value</div></div><div class="blended-value" id="green_blended">—</div></div>
+          <div class="field-group" style="margin-top:14px;">
+            <div class="field"><label>Purchase Price <span class="annual-note">— One-time entry for yield-on-cost cap rate</span></label><input type="text" class="money-input" id="green_purchase_price" placeholder="$0" /></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-section">
+          <div class="sub-section-title">Income & Expenses (Quarterly)</div>
+          <div class="field-group field-group-3">
+            <div class="field"><label>Total Cash Invested <span class="annual-note">— Down pmt + closing costs</span></label><input type="text" class="money-input" id="green_cash_invested" placeholder="$0" /></div>
+            <div class="field"><label>Gross Rent</label><input type="text" class="money-input" id="green_rent" placeholder="$0" /></div>
+            <div class="field"><label>Months Occupied</label><input type="text" id="green_months_occupied" placeholder="e.g. 3" style="width:100%;text-align:right;" /></div>
+            <div class="field"><label>Property Mgmt Fee</label><input type="text" class="money-input" id="green_pm" placeholder="$0" /></div>
+            <div class="field">
+              <label>Property Tax <span class="annual-note">— Enter annual amount</span></label>
+              <input type="text" class="money-input" id="green_tax" placeholder="$0 / year" />
+            </div>
+            <div class="field">
+              <label>Insurance <span class="annual-note">— Enter annual amount</span></label>
+              <input type="text" class="money-input" id="green_insurance" placeholder="$0 / year" />
+            </div>
+            <div class="field"><label>Repairs & Maintenance</label><input type="text" class="money-input" id="green_rm" placeholder="$0" /></div>
+            <div class="field"><label>Utilities</label><input type="text" class="money-input" id="green_util" placeholder="$0" /></div>
+            <div class="field"><label>Subscriptions</label><input type="text" class="money-input" id="green_subs" placeholder="$0" /></div>
+            <div class="field"><label>CapEx, Furniture & Appliances</label><input type="text" class="money-input" id="green_capex" placeholder="$0" /></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOLLADAY -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-title"><span class="acc-badge" style="background:rgba(91,155,213,0.15);color:var(--blue);">MTR</span> &nbsp;Holladay, UT</div>
+        <div class="acc-arrow">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sub-section">
+          <div class="sub-section-title">Property Valuation</div>
+          <div class="field-group field-group-3">
+            <div class="field"><label>Sq Footage</label><input type="text" class="sqft-input" id="holl_sqft" placeholder="e.g. 2,200" /></div>
+            <div class="field">
+              <label>Zillow Estimate <a class="avm-link" href="https://www.zillow.com/homes/2123-E-6320-S-Salt-Lake-City,-UT-84121_rb/12871797_zpid/" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="holl_zillow" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>Redfin Estimate <a class="avm-link" href="https://www.redfin.com/UT/Holladay/2123-E-6320-S-84121/home/91810043" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="holl_redfin" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>Chase Estimate <a class="avm-link" href="https://www.chase.com/personal/mortgage/calculators-resources/home-value-estimator" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="holl_chase" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>Bank of America Estimate <a class="avm-link" href="https://homevaluerealestatecenter.bankofamerica.com/" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="holl_bofa" placeholder="$0" />
+            </div>
+          </div>
+          <div class="sub-section-title" style="margin-top:16px;">Recent Sold Comps</div>
+          <div class="comp-row"><div><label>Comp 1 — Sq Ft</label><input type="text" class="sqft-input" id="holl_c1_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="holl_c1_price" placeholder="$0" /></div></div>
+          <div class="comp-row"><div><label>Comp 2 — Sq Ft</label><input type="text" class="sqft-input" id="holl_c2_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="holl_c2_price" placeholder="$0" /></div></div>
+          <div class="comp-row"><div><label>Comp 3 — Sq Ft</label><input type="text" class="sqft-input" id="holl_c3_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="holl_c3_price" placeholder="$0" /></div></div>
+          <div class="blended-display"><div><div class="blended-label">Blended Estimated Value</div></div><div class="blended-value" id="holl_blended">—</div></div>
+          <div class="field-group" style="margin-top:14px;">
+            <div class="field"><label>Purchase Price <span class="annual-note">— One-time entry for yield-on-cost cap rate</span></label><input type="text" class="money-input" id="holl_purchase_price" placeholder="$0" /></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-section">
+          <div class="sub-section-title">Income & Expenses (Quarterly)</div>
+          <div class="field-group field-group-3">
+            <div class="field"><label>Mortgage Balance</label><input type="text" class="money-input" id="holl_mortgage" placeholder="$0" /></div>
+            <div class="field"><label>Monthly P&amp;I <span class="annual-note">— Enter monthly amount</span></label><input type="text" class="money-input" id="holl_pi" placeholder="$0 / month" /></div>
+            <div class="field"><label>Total Cash Invested <span class="annual-note">— Down pmt + closing costs</span></label><input type="text" class="money-input" id="holl_cash_invested" placeholder="$0" /></div>
+            <div class="field"><label>Gross Rent (incl. utilities)</label><input type="text" class="money-input" id="holl_rent" placeholder="$0" /></div>
+            <div class="field"><label>Nights Available</label><input type="text" id="holl_nights_avail" placeholder="e.g. 91" style="width:100%;" /></div>
+            <div class="field"><label>Nights Booked</label><input type="text" id="holl_nights_booked" placeholder="e.g. 70" style="width:100%;" /></div>
+            <div class="field"><label>Platform Fees</label><input type="text" class="money-input" id="holl_platform" placeholder="$0" /></div>
+            <div class="field">
+              <label>Property Tax <span class="annual-note">— Enter annual amount</span></label>
+              <input type="text" class="money-input" id="holl_tax" placeholder="$0 / year" />
+            </div>
+            <div class="field">
+              <label>Insurance <span class="annual-note">— Enter annual amount</span></label>
+              <input type="text" class="money-input" id="holl_insurance" placeholder="$0 / year" />
+            </div>
+            <div class="field"><label>Repairs & Maintenance</label><input type="text" class="money-input" id="holl_rm" placeholder="$0" /></div>
+            <div class="field"><label>Utilities</label><input type="text" class="money-input" id="holl_util" placeholder="$0" /></div>
+            <div class="field"><label>Supplies</label><input type="text" class="money-input" id="holl_supplies" placeholder="$0" /></div>
+            <div class="field"><label>Subscriptions</label><input type="text" class="money-input" id="holl_subs" placeholder="$0" /></div>
+            <div class="field"><label>CapEx, Furniture & Appliances</label><input type="text" class="money-input" id="holl_capex" placeholder="$0" /></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BROKEN BOW -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-title"><span class="acc-badge" style="background:rgba(230,126,34,0.15);color:var(--orange);">STR</span> &nbsp;Broken Bow, OK</div>
+        <div class="acc-arrow">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sub-section">
+          <div class="sub-section-title">Property Valuation</div>
+          <div class="field-group field-group-3">
+            <div class="field"><label>Sq Footage</label><input type="text" class="sqft-input" id="bb_sqft" placeholder="e.g. 2,500" /></div>
+            <div class="field">
+              <label>Zillow Estimate <a class="avm-link" href="https://www.zillow.com/homes/200-Stevens-Rd-Broken-Bow,-OK-74728_rb/231580495_zpid/" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="bb_zillow" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>Redfin Estimate <a class="avm-link" href="https://www.redfin.com/OK/Broken-Bow/200-Stevens-Rd-74728/home/74201965" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="bb_redfin" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>Chase Estimate <a class="avm-link" href="https://www.chase.com/personal/mortgage/calculators-resources/home-value-estimator" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="bb_chase" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>Bank of America Estimate <a class="avm-link" href="https://homevaluerealestatecenter.bankofamerica.com/" target="_blank">↗</a></label>
+              <input type="text" class="money-input" id="bb_bofa" placeholder="$0" />
+            </div>
+          </div>
+          <div class="sub-section-title" style="margin-top:16px;">Recent Sold Comps</div>
+          <div class="comp-row"><div><label>Comp 1 — Sq Ft</label><input type="text" class="sqft-input" id="bb_c1_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="bb_c1_price" placeholder="$0" /></div></div>
+          <div class="comp-row"><div><label>Comp 2 — Sq Ft</label><input type="text" class="sqft-input" id="bb_c2_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="bb_c2_price" placeholder="$0" /></div></div>
+          <div class="comp-row"><div><label>Comp 3 — Sq Ft</label><input type="text" class="sqft-input" id="bb_c3_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="bb_c3_price" placeholder="$0" /></div></div>
+          <div class="blended-display"><div><div class="blended-label">Blended Estimated Value</div></div><div class="blended-value" id="bb_blended">—</div></div>
+          <div class="field-group" style="margin-top:14px;">
+            <div class="field"><label>Purchase Price <span class="annual-note">— One-time entry for yield-on-cost cap rate</span></label><input type="text" class="money-input" id="bb_purchase_price" placeholder="$0" /></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-section">
+          <div class="sub-section-title">Income & Expenses (Quarterly)</div>
+          <div class="field-group field-group-3">
+            <div class="field"><label>Primary Mortgage Balance</label><input type="text" class="money-input" id="bb_mortgage1" placeholder="$0" /></div>
+            <div class="field"><label>Monthly P&amp;I — Primary <span class="annual-note">— Enter monthly amount</span></label><input type="text" class="money-input" id="bb_pi1" placeholder="$0 / month" /></div>
+            <div class="field"><label>Seller Finance Balance</label><input type="text" class="money-input" id="bb_mortgage2" placeholder="$0" /></div>
+            <div class="field"><label>Monthly P&amp;I — Seller Note <span class="annual-note">— Enter monthly amount</span></label><input type="text" class="money-input" id="bb_pi2" placeholder="$0 / month" /></div>
+            <div class="field"><label>Total Cash Invested <span class="annual-note">— Down pmt + closing costs</span></label><input type="text" class="money-input" id="bb_cash_invested" placeholder="$0" /></div>
+            <div class="field"><label>Gross Booking Revenue</label><input type="text" class="money-input" id="bb_revenue" placeholder="$0" /></div>
+            <div class="field"><label>Nights Available</label><input type="text" id="bb_nights_avail" placeholder="e.g. 91" style="width:100%;" /></div>
+            <div class="field"><label>Nights Booked</label><input type="text" id="bb_nights_booked" placeholder="e.g. 52" style="width:100%;" /></div>
+            <div class="field"><label>Platform Fees</label><input type="text" class="money-input" id="bb_platform" placeholder="$0" /></div>
+            <div class="field">
+              <label>Property Tax <span class="annual-note">— Enter annual amount</span></label>
+              <input type="text" class="money-input" id="bb_tax" placeholder="$0 / year" />
+            </div>
+            <div class="field">
+              <label>Insurance <span class="annual-note">— Enter annual amount</span></label>
+              <input type="text" class="money-input" id="bb_insurance" placeholder="$0 / year" />
+            </div>
+            <div class="field"><label>Repairs & Maintenance</label><input type="text" class="money-input" id="bb_rm" placeholder="$0" /></div>
+            <div class="field"><label>Utilities</label><input type="text" class="money-input" id="bb_util" placeholder="$0" /></div>
+            <div class="field"><label>Supplies</label><input type="text" class="money-input" id="bb_supplies" placeholder="$0" /></div>
+            <div class="field"><label>Subscriptions</label><input type="text" class="money-input" id="bb_subs" placeholder="$0" /></div>
+            <div class="field"><label>CapEx, Furniture & Appliances</label><input type="text" class="money-input" id="bb_capex" placeholder="$0" /></div>
+            <div class="field"><label>Lodging & Sales Tax</label><input type="text" class="money-input" id="bb_lodging_tax" placeholder="$0" /></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OTHER ASSETS & DEBTS -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-title">🏦 &nbsp;Other Assets & Debts</div>
+        <div class="acc-arrow">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sub-section">
+          <div class="sub-section-title">Other Assets</div>
+          <div class="field-group field-group-3">
+            <div class="field"><label>Series I Bonds</label><input type="text" class="money-input" id="a_ibonds" placeholder="$0" /></div>
+            <div class="field"><label>Muni Bonds (Brokerage)</label><input type="text" class="money-input" id="a_muni" placeholder="$0" /></div>
+            <div class="field"><label>Liquid Cash</label><input type="text" class="money-input" id="a_cash" placeholder="$0" /></div>
+            <div class="field"><label>Other</label><input type="text" class="money-input" id="a_other" placeholder="$0" /></div>
+          </div>
+        </div>
+        <div class="sub-section">
+          <div class="sub-section-title">W-2 Income</div>
+          <div class="field-group">
+            <div class="field">
+              <label>Annual W-2 Salary <span class="annual-note">— Used to calculate savings rate</span></label>
+              <input type="text" class="money-input" id="w2_annual" placeholder="$0 / year" />
+            </div>
+          </div>
+        </div>
+        <div class="sub-section">
+          <div class="sub-section-title">Other Savings This Quarter</div>
+          <div class="field-group field-group-3">
+            <div class="field"><label>I Bond Purchases</label><input type="text" class="money-input" id="s_ibonds" placeholder="$0" /></div>
+            <div class="field"><label>Extra Mortgage Principal</label><input type="text" class="money-input" id="s_extra_principal" placeholder="$0" /></div>
+            <div class="field"><label>Additional Savings <span class="annual-note">— Money market, munis, etc.</span></label><input type="text" class="money-input" id="s_other" placeholder="$0" /></div>
+          </div>
+        </div>
+        <div class="sub-section">
+          <div class="sub-section-title">Other Debts</div>
+          <div class="field-group">
+            <div class="field"><label>Non-Mortgage Debt</label><input type="text" class="money-input" id="d_other" placeholder="$0" /></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:28px;">
+      <button class="btn-primary" onclick="runReview()">Analyze &amp; Save Quarter</button>
+      <button class="btn-secondary" style="width:100%;margin-top:10px;display:block;text-align:center;" onclick="prefillDemo()">Load Q2 2026 Starting Values</button>
+      <button class="btn-secondary" style="width:100%;margin-top:6px;display:block;text-align:center;opacity:0.6;" onclick="prefillDemoQ1()">Load Q1 2026 Demo (for trend arrow preview)</button>
+      <div id="draft-status" style="text-align:center;font-size:0.68rem;color:var(--text-muted);margin-top:10px;height:16px;"></div>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="review-results">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+        <h3 style="font-size:1.2rem;color:#fff;">Q Analysis Results</h3>
+        <button class="btn-gold-outline" onclick="window.print()">🖨 Save / Print</button>
+      </div>
+
+      <!-- Net Worth Summary -->
+      <div class="result-card">
+        <div class="result-title"><span class="step-pill">Overview</span> Quarter Snapshot</div>
+        <div class="summary-grid" id="res-summary" style="margin-bottom:0;"></div>
+      </div>
+
+      <!-- Drift Check -->
+      <div class="result-card">
+        <div class="result-title"><span class="step-pill">Step 1</span> Portfolio Drift Check</div>
+        <table class="result-table">
+          <thead><tr><th>Asset Class</th><th>Fund(s)</th><th class="right">Amount</th><th class="right">Target</th><th class="right">Actual</th><th class="right">Deviation</th><th class="right">Status</th></tr></thead>
+          <tbody id="res-drift"></tbody>
+        </table>
+      </div>
+
+      <!-- Contribution Allocation -->
+      <div class="result-card">
+        <div class="result-title"><span class="step-pill">Step 2</span> Contribution Allocation</div>
+        <div id="res-contrib"></div>
+      </div>
+
+      <!-- Trade Instructions -->
+      <div class="result-card">
+        <div class="result-title"><span class="step-pill">Step 3</span> Trade Instructions</div>
+        <div id="res-trades"></div>
+      </div>
+
+      <!-- Property Summary -->
+      <div class="result-card">
+        <div class="result-title"><span class="step-pill">Properties</span> Cash Flow Summary</div>
+        <table class="result-table">
+          <thead><tr>
+            <th>Property</th><th>Type</th>
+            <th class="right">Est. Value</th>
+            <th class="right">Q Revenue</th>
+            <th class="right">Q Expenses</th>
+            <th class="right">Q Net</th>
+            <th class="right"><span class="metric-tip">Annual Net<span class="tip-box">
+              <div class="tip-label">Annual Net Cash Flow</div>
+              <div class="tip-formula">YTD Actuals + Avg Quarterly CF Ex-CapEx × Remaining Quarters</div>
+              <div class="tip-why">Projects your full-year cash flow using real data where it exists. CapEx is excluded from the forward projection since it's non-recurring — prevents one-time purchases from distorting your annual outlook.</div>
+            </span></span></th>
+          </tr></thead>
+          <tbody id="res-properties"></tbody>
+        </table>
+      </div>
+
+      <!-- Property Investment Metrics — Returns -->
+      <div class="result-card">
+        <div class="result-title"><span class="step-pill">Properties</span> Return Metrics</div>
+        <table class="result-table">
+          <thead><tr>
+            <th>Property</th>
+            <th class="right"><span class="metric-tip">Cap Rate (MV)<span class="tip-box">
+              <div class="tip-label">Capitalization Rate — Market Value</div>
+              <div class="tip-formula">Annualized NOI ÷ Current Market Value</div>
+              <div class="tip-why">Shows what yield your property generates relative to what it's worth today. Use this to compare against other investments or benchmark against local market cap rates.</div>
+            </span></span></th>
+            <th class="right"><span class="metric-tip">Cap Rate (Cost)<span class="tip-box">
+              <div class="tip-label">Capitalization Rate — Purchase Price</div>
+              <div class="tip-formula">Annualized NOI ÷ Original Purchase Price</div>
+              <div class="tip-why">Your locked-in yield at acquisition. Useful for seeing how your original underwriting holds up over time — this number never changes regardless of market swings.</div>
+            </span></span></th>
+            <th class="right"><span class="metric-tip">Cash-on-Cash<span class="tip-box">
+              <div class="tip-label">Cash-on-Cash Return</div>
+              <div class="tip-formula">Annualized Net CF After P&amp;I ÷ Total Cash Invested</div>
+              <div class="tip-why">The truest measure of your actual cash return on the money you put in. Accounts for financing — a leveraged property can have a high CoC even with a modest cap rate.</div>
+            </span></span></th>
+            <th class="right"><span class="metric-tip">ROE<span class="tip-box">
+              <div class="tip-label">Return on Equity</div>
+              <div class="tip-formula">Annualized Net CF ÷ Current Equity (Value − Mortgage)</div>
+              <div class="tip-why">Measures how hard your equity is working. As properties appreciate and mortgages pay down, ROE tends to fall — signaling when it might make sense to 1031 into a larger asset.</div>
+            </span></span></th>
+            <th class="right"><span class="metric-tip">DSCR<span class="tip-box">
+              <div class="tip-label">Debt Service Coverage Ratio</div>
+              <div class="tip-formula">Annualized NOI ÷ Annualized P&amp;I Payments</div>
+              <div class="tip-why">Shows how comfortably income covers debt. ≥1.25x is healthy — lenders typically require this. Below 1.0x means the property can't service its own debt from income alone.</div>
+            </span></span></th>
+          </tr></thead>
+          <tbody id="res-prop-returns"></tbody>
+        </table>
+      </div>
+
+      <!-- Property Investment Metrics — Operations -->
+      <div class="result-card">
+        <div class="result-title"><span class="step-pill">Properties</span> Operating Metrics</div>
+        <table class="result-table">
+          <thead><tr>
+            <th>Property</th>
+            <th class="right"><span class="metric-tip">OER<span class="tip-box">
+              <div class="tip-label">Operating Expense Ratio</div>
+              <div class="tip-formula">Operating Expenses ÷ Gross Revenue</div>
+              <div class="tip-why">What share of income goes to expenses before debt service. ≤50% is strong, ≤70% is acceptable, &gt;70% signals the property is consuming too much of its own income.</div>
+            </span></span></th>
+            <th class="right"><span class="metric-tip">Occupancy<span class="tip-box">
+              <div class="tip-label">Occupancy Rate</div>
+              <div class="tip-formula">STR/MTR: Nights Booked ÷ Nights Available · LTR: Months Occupied ÷ 3</div>
+              <div class="tip-why">How often your rental is actually generating revenue. Higher is better, but very high occupancy can mean you're underpriced — balance with ADR.</div>
+            </span></span></th>
+            <th class="right"><span class="metric-tip">ADR<span class="tip-box">
+              <div class="tip-label">Average Daily Rate</div>
+              <div class="tip-formula">STR/MTR: Gross Revenue ÷ Nights Booked · LTR: Gross Revenue ÷ Months Occupied</div>
+              <div class="tip-why">Your average rate per booked period. For STR/MTR this is nightly; for LTR this is monthly rent per occupied month. Track alongside occupancy — a rising ADR with stable occupancy means your pricing strategy is working.</div>
+            </span></span></th>
+            <th class="right"><span class="metric-tip">RevPAR<span class="tip-box">
+              <div class="tip-label">Revenue Per Available Night</div>
+              <div class="tip-formula">STR/MTR: Gross Revenue ÷ Nights Available · LTR: Gross Revenue ÷ 3 Months</div>
+              <div class="tip-why">The single best top-line performance metric for STR/MTR — combines occupancy and rate into one number. Lets you benchmark quarters against each other regardless of how many nights were available.</div>
+            </span></span></th>
+            <th class="right"><span class="metric-tip">Breakeven Occ<span class="tip-box">
+              <div class="tip-label">Breakeven Occupancy</div>
+              <div class="tip-formula">Total Expenses Incl. P&amp;I ÷ ADR ÷ Nights Available</div>
+              <div class="tip-why">The occupancy rate you need just to cover all costs. If your actual occupancy is above this, you're profitable. Useful for stress-testing slow seasons and setting pricing floors.</div>
+            </span></span></th>
+          </tr></thead>
+          <tbody id="res-prop-ops"></tbody>
+        </table>
+      </div>
+
+      <!-- Debt Paydown & Savings -->
+      <div class="result-card">
+        <div class="result-title"><span class="step-pill">Progress</span> Debt Paydown &amp; Savings Rate</div>
+        <div id="res-paydown"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB: HISTORY
+═════════════════════════════════════════════ -->
+<div id="tab-history" class="tab-content">
+  <div class="page">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h2 style="font-size:1.6rem;color:#fff;margin-bottom:4px;">Quarter History</h2>
+        <p style="font-size:0.82rem;color:var(--text-muted);">All saved quarterly snapshots</p>
+      </div>
+      <button class="btn-danger" onclick="clearAllData()">Clear All Data</button>
+    </div>
+    <div id="history-content"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     JAVASCRIPT
+═════════════════════════════════════════════ -->
+<script>
+// ── CONSTANTS ──────────────────────────────────────────────────────────────
+const BIRTH_YEAR = 1989;
+const FI_TARGET_CASH = 115000;
+const FI_TARGET_YEAR = 2029;
+const DEBT_FREE_YEAR = 2030;
+const DRAWDOWN_AGE   = 59.5;
+const DRAWDOWN_YEAR  = BIRTH_YEAR + DRAWDOWN_AGE;
+const DRAWDOWN_INCOME = 250000;
+const PORTFOLIO_RETURN = 0.10;
+const SAFE_WITHDRAWAL = 0.04;
+const STORAGE_KEY = 'cordoba_fin_v1';
+const DRAFT_KEY   = 'cordoba_draft_v1';
+
+const TARGETS = {
+  'Large Cap': 0.57, 'Small Cap': 0.17, 'Intl Developed': 0.15,
+  'Emerging Markets': 0.07, 'Crypto – BTC': 0.0175, 'Crypto – ETH': 0.0075, 'Crypto – Infra': 0.015,
+};
+const AC_FUNDS = {
+  'Large Cap':'FXAIX', 'Small Cap':'SWSSX / FSSNX', 'Intl Developed':'SWISX',
+  'Emerging Markets':'VWO', 'Crypto – BTC':'BITB', 'Crypto – ETH':'ETHA', 'Crypto – Infra':'IBLC',
+};
+const DRIFT_THRESHOLD = 0.05;
+
+const C = {
+  gold:'#cfac67', green:'#4caf7d', red:'#e05c5c', blue:'#5b9bd5',
+  orange:'#e67e22', purple:'#9b59b6', teal:'#1abc9c',
+  largecap:'#cfac67', smallcap:'#5b9bd5', intl:'#4caf7d',
+  em:'#e67e22', btc:'#f7931a', eth:'#627eea', infra:'#9b59b6',
+};
+
+// ── UTILITIES ──────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+
+// Parse money-formatted string or plain number
+const v = id => {
+  const raw = ($(id)?.value || '').replace(/[$,\s]/g, '');
+  return parseFloat(raw) || 0;
+};
+
+const fmt$  = n => '$' + Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+const fmt$d = n => '$' + Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtPct = n => (n>=0?'+':'') + (n*100).toFixed(1)+'%';
+const fmtPctAbs = n => (n*100).toFixed(1)+'%';
+const ageAt = year => year - BIRTH_YEAR;
+
+function getQuarter(dateStr) {
+  const d = new Date(dateStr);
+  return 'Q' + (Math.floor(d.getMonth()/3)+1) + ' ' + d.getFullYear();
+}
+
+// ── MONEY FORMAT ───────────────────────────────────────────────────────────
+function fmtMoneyStr(num) {
+  return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function formatMoneyEl(el) {
+  const raw = el.value.replace(/[$,\s]/g, '');
+  if (!raw) return;
+  const num = parseFloat(raw);
+  if (!isNaN(num)) el.value = fmtMoneyStr(num);
+}
+
+function setMoney(id, num) {
+  const el = $(id);
+  if (el) el.value = num > 0 ? fmtMoneyStr(num) : '';
+}
+
+function attachMoneyFormatters() {
+  document.querySelectorAll('.money-input').forEach(el => {
+    el.addEventListener('focus', () => {
+      const raw = el.value.replace(/[$,\s]/g, '');
+      if (raw) el.value = raw;
+    });
+    el.addEventListener('blur', () => formatMoneyEl(el));
+  });
+  document.querySelectorAll('.sqft-input').forEach(el => {
+    el.addEventListener('focus', () => {
+      const raw = el.value.replace(/[,\s]/g, '');
+      if (raw) el.value = raw;
+    });
+    el.addEventListener('blur', () => {
+      const raw = el.value.replace(/[,\s]/g, '');
+      const num = parseInt(raw, 10);
+      if (!isNaN(num)) el.value = num.toLocaleString('en-US');
+    });
+  });
+}
+
+
+// ── STORAGE ────────────────────────────────────────────────────────────────
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { quarters: [] }; }
+  catch { return { quarters: [] }; }
+}
+function saveData(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+function getQuarters() { return loadData().quarters.sort((a,b)=>new Date(a.date)-new Date(b.date)); }
+
+// ── DRAFT AUTOSAVE ─────────────────────────────────────────────────────────
+const DRAFT_FIELD_IDS = [
+  'r_date',
+  'h_fxaix_401k','h_fxaix_r401k','h_fssnx_hsa','h_bitb_hsa','h_etha_hsa','h_iblc_hsa','h_swssx_ira','h_swisx_ira','h_vwo_ira',
+  'c_401k','c_r401k','c_hsa','c_ira',
+  'cn_401k','cn_r401k','cn_hsa','cn_ira',
+  'brad_sqft','brad_zillow','brad_redfin','brad_chase','brad_bofa',
+  'brad_c1_sqft','brad_c1_price','brad_c2_sqft','brad_c2_price','brad_c3_sqft','brad_c3_price',
+  'brad_mortgage','brad_rent','brad_months_occupied','brad_pm','brad_rm','brad_util','brad_subs','brad_capex',
+  'neely_sqft','neely_zillow','neely_redfin','neely_chase','neely_bofa',
+  'neely_c1_sqft','neely_c1_price','neely_c2_sqft','neely_c2_price','neely_c3_sqft','neely_c3_price',
+  'neely_rent','neely_months_occupied','neely_pm','neely_rm','neely_util','neely_subs','neely_capex',
+  'green_sqft','green_zillow','green_redfin','green_chase','green_bofa',
+  'green_c1_sqft','green_c1_price','green_c2_sqft','green_c2_price','green_c3_sqft','green_c3_price',
+  'green_rent','green_months_occupied','green_pm','green_rm','green_util','green_subs','green_capex',
+  'holl_sqft','holl_zillow','holl_redfin','holl_chase','holl_bofa',
+  'holl_c1_sqft','holl_c1_price','holl_c2_sqft','holl_c2_price','holl_c3_sqft','holl_c3_price',
+  'holl_mortgage','holl_rent','holl_nights_avail','holl_nights_booked','holl_platform','holl_rm','holl_util','holl_supplies','holl_subs','holl_capex',
+  'bb_sqft','bb_zillow','bb_redfin','bb_chase','bb_bofa',
+  'bb_c1_sqft','bb_c1_price','bb_c2_sqft','bb_c2_price','bb_c3_sqft','bb_c3_price',
+  'bb_mortgage1','bb_mortgage2','bb_revenue','bb_nights_avail','bb_nights_booked','bb_platform','bb_rm','bb_util','bb_supplies','bb_subs','bb_capex','bb_lodging_tax',
+  'a_ibonds','a_muni','a_cash','a_other','d_other',
+  's_ibonds','s_extra_principal','s_other',
+];
+
+let draftTimer = null;
+
+function saveDraft() {
+  const draft = {};
+  DRAFT_FIELD_IDS.forEach(id => {
+    const el = $(id);
+    if (el) draft[id] = el.value;
+  });
+  localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+  const status = $('draft-status');
+  if (status) {
+    const now = new Date();
+    const t = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    status.textContent = `Draft saved at ${t}`;
+  }
+}
+
+function loadDraft() {
+  try { return JSON.parse(localStorage.getItem(DRAFT_KEY)) || null; }
+  catch { return null; }
+}
+
+function restoreDraft() {
+  const draft = loadDraft();
+  if (!draft) return;
+  DRAFT_FIELD_IDS.forEach(id => {
+    const el = $(id);
+    if (el && draft[id] !== undefined && draft[id] !== '') el.value = draft[id];
+  });
+  recalcAllBlended();
+  const status = $('draft-status');
+  if (status) status.textContent = 'Draft restored — pick up where you left off.';
+}
+
+function clearDraft() {
+  localStorage.removeItem(DRAFT_KEY);
+  const status = $('draft-status');
+  if (status) status.textContent = '';
+}
+
+// ── STICKY ANNUAL VALUES ───────────────────────────────────────────────────
+const STICKY_KEY = 'cordoba_sticky_v1';
+const STICKY_IDS = [
+  'brad_tax','brad_insurance','brad_pi','brad_cash_invested','brad_purchase_price',
+  'neely_tax','neely_insurance','neely_cash_invested','neely_purchase_price',
+  'green_tax','green_insurance','green_cash_invested','green_purchase_price',
+  'holl_tax','holl_insurance','holl_pi','holl_cash_invested','holl_purchase_price',
+  'bb_tax','bb_insurance','bb_pi1','bb_pi2','bb_cash_invested','bb_purchase_price',
+  'w2_annual',
+];
+
+function loadSticky() {
+  try { return JSON.parse(localStorage.getItem(STICKY_KEY)) || {}; }
+  catch { return {}; }
+}
+
+function saveSticky(id, value) {
+  const sticky = loadSticky();
+  sticky[id] = value;
+  localStorage.setItem(STICKY_KEY, JSON.stringify(sticky));
+}
+
+function initSticky() {
+  const sticky = loadSticky();
+  STICKY_IDS.forEach(id => {
+    const el = $(id);
+    if (!el) return;
+    // Restore saved value if field is empty, then format it
+    if (sticky[id] && !el.value) {
+      el.value = sticky[id];
+      formatMoneyEl(el);
+    }
+    // Save on change (fires after blur, so value is already formatted)
+    el.addEventListener('change', () => saveSticky(id, el.value));
+  });
+}
+
+function initAutosave() {
+  DRAFT_FIELD_IDS.forEach(id => {
+    const el = $(id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      clearTimeout(draftTimer);
+      draftTimer = setTimeout(saveDraft, 800);
+    });
+  });
+}
+
+// ── ACCORDION ──────────────────────────────────────────────────────────────
+function toggleAcc(header) {
+  const body = header.nextElementSibling;
+  header.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+// ── TABS ───────────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    const names = ['dashboard','review','history'];
+    b.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  $('tab-'+name).classList.add('active');
+  if (name === 'dashboard') renderDashboard();
+  if (name === 'history')   renderHistory();
+}
+
+// ── BLENDED VALUATION ──────────────────────────────────────────────────────
+// AVMs with value 0 (blank) are automatically excluded from weighting
+function blendedVal(zillow, redfin, chase, bofa, sqft, comps) {
+  const avms = [];
+  if (zillow>0) avms.push({v:zillow, w:20});
+  if (redfin>0) avms.push({v:redfin, w:25});
+  if (chase>0)  avms.push({v:chase,  w:10});
+  if (bofa>0)   avms.push({v:bofa,   w:10});
+  if (avms.length === 0) return 0;
+
+  const validComps = comps.filter(c=>c.sqft>0&&c.price>0);
+  let compVal=0, compW=0;
+  if (validComps.length>0 && sqft>0) {
+    const avgPsf = validComps.reduce((s,c)=>s+c.price/c.sqft,0)/validComps.length;
+    compVal = avgPsf * sqft;
+    compW = 35;
+  }
+
+  const totalAVMW = avms.reduce((s,a)=>s+a.w,0);
+  const availAVMW = 100 - compW;
+  let result = compVal * (compW/100);
+  for (const a of avms) {
+    result += a.v * ((a.w/totalAVMW)*availAVMW/100);
+  }
+  return result;
+}
+
+function attachBlendedListeners(prefix, displayId) {
+  const ids = [prefix+'_zillow',prefix+'_redfin',prefix+'_chase',prefix+'_bofa',
+               prefix+'_sqft',
+               prefix+'_c1_sqft',prefix+'_c1_price',
+               prefix+'_c2_sqft',prefix+'_c2_price',
+               prefix+'_c3_sqft',prefix+'_c3_price'];
+  ids.forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('input', () => updateBlended(prefix, displayId));
+    if (el) el.addEventListener('change', () => updateBlended(prefix, displayId));
+  });
+}
+function updateBlended(prefix, displayId) {
+  const bv = blendedVal(v(prefix+'_zillow'), v(prefix+'_redfin'), v(prefix+'_chase'), v(prefix+'_bofa'),
+    v(prefix+'_sqft'),
+    [{sqft:v(prefix+'_c1_sqft'),price:v(prefix+'_c1_price')},
+     {sqft:v(prefix+'_c2_sqft'),price:v(prefix+'_c2_price')},
+     {sqft:v(prefix+'_c3_sqft'),price:v(prefix+'_c3_price')}]);
+  $(displayId).textContent = bv > 0 ? fmt$(bv) : '—';
+}
+
+function recalcAllBlended() {
+  ['brad','neely','green','holl','bb'].forEach(p => updateBlended(p, p+'_blended'));
+}
+
+// ── PORTFOLIO MATH ─────────────────────────────────────────────────────────
+function getAllocPct(gaps, key, keys) {
+  const posSum = keys.reduce((s,k)=>s+Math.max(0,gaps[k]),0);
+  if (posSum > 0) return Math.max(0, gaps[key]) / posSum;
+  const invSum = keys.reduce((s,k)=>s+1/Math.max(Math.abs(gaps[k]),0.01),0);
+  return (1/Math.max(Math.abs(gaps[key]),0.01))/invSum;
+}
+
+// ── RUN REVIEW ─────────────────────────────────────────────────────────────
+function runReview() {
+  const dateStr = $('r_date').value || new Date().toISOString().split('T')[0];
+  const data = loadData();
+
+  // Portfolio
+  const port = {
+    fxaix_401k:  v('h_fxaix_401k'),  fxaix_r401k: v('h_fxaix_r401k'),
+    fssnx_hsa:   v('h_fssnx_hsa'),   bitb_hsa:    v('h_bitb_hsa'),
+    etha_hsa:    v('h_etha_hsa'),     iblc_hsa:    v('h_iblc_hsa'),
+    swssx_ira:   v('h_swssx_ira'),    swisx_ira:   v('h_swisx_ira'),
+    vwo_ira:     v('h_vwo_ira'),
+  };
+  port.total = Object.values(port).reduce((s,x)=>s+x,0);
+
+  // Contributions — actual (this quarter, used for savings rate + growth chart)
+  const contrib = { c401k:v('c_401k'), r401k:v('c_r401k'), hsa:v('c_hsa'), ira:v('c_ira') };
+  contrib.total = contrib.c401k + contrib.r401k + contrib.hsa + contrib.ira;
+
+  // Planned contributions — next quarter (used for Step 2 allocation guidance)
+  const contribNext = { c401k:v('cn_401k'), r401k:v('cn_r401k'), hsa:v('cn_hsa'), ira:v('cn_ira') };
+  contribNext.total = contribNext.c401k + contribNext.r401k + contribNext.hsa + contribNext.ira;
+
+  // Properties — property tax and insurance are entered annually, divide by 4 for quarterly
+  function propVal(p) {
+    return blendedVal(v(p+'_zillow'),v(p+'_redfin'),v(p+'_chase'),v(p+'_bofa'),
+      v(p+'_sqft'),
+      [{sqft:v(p+'_c1_sqft'),price:v(p+'_c1_price')},
+       {sqft:v(p+'_c2_sqft'),price:v(p+'_c2_price')},
+       {sqft:v(p+'_c3_sqft'),price:v(p+'_c3_price')}]);
+  }
+
+  const props = {
+    bradcliff: {
+      value: propVal('brad'),
+      mortgage: v('brad_mortgage'),
+      pi: v('brad_pi'),
+      cashInvested: v('brad_cash_invested'),
+      purchasePrice: v('brad_purchase_price'),
+      monthsOccupied: v('brad_months_occupied'),
+      income: { gross: v('brad_rent') },
+      expenses: { pm:v('brad_pm'), tax:v('brad_tax')/4, insurance:v('brad_insurance')/4, rm:v('brad_rm'), util:v('brad_util'), subs:v('brad_subs'), capex:v('brad_capex') },
+    },
+    neely: {
+      value: propVal('neely'), mortgage: 0,
+      cashInvested: v('neely_cash_invested'),
+      purchasePrice: v('neely_purchase_price'),
+      monthsOccupied: v('neely_months_occupied'),
+      income: { gross: v('neely_rent') },
+      expenses: { pm:v('neely_pm'), tax:v('neely_tax')/4, insurance:v('neely_insurance')/4, rm:v('neely_rm'), util:v('neely_util'), subs:v('neely_subs'), capex:v('neely_capex') },
+    },
+    greenmount: {
+      value: propVal('green'), mortgage: 0,
+      cashInvested: v('green_cash_invested'),
+      purchasePrice: v('green_purchase_price'),
+      monthsOccupied: v('green_months_occupied'),
+      income: { gross: v('green_rent') },
+      expenses: { pm:v('green_pm'), tax:v('green_tax')/4, insurance:v('green_insurance')/4, rm:v('green_rm'), util:v('green_util'), subs:v('green_subs'), capex:v('green_capex') },
+    },
+    holladay: {
+      value: propVal('holl'),
+      mortgage: v('holl_mortgage'),
+      pi: v('holl_pi'),
+      cashInvested: v('holl_cash_invested'),
+      purchasePrice: v('holl_purchase_price'),
+      nightsAvail: v('holl_nights_avail'),
+      nightsBooked: v('holl_nights_booked'),
+      income: { gross: v('holl_rent') },
+      expenses: { platform:v('holl_platform'), tax:v('holl_tax')/4, insurance:v('holl_insurance')/4, rm:v('holl_rm'), util:v('holl_util'), supplies:v('holl_supplies'), subs:v('holl_subs'), capex:v('holl_capex') },
+    },
+    brokenBow: {
+      value: propVal('bb'),
+      mortgage1: v('bb_mortgage1'), mortgage2: v('bb_mortgage2'),
+      pi1: v('bb_pi1'), pi2: v('bb_pi2'),
+      cashInvested: v('bb_cash_invested'),
+      purchasePrice: v('bb_purchase_price'),
+      nightsAvail: v('bb_nights_avail'),
+      nightsBooked: v('bb_nights_booked'),
+      income: { gross: v('bb_revenue') },
+      expenses: { platform:v('bb_platform'), tax:v('bb_tax')/4, insurance:v('bb_insurance')/4, rm:v('bb_rm'), util:v('bb_util'), supplies:v('bb_supplies'), subs:v('bb_subs'), capex:v('bb_capex'), lodgingTax:v('bb_lodging_tax') },
+    },
+  };
+
+  // netCF = revenue minus operating expenses minus quarterly P&I (pi × 3)
+  // netCFExCapex = same but excluding capex — used for forward extrapolation
+  function calcNetCF(prop, excludeCapex) {
+    const income = prop.income.gross;
+    const exp = Object.values(prop.expenses).reduce((s,x)=>s+x,0);
+    const capexAmt = prop.expenses.capex || 0;
+    const piQ = ((prop.pi||0) + (prop.pi1||0) + (prop.pi2||0)) * 3;
+    return income - exp + (excludeCapex ? capexAmt : 0) - piQ;
+  }
+  Object.values(props).forEach(p => {
+    p.netCF = calcNetCF(p, false);
+    p.netCFExCapex = calcNetCF(p, true);
+  });
+
+  // Annualized cash flow — use YTD actuals + average-ex-capex for remaining quarters
+  // Pulls current-year prior quarters from saved data
+  const currentYear = new Date(dateStr).getFullYear();
+  const currentQNum = Math.floor(new Date(dateStr).getMonth() / 3) + 1; // 1–4
+  const priorYTD = data.quarters.filter(q => {
+    const qYear = new Date(q.date).getFullYear();
+    const qNum  = Math.floor(new Date(q.date).getMonth() / 3) + 1;
+    return qYear === currentYear && qNum < currentQNum;
+  });
+
+  const remainingQs = 4 - currentQNum;
+  const propKeys = ['bradcliff','neely','greenmount','holladay','brokenBow'];
+
+  // Per-property annualized CF using YTD actuals + avg-ex-capex for remaining quarters
+  const annualCFPerProp = {};
+  for (const key of propKeys) {
+    const curProp = props[key];
+    // YTD actuals for this property (prior quarters, capex included)
+    const ytdActualProp = priorYTD.reduce((s, q) => s + (q.properties?.[key]?.netCF || 0), 0)
+      + curProp.netCF;
+    // Average ex-capex across all YTD quarters for this property
+    const ytdExCapexValues = [
+      ...priorYTD.map(q => q.properties?.[key]?.netCFExCapex ?? q.properties?.[key]?.netCF ?? 0),
+      curProp.netCFExCapex,
+    ];
+    const avgExCapexProp = ytdExCapexValues.reduce((s, x) => s + x, 0) / ytdExCapexValues.length;
+    annualCFPerProp[key] = ytdActualProp + avgExCapexProp * remainingQs;
+  }
+
+  // Portfolio-level annualized CF = sum of per-property annualized
+  const annualCashFlow = propKeys.reduce((s, key) => s + annualCFPerProp[key], 0);
+  const totalPropValue = Object.values(props).reduce((s,p)=>s+p.value,0);
+  const totalMortgage = (props.bradcliff.mortgage||0) + (props.holladay.mortgage||0) + (props.brokenBow.mortgage1||0) + (props.brokenBow.mortgage2||0);
+
+  const otherAssets = { ibonds:v('a_ibonds'), muni:v('a_muni'), cash:v('a_cash'), other:v('a_other') };
+  otherAssets.total = Object.values(otherAssets).reduce((s,x)=>s+x,0);
+  const otherDebts = v('d_other');
+
+  const totalAssets = port.total + totalPropValue + otherAssets.total;
+  const totalDebt   = totalMortgage + otherDebts;
+  const netWorth    = totalAssets - totalDebt;
+
+  // Other savings
+  const otherSavings = {
+    ibonds:        v('s_ibonds'),
+    extraPrincipal: v('s_extra_principal'),
+    other:         v('s_other'),
+  };
+  otherSavings.total = otherSavings.ibonds + otherSavings.extraPrincipal + otherSavings.other;
+
+  // W-2 savings rate — account contributions + other savings vs. quarterly gross
+  const w2Annual = v('w2_annual') || 350000;
+  const totalSaved = contrib.total + otherSavings.total;
+  const savingsRate = w2Annual > 0 ? totalSaved / (w2Annual / 4) : 0;
+
+  // Principal paydown vs prior quarter
+  const quarterLabel = getQuarter(dateStr);
+  const sortedPrior = data.quarters
+    .filter(q => q.quarter !== quarterLabel)
+    .sort((a,b) => new Date(a.date) - new Date(b.date));
+  const priorQ = sortedPrior.length > 0 ? sortedPrior[sortedPrior.length - 1] : null;
+  const principalPaydown = priorQ ? Math.max(0,
+    ((priorQ.properties?.bradcliff?.mortgage||0) - (props.bradcliff.mortgage||0)) +
+    ((priorQ.properties?.holladay?.mortgage||0) - (props.holladay.mortgage||0)) +
+    ((priorQ.properties?.brokenBow?.mortgage1||0) - (props.brokenBow.mortgage1||0)) +
+    ((priorQ.properties?.brokenBow?.mortgage2||0) - (props.brokenBow.mortgage2||0))
+  ) : null;
+
+  // Save every form field verbatim so Edit can restore the full form exactly
+  const rawInputs = {};
+  [...DRAFT_FIELD_IDS, ...STICKY_IDS].forEach(id => {
+    const el = $(id);
+    if (el) rawInputs[id] = el.value;
+  });
+
+  const snapshot = {
+    date: dateStr, quarter: quarterLabel,
+    age: ageAt(new Date(dateStr).getFullYear()) + (new Date(dateStr).getMonth()/12),
+    portfolio: port, contributions: contrib,
+    properties: props,
+    otherAssets, otherDebts,
+    totalPortfolio: port.total,
+    totalPropertyValue: totalPropValue,
+    totalAssets, totalDebt, netWorth,
+    annualRentalCashFlow: annualCashFlow,
+    annualCFPerProp,
+    w2Annual, savingsRate, principalPaydown,
+    otherSavings, totalSaved,
+    contributionsNext: contribNext,
+    rawInputs,
+  };
+
+  const existingIdx = data.quarters.findIndex(q => q.quarter === snapshot.quarter);
+  if (existingIdx >= 0) data.quarters[existingIdx] = snapshot;
+  else data.quarters.push(snapshot);
+  saveData(data);
+  clearDraft();
+
+  renderReviewResults(snapshot);
+  $('review-results').style.display = 'block';
+  $('review-results').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ── RENDER REVIEW RESULTS ──────────────────────────────────────────────────
+function renderReviewResults(s) {
+  const allQ = getQuarters();
+  const priorIdx = allQ.findIndex(q => q.quarter === s.quarter) - 1;
+  const prev = priorIdx >= 0 ? allQ[priorIdx] : null;
+
+  const chgBadgeR = (cur, priorVal, invertColor) => {
+    if (priorVal == null) return '<div class="sum-change" style="color:var(--text-muted);opacity:0.4;">▲ $0 vs last Q</div>';
+    const chg = cur - priorVal;
+    const good = invertColor ? chg <= 0 : chg >= 0;
+    const arrow = chg >= 0 ? '▲' : '▼';
+    return `<div class="sum-change ${good?'pos':'neg'}">${arrow} ${fmt$(Math.abs(chg))} vs last Q</div>`;
+  };
+  const chgBadgePct = (cur, priorVal) => {
+    if (priorVal == null) return '<div class="sum-change" style="color:var(--text-muted);opacity:0.4;">▲ 0.0% vs last Q</div>';
+    const chg = cur - priorVal;
+    const arrow = chg >= 0 ? '▲' : '▼';
+    return `<div class="sum-change ${chg>=0?'pos':'neg'}">${arrow} ${Math.abs(chg).toFixed(1)}% vs last Q</div>`;
+  };
+
+  const fiPctCur  = Math.min(100, s.annualRentalCashFlow / FI_TARGET_CASH * 100);
+  const fiPctPrev = prev ? Math.min(100, prev.annualRentalCashFlow / FI_TARGET_CASH * 100) : null;
+  const sDate     = new Date(s.date);
+  const fiTarget  = new Date(FI_TARGET_YEAR, 0, 1);
+  const monthsToFI = Math.max(0, (fiTarget.getFullYear() - sDate.getFullYear()) * 12 + (fiTarget.getMonth() - sDate.getMonth()));
+
+  $('res-summary').innerHTML = `
+    <div class="sum-card"><div class="sum-label">Net Worth</div><div class="sum-value gold">${fmt$(s.netWorth)}</div>${chgBadgeR(s.netWorth, prev?.netWorth, false)}</div>
+    <div class="sum-card"><div class="sum-label">Portfolio</div><div class="sum-value">${fmt$(s.totalPortfolio)}</div>${chgBadgeR(s.totalPortfolio, prev?.totalPortfolio, false)}</div>
+    <div class="sum-card"><div class="sum-label">Property Value</div><div class="sum-value">${fmt$(s.totalPropertyValue)}</div>${chgBadgeR(s.totalPropertyValue, prev?.totalPropertyValue, false)}</div>
+    <div class="sum-card"><div class="sum-label">Total Debt</div><div class="sum-value neg">-${fmt$(s.totalDebt)}</div>${chgBadgeR(s.totalDebt, prev?.totalDebt, true)}</div>
+    <div class="sum-card"><div class="sum-label">Annual Cash Flow</div><div class="sum-value ${s.annualRentalCashFlow>=0?'green':'neg'}">${fmt$(s.annualRentalCashFlow)}</div>
+      ${chgBadgeR(s.annualRentalCashFlow, prev?.annualRentalCashFlow, false)}
+      <div class="sum-sub" style="margin-top:4px;margin-bottom:6px;">YTD actuals + avg-ex-capex projection</div>
+      <div class="fi-bar-wrap"><div class="fi-bar-track"><div class="fi-bar-fill" style="width:${Math.min(100,Math.max(0,fiPctCur)).toFixed(0)}%"></div></div>
+      <div class="fi-bar-label"><span>0</span><span>FI: ${fmt$(FI_TARGET_CASH)}</span></div></div></div>
+    <div class="sum-card"><div class="sum-label">FI Progress</div><div class="sum-value">${fiPctCur.toFixed(0)}%</div>${chgBadgePct(fiPctCur, fiPctPrev)}<div class="sum-sub">Target: $115K by age 40</div></div>
+  `;
+
+  const port = s.portfolio;
+  const total = s.totalPortfolio;
+  const acVals = {
+    'Large Cap': port.fxaix_401k+port.fxaix_r401k, 'Small Cap': port.fssnx_hsa+port.swssx_ira,
+    'Intl Developed': port.swisx_ira, 'Emerging Markets': port.vwo_ira,
+    'Crypto – BTC': port.bitb_hsa, 'Crypto – ETH': port.etha_hsa, 'Crypto – Infra': port.iblc_hsa,
+  };
+  let driftHTML = '';
+  for (const [ac, tgt] of Object.entries(TARGETS)) {
+    const actual = total>0 ? acVals[ac]/total : 0;
+    const dev = actual - tgt;
+    const flagged = Math.abs(dev) > DRIFT_THRESHOLD;
+    driftHTML += `<tr>
+      <td>${ac}</td><td class="muted">${AC_FUNDS[ac]}</td>
+      <td class="right">${fmt$(acVals[ac])}</td>
+      <td class="right">${fmtPctAbs(tgt)}</td>
+      <td class="right">${fmtPctAbs(actual)}</td>
+      <td class="right ${Math.abs(dev)>DRIFT_THRESHOLD?(dev>0?'neg':'pos'):''}">${fmtPct(dev)}</td>
+      <td class="right">${flagged?'<span class="badge-flag">⚠ Rebalance</span>':'<span class="badge-ok">✓ OK</span>'}</td>
+    </tr>`;
+  }
+  $('res-drift').innerHTML = driftHTML;
+
+  // Use planned next-quarter contributions for forward-looking steps 2 & 3
+  const next = s.contributionsNext || s.contributions; // fallback for legacy snapshots
+  const projTotal = total + next.total;
+  const lcT = port.fxaix_401k+port.fxaix_r401k;
+  const scT = port.fssnx_hsa+port.swssx_ira;
+  const gaps = {
+    fxaix_401k:  TARGETS['Large Cap']*projTotal*(lcT>0?port.fxaix_401k/lcT:0.5)-port.fxaix_401k,
+    fxaix_r401k: TARGETS['Large Cap']*projTotal*(lcT>0?port.fxaix_r401k/lcT:0.5)-port.fxaix_r401k,
+    fssnx_hsa:   TARGETS['Small Cap']*projTotal*(scT>0?port.fssnx_hsa/scT:0.5)-port.fssnx_hsa,
+    bitb_hsa:    TARGETS['Crypto – BTC']*projTotal-port.bitb_hsa,
+    etha_hsa:    TARGETS['Crypto – ETH']*projTotal-port.etha_hsa,
+    iblc_hsa:    TARGETS['Crypto – Infra']*projTotal-port.iblc_hsa,
+    swssx_ira:   TARGETS['Small Cap']*projTotal*(scT>0?port.swssx_ira/scT:0.5)-port.swssx_ira,
+    swisx_ira:   TARGETS['Intl Developed']*projTotal-port.swisx_ira,
+    vwo_ira:     TARGETS['Emerging Markets']*projTotal-port.vwo_ira,
+  };
+
+  const acctGroups = {
+    '401(k)': { contrib: next.c401k, keys: ['fxaix_401k'], labels: [['FXAIX','Large Cap']] },
+    'Roth 401(k)': { contrib: next.r401k, keys: ['fxaix_r401k'], labels: [['FXAIX','Large Cap']] },
+    'HSA': { contrib: next.hsa, keys: ['fssnx_hsa','bitb_hsa','etha_hsa','iblc_hsa'], labels: [['FSSNX','Small Cap'],['BITB','Crypto – BTC'],['ETHA','Crypto – ETH'],['IBLC','Crypto – Infra']] },
+    'Roth IRA': { contrib: next.ira, keys: ['swssx_ira','swisx_ira','vwo_ira'], labels: [['SWSSX','Small Cap'],['SWISX','Intl Developed'],['VWO','Emerging Markets']] },
+  };
+
+  const noNextContrib = next.total === 0;
+  let contribHTML = noNextContrib
+    ? '<div class="status-msg">Enter your planned next-quarter contributions above to see allocation guidance.</div>'
+    : '';
+  if (!noNextContrib) {
+    for (const [acct, g] of Object.entries(acctGroups)) {
+      contribHTML += `<div style="font-family:'Montserrat',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);padding:12px 0 8px;border-top:1px solid var(--border);margin-top:4px;">${acct} — Planned: ${fmt$d(g.contrib)}</div>
+      <table class="result-table"><thead><tr><th>Asset Class</th><th>Fund</th><th class="right">Alloc %</th><th class="right">$ Amount</th></tr></thead><tbody>`;
+      for (let i=0; i<g.keys.length; i++) {
+        const key = g.keys[i]; const [fund,ac] = g.labels[i];
+        const pct = getAllocPct(gaps, key, g.keys);
+        const amt = g.contrib * pct;
+        contribHTML += `<tr><td>${ac}</td><td class="muted">${fund}</td><td class="right">${(pct*100).toFixed(0)}%</td><td class="right pos">${fmt$d(amt)}</td></tr>`;
+      }
+      contribHTML += `</tbody></table>`;
+    }
+  }
+  $('res-contrib').innerHTML = contribHTML;
+
+  const tradeAccts = [
+    { name:'401(k)', funds:[{key:'fxaix_401k',label:'FXAIX',ac:'Large Cap',tgt:TARGETS['Large Cap']*projTotal*(lcT>0?port.fxaix_401k/lcT:0.5),proj:port.fxaix_401k+next.c401k*getAllocPct(gaps,'fxaix_401k',['fxaix_401k']),acFlagged:Math.abs(acVals['Large Cap']/total-TARGETS['Large Cap'])>DRIFT_THRESHOLD}] },
+    { name:'Roth 401(k)', funds:[{key:'fxaix_r401k',label:'FXAIX',ac:'Large Cap',tgt:TARGETS['Large Cap']*projTotal*(lcT>0?port.fxaix_r401k/lcT:0.5),proj:port.fxaix_r401k+next.r401k,acFlagged:Math.abs(acVals['Large Cap']/total-TARGETS['Large Cap'])>DRIFT_THRESHOLD}] },
+    { name:'HSA', funds:[
+      {key:'fssnx_hsa',label:'FSSNX',ac:'Small Cap',tgt:TARGETS['Small Cap']*projTotal*(scT>0?port.fssnx_hsa/scT:0.5),proj:port.fssnx_hsa+next.hsa*getAllocPct(gaps,'fssnx_hsa',['fssnx_hsa','bitb_hsa','etha_hsa','iblc_hsa']),acFlagged:Math.abs(acVals['Small Cap']/total-TARGETS['Small Cap'])>DRIFT_THRESHOLD},
+      {key:'bitb_hsa',label:'BITB',ac:'Crypto – BTC',tgt:TARGETS['Crypto – BTC']*projTotal,proj:port.bitb_hsa+next.hsa*getAllocPct(gaps,'bitb_hsa',['fssnx_hsa','bitb_hsa','etha_hsa','iblc_hsa']),acFlagged:Math.abs(acVals['Crypto – BTC']/total-TARGETS['Crypto – BTC'])>DRIFT_THRESHOLD},
+      {key:'etha_hsa',label:'ETHA',ac:'Crypto – ETH',tgt:TARGETS['Crypto – ETH']*projTotal,proj:port.etha_hsa+next.hsa*getAllocPct(gaps,'etha_hsa',['fssnx_hsa','bitb_hsa','etha_hsa','iblc_hsa']),acFlagged:Math.abs(acVals['Crypto – ETH']/total-TARGETS['Crypto – ETH'])>DRIFT_THRESHOLD},
+      {key:'iblc_hsa',label:'IBLC',ac:'Crypto – Infra',tgt:TARGETS['Crypto – Infra']*projTotal,proj:port.iblc_hsa+next.hsa*getAllocPct(gaps,'iblc_hsa',['fssnx_hsa','bitb_hsa','etha_hsa','iblc_hsa']),acFlagged:Math.abs(acVals['Crypto – Infra']/total-TARGETS['Crypto – Infra'])>DRIFT_THRESHOLD},
+    ]},
+    { name:'Roth IRA', funds:[
+      {key:'swssx_ira',label:'SWSSX',ac:'Small Cap',tgt:TARGETS['Small Cap']*projTotal*(scT>0?port.swssx_ira/scT:0.5),proj:port.swssx_ira+next.ira*getAllocPct(gaps,'swssx_ira',['swssx_ira','swisx_ira','vwo_ira']),acFlagged:Math.abs(acVals['Small Cap']/total-TARGETS['Small Cap'])>DRIFT_THRESHOLD},
+      {key:'swisx_ira',label:'SWISX',ac:'Intl Developed',tgt:TARGETS['Intl Developed']*projTotal,proj:port.swisx_ira+next.ira*getAllocPct(gaps,'swisx_ira',['swssx_ira','swisx_ira','vwo_ira']),acFlagged:Math.abs(acVals['Intl Developed']/total-TARGETS['Intl Developed'])>DRIFT_THRESHOLD},
+      {key:'vwo_ira',label:'VWO',ac:'Emerging Markets',tgt:TARGETS['Emerging Markets']*projTotal,proj:port.vwo_ira+next.ira*getAllocPct(gaps,'vwo_ira',['swssx_ira','swisx_ira','vwo_ira']),acFlagged:Math.abs(acVals['Emerging Markets']/total-TARGETS['Emerging Markets'])>DRIFT_THRESHOLD},
+    ]},
+  ];
+
+  let tradesHTML = '';
+  for (const acct of tradeAccts) {
+    const trades = acct.funds.map(f => ({ ...f, raw: f.acFlagged ? f.tgt - f.proj : 0 }));
+    const sellPool = Math.abs(trades.reduce((s,t)=>s+Math.min(0,t.raw),0));
+    const buyNeeded = trades.reduce((s,t)=>s+Math.max(0,t.raw),0);
+    const scale = buyNeeded>0 ? Math.min(1, sellPool/buyNeeded) : 1;
+    const canTrade = sellPool > 0.01 && buyNeeded > 0.01;
+
+    tradesHTML += `<div style="font-family:'Montserrat',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);padding:12px 0 8px;border-top:1px solid var(--border);margin-top:4px;">${acct.name}</div>
+    <table class="result-table"><thead><tr><th>Asset Class</th><th>Fund</th><th class="right">Target $</th><th class="right">Projected $</th><th class="right">Trade Amt</th><th class="right">Action</th></tr></thead><tbody>`;
+    for (const t of trades) {
+      const exec = canTrade ? (t.raw<0?t.raw:t.raw*scale) : 0;
+      const action = exec<-0.01 ? '<span class="badge-sell">SELL</span>' : exec>0.01 ? '<span class="badge-buy">BUY</span>' : '<span class="muted">—</span>';
+      const amtStr = Math.abs(exec)>0.01 ? `<span class="${exec>0?'pos':'neg'}">${exec>0?'+':''}${fmt$d(exec)}</span>` : '<span class="muted">—</span>';
+      tradesHTML += `<tr><td>${t.ac}</td><td class="muted">${t.label}</td><td class="right">${fmt$d(t.tgt)}</td><td class="right">${fmt$d(t.proj)}</td><td class="right">${amtStr}</td><td class="right">${action}</td></tr>`;
+    }
+    tradesHTML += `</tbody></table>`;
+    const msg = canTrade ? 'Trades executable. Execute SELLs first — proceeds fund BUYs within this account.'
+      : sellPool<0.01&&buyNeeded<0.01 ? 'No flagged asset classes — no action needed.'
+      : sellPool<0.01 ? 'Nothing to SELL — all flagged funds are underweight. Address via contributions.'
+      : 'No BUY targets — address via contributions.';
+    tradesHTML += `<div class="status-msg ${canTrade?'exec':''}">${msg}</div>`;
+  }
+  $('res-trades').innerHTML = tradesHTML;
+
+  const propDefs = [
+    { key:'bradcliff', label:'Bradcliff, Memphis', type:'LTR' },
+    { key:'neely',     label:'Neely Rd, Memphis',  type:'LTR' },
+    { key:'greenmount',label:'Greenmount, Memphis', type:'LTR' },
+    { key:'holladay',  label:'Holladay, UT',        type:'MTR' },
+    { key:'brokenBow', label:'Broken Bow, OK',      type:'STR' },
+  ];
+
+  // Helper: small inline trend arrow vs prior quarter
+  // invertColor=true means "lower is better" (OER, breakeven, debt ratio)
+  const ta = (cur, prevVal, invertColor) => {
+    if (cur === null) return '';
+    if (prevVal === null || prevVal === undefined) return ` <span style="font-size:0.7em;color:var(--text-muted);opacity:0.4;">▲</span>`;
+    const diff = cur - prevVal;
+    if (Math.abs(diff) < 0.0001) return ` <span style="font-size:0.7em;color:var(--text-muted);opacity:0.4;">▲</span>`;
+    const up = diff > 0;
+    const good = invertColor ? !up : up;
+    return ` <span style="font-size:0.7em;color:var(--${good?'green':'red'});">${up?'▲':'▼'}</span>`;
+  };
+
+  let propHTML = '';
+  let totalInc=0, totalExp=0, totalNet=0, totalAnnual=0;
+  for (const pd of propDefs) {
+    const p = s.properties[pd.key];
+    const pp = prev?.properties?.[pd.key];
+    const inc = p.income.gross;
+    const opex = Object.values(p.expenses).reduce((s,x)=>s+x,0);
+    const piQ = ((p.pi||0)+(p.pi1||0)+(p.pi2||0))*3;
+    const exp = opex + piQ;
+    const net = p.netCF;
+    const annualNet = s.annualCFPerProp?.[pd.key] ?? net * 4;
+    const prevNet = pp?.netCF ?? null;
+    const prevAnnual = prev?.annualCFPerProp?.[pd.key] ?? null;
+    const prevValue = pp?.value ?? null;
+    const prevInc = pp?.income?.gross ?? null;
+    const prevExp = pp ? Object.values(pp.expenses).reduce((s,x)=>s+x,0) + ((pp.pi||0)+(pp.pi1||0)+(pp.pi2||0))*3 : null;
+    totalInc+=inc; totalExp+=exp; totalNet+=net; totalAnnual+=annualNet;
+    const typeBadge = pd.type==='STR'?`style="background:rgba(230,126,34,0.15);color:var(--orange);"`:pd.type==='MTR'?`style="background:rgba(91,155,213,0.15);color:var(--blue);"`:'' ;
+    propHTML += `<tr>
+      <td>${pd.label}</td>
+      <td><span class="acct-tag" ${typeBadge}>${pd.type}</span></td>
+      <td class="right">${p.value>0?fmt$(p.value)+ta(p.value,prevValue,false):'<span class="muted">—</span>'}</td>
+      <td class="right">${fmt$d(inc)}${ta(inc,prevInc,false)}</td>
+      <td class="right neg">-${fmt$d(exp)}${ta(exp,prevExp,true)}</td>
+      <td class="right ${net>=0?'pos':'neg'}">${net>=0?'+':''}${fmt$d(net)}${ta(net, prevNet, false)}</td>
+      <td class="right ${annualNet>=0?'pos':'neg'}">${annualNet>=0?'+':''}${fmt$d(annualNet)}${ta(annualNet, prevAnnual, false)}</td>
+    </tr>`;
+  }
+  propHTML += `<tr style="border-top:1px solid var(--border);font-weight:600;">
+    <td colspan="3"><strong>Total</strong></td>
+    <td class="right">${fmt$d(totalInc)}${(() => { const pt = prev ? propDefs.reduce((s,pd)=>s+(prev.properties?.[pd.key]?.income?.gross||0),0) : null; return ta(totalInc,pt,false); })()}</td>
+    <td class="right neg">-${fmt$d(totalExp)}${(() => { const pt = prev ? propDefs.reduce((s,pd)=>{ const pp=prev.properties?.[pd.key]; return s+(pp?Object.values(pp.expenses).reduce((a,x)=>a+x,0)+((pp.pi||0)+(pp.pi1||0)+(pp.pi2||0))*3:0); },0) : null; return ta(totalExp,pt,true); })()}</td>
+    <td class="right ${totalNet>=0?'pos':'neg'}">${totalNet>=0?'+':''}${fmt$d(totalNet)}${(() => { const pt = prev ? propDefs.reduce((s,pd)=>s+(prev.properties?.[pd.key]?.netCF||0),0) : null; return ta(totalNet,pt,false); })()}</td>
+    <td class="right ${totalAnnual>=0?'pos':'neg'}">${totalAnnual>=0?'+':''}${fmt$d(totalAnnual)}${(() => { const pt = prev ? propDefs.reduce((s,pd)=>s+(prev.annualCFPerProp?.[pd.key]||0),0) : null; return ta(totalAnnual,pt,false); })()}</td>
+  </tr>`;
+  $('res-properties').innerHTML = propHTML;
+
+  // ── Investment Metrics per property ──────────────────────────────────────
+  const dash = '<span class="muted">—</span>';
+  let propReturnsHTML = '', propOpsHTML = '';
+  for (const pd of propDefs) {
+    const p = s.properties[pd.key];
+    const pp = prev?.properties?.[pd.key];
+    const opex = Object.values(p.expenses).reduce((sum,x)=>sum+x,0);
+    const noi = p.income.gross - opex;
+    const piQ = ((p.pi||0)+(p.pi1||0)+(p.pi2||0))*3;
+    const netCfQ = noi - piQ;
+    const piAnnual = ((p.pi||0)+(p.pi1||0)+(p.pi2||0))*12;
+    const equity = p.value - (p.mortgage||0) - (p.mortgage1||0) - (p.mortgage2||0);
+    const typeBadge = pd.type==='STR'?`style="background:rgba(230,126,34,0.15);color:var(--orange);"`:pd.type==='MTR'?`style="background:rgba(91,155,213,0.15);color:var(--blue);"`:'' ;
+    const label = `${pd.label} <span class="acct-tag" ${typeBadge} style="margin-left:4px;">${pd.type}</span>`;
+
+    // Prior quarter metrics for trend arrows
+    const ppOpex = pp ? Object.values(pp.expenses).reduce((sum,x)=>sum+x,0) : null;
+    const ppNoi  = pp ? pp.income.gross - ppOpex : null;
+    const ppPiQ  = pp ? ((pp.pi||0)+(pp.pi1||0)+(pp.pi2||0))*3 : null;
+    const ppNetCfQ = pp ? ppNoi - ppPiQ : null;
+    const ppPiAnnual = pp ? ((pp.pi||0)+(pp.pi1||0)+(pp.pi2||0))*12 : null;
+    const ppEquity = pp ? (pp.value - (pp.mortgage||0) - (pp.mortgage1||0) - (pp.mortgage2||0)) : null;
+
+    // Return metrics
+    const capMV   = p.value > 0          ? (noi * 4) / p.value : null;
+    const capCost = p.purchasePrice > 0  ? (noi * 4) / p.purchasePrice : null;
+    const coc     = p.cashInvested > 0   ? (netCfQ * 4) / p.cashInvested : null;
+    const roe     = equity > 0           ? (netCfQ * 4) / equity : null;
+    const dscr    = piAnnual > 0         ? (noi * 4) / piAnnual : null;
+
+    const ppCapMV   = (pp && pp.value > 0 && ppNoi !== null)       ? (ppNoi * 4) / pp.value : null;
+    const ppCapCost = (pp && pp.purchasePrice > 0 && ppNoi !== null) ? (ppNoi * 4) / pp.purchasePrice : null;
+    const ppCoc     = (pp && pp.cashInvested > 0 && ppNetCfQ !== null) ? (ppNetCfQ * 4) / pp.cashInvested : null;
+    const ppRoe     = (ppEquity > 0 && ppNetCfQ !== null)           ? (ppNetCfQ * 4) / ppEquity : null;
+    const ppDscr    = (ppPiAnnual > 0 && ppNoi !== null)            ? (ppNoi * 4) / ppPiAnnual : null;
+
+    propReturnsHTML += `<tr>
+      <td>${label}</td>
+      <td class="right">${capMV  !== null ? fmtPctAbs(capMV)+ta(capMV,ppCapMV,false)   : dash}</td>
+      <td class="right">${capCost !== null ? fmtPctAbs(capCost)+ta(capCost,ppCapCost,false) : '<span class="muted">Enter purchase price</span>'}</td>
+      <td class="right ${coc!==null?(coc>=0?'pos':'neg'):''}">${coc !== null ? fmtPctAbs(coc)+ta(coc,ppCoc,false) : '<span class="muted">Enter cash invested</span>'}</td>
+      <td class="right ${roe!==null?(roe>=0?'pos':'neg'):''}">${roe !== null ? fmtPctAbs(roe)+ta(roe,ppRoe,false) : dash}</td>
+      <td class="right ${dscr!==null?(dscr>=1.25?'pos':dscr>=1?'gold':'neg'):''}">${dscr !== null ? dscr.toFixed(2)+'x'+ta(dscr,ppDscr,false) : dash}</td>
+    </tr>`;
+
+    // Operating metrics
+    const oer  = p.income.gross > 0 ? opex / p.income.gross : null;
+    const isLTR = pd.type === 'LTR';
+    const strOrMtr = pd.type === 'STR' || pd.type === 'MTR';
+    const occ    = isLTR
+      ? (p.monthsOccupied > 0 ? p.monthsOccupied / 3 : null)
+      : (p.nightsAvail > 0 ? p.nightsBooked / p.nightsAvail : null);
+    const adr    = isLTR
+      ? (p.monthsOccupied > 0 ? p.income.gross / p.monthsOccupied : null)
+      : (p.nightsBooked > 0 ? p.income.gross / p.nightsBooked : null);
+    const revpar = isLTR
+      ? p.income.gross / 3
+      : (p.nightsAvail > 0 ? p.income.gross / p.nightsAvail : null);
+    const totalExpQ = opex + piQ;
+    const breakeven = isLTR
+      ? (adr ? totalExpQ / adr / 3 : null)
+      : (adr && p.nightsAvail > 0 ? totalExpQ / adr / p.nightsAvail : null);
+
+    const ppOer  = (pp && pp.income.gross > 0 && ppOpex !== null) ? ppOpex / pp.income.gross : null;
+    const ppOcc  = isLTR
+      ? (pp?.monthsOccupied > 0 ? pp.monthsOccupied / 3 : null)
+      : (pp?.nightsAvail > 0 ? pp.nightsBooked / pp.nightsAvail : null);
+    const ppAdr  = isLTR
+      ? (pp?.monthsOccupied > 0 ? pp.income.gross / pp.monthsOccupied : null)
+      : (pp?.nightsBooked > 0 ? pp.income.gross / pp.nightsBooked : null);
+    const ppRevpar = isLTR
+      ? (pp ? pp.income.gross / 3 : null)
+      : (pp?.nightsAvail > 0 ? pp.income.gross / pp.nightsAvail : null);
+    const ppTotalExpQ = ppOpex !== null && ppPiQ !== null ? ppOpex + ppPiQ : null;
+    const ppBreakeven = isLTR
+      ? (ppAdr && ppTotalExpQ !== null ? ppTotalExpQ / ppAdr / 3 : null)
+      : (ppAdr && pp?.nightsAvail > 0 && ppTotalExpQ !== null ? ppTotalExpQ / ppAdr / pp.nightsAvail : null);
+
+    const occMissing = isLTR ? '<span class="muted">Enter months</span>' : (strOrMtr ? '<span class="muted">Enter nights</span>' : dash);
+    propOpsHTML += `<tr>
+      <td>${label}</td>
+      <td class="right ${oer!==null?(oer<=0.5?'pos':oer<=0.7?'gold':'neg'):''}">${oer !== null ? fmtPctAbs(oer)+ta(oer,ppOer,true) : dash}</td>
+      <td class="right">${occ !== null ? fmtPctAbs(occ)+ta(occ,ppOcc,false) : occMissing}</td>
+      <td class="right">${adr !== null ? fmt$d(adr)+ta(adr,ppAdr,false) : occMissing}</td>
+      <td class="right">${revpar !== null ? fmt$d(revpar)+ta(revpar,ppRevpar,false) : dash}</td>
+      <td class="right ${breakeven!==null?(breakeven<=0.6?'pos':breakeven<=0.8?'gold':'neg'):''}">${breakeven !== null ? fmtPctAbs(breakeven)+ta(breakeven,ppBreakeven,true) : occMissing}</td>
+    </tr>`;
+  }
+  $('res-prop-returns').innerHTML = propReturnsHTML;
+  $('res-prop-ops').innerHTML = propOpsHTML;
+
+  // ── Debt Paydown & Savings Rate ───────────────────────────────────────────
+  const w2Q = (s.w2Annual || 350000) / 4;
+  const sr = s.savingsRate || 0;
+  const pp = s.principalPaydown;
+  const os = s.otherSavings || {};
+  const totalSaved = s.totalSaved || s.contributions.total;
+  const prevTotalSaved = prev ? (prev.totalSaved || prev.contributions?.total || null) : null;
+  const prevSr = prev?.savingsRate ?? null;
+  const prevPp = prev?.principalPaydown ?? null;
+  const srArrow = ta(sr, prevSr, false);
+  const ppArrow = ta(pp, prevPp, false);
+  const tsArrow = ta(totalSaved, prevTotalSaved, false);
+  $('res-paydown').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:20px;">
+      <div>
+        <div class="sum-label">Total Saved This Quarter</div>
+        <div class="sum-value" style="font-size:1.1rem;">${fmt$(totalSaved)}${tsArrow}</div>
+        <div class="sum-sub">W-2 Quarterly Gross: ${fmt$(w2Q)}</div>
+      </div>
+      <div>
+        <div class="sum-label">Savings Rate</div>
+        <div class="sum-value ${sr>=0.20?'green':'gold'}" style="font-size:1.1rem;">${(sr*100).toFixed(1)}%${srArrow}</div>
+        <div class="sum-sub">All savings ÷ Quarterly W-2 · Target: 20%+</div>
+      </div>
+      <div>
+        <div class="sum-label">Principal Paydown This Quarter</div>
+        <div class="sum-value pos" style="font-size:1.1rem;">${pp !== null ? fmt$(pp)+ppArrow : '<span class="muted" style="font-size:0.7em;">First quarter</span>'}</div>
+        <div class="sum-sub">Equity built via debt reduction</div>
+      </div>
+    </div>
+    <table class="result-table">
+      <thead><tr><th>Savings Category</th><th class="right">Amount</th></tr></thead>
+      <tbody>
+        <tr><td>401(k) + Roth 401(k)</td><td class="right">${fmt$d(s.contributions.c401k + s.contributions.r401k)}</td></tr>
+        <tr><td>HSA</td><td class="right">${fmt$d(s.contributions.hsa)}</td></tr>
+        <tr><td>Roth IRA (Backdoor)</td><td class="right">${fmt$d(s.contributions.ira)}</td></tr>
+        ${(os.ibonds||0)>0?`<tr><td>I Bond Purchases</td><td class="right">${fmt$d(os.ibonds)}</td></tr>`:''}
+        ${(os.extraPrincipal||0)>0?`<tr><td>Extra Mortgage Principal</td><td class="right">${fmt$d(os.extraPrincipal)}</td></tr>`:''}
+        ${(os.other||0)>0?`<tr><td>Additional Savings</td><td class="right">${fmt$d(os.other)}</td></tr>`:''}
+        <tr style="border-top:1px solid var(--border);font-weight:600;"><td>Total</td><td class="right pos">${fmt$d(totalSaved)}</td></tr>
+      </tbody>
+    </table>
+  `;
+}
+
+// ── DASHBOARD ──────────────────────────────────────────────────────────────
+let charts = {};
+
+function renderDashboard() {
+  const quarters = getQuarters();
+  if (quarters.length === 0) {
+    $('dash-empty').style.display = 'block';
+    $('dash-content').style.display = 'none';
+    return;
+  }
+  $('dash-empty').style.display = 'none';
+  $('dash-content').style.display = 'block';
+
+  const last = quarters[quarters.length-1];
+  const prev = quarters.length > 1 ? quarters[quarters.length-2] : null;
+  const nwChg   = prev ? last.netWorth         - prev.netWorth         : null;
+  const portChg = prev ? last.totalPortfolio   - prev.totalPortfolio   : null;
+  const propChg = prev ? last.totalPropertyValue - prev.totalPropertyValue : null;
+  const debtChg = prev ? last.totalDebt        - prev.totalDebt        : null;
+
+  // Property equity = blended value − all mortgages
+  const propEquity = (last.totalPropertyValue || 0) - (last.totalDebt || 0);
+  const prevPropEquity = prev ? (prev.totalPropertyValue || 0) - (prev.totalDebt || 0) : null;
+  const propEquityChg = prevPropEquity !== null ? propEquity - prevPropEquity : null;
+
+  // Other financial assets (I Bonds + Muni + Cash + Other)
+  const otherFinAssets = last.otherAssets?.total || 0;
+  const prevOtherFin = prev?.otherAssets?.total || null;
+  const otherFinChg = prevOtherFin !== null ? otherFinAssets - prevOtherFin : null;
+
+  // YTD savings rate: sum totalSaved / sum w2Quarterly across all quarters this calendar year
+  const lastYear = new Date(last.date).getFullYear();
+  const ytdQuarters = quarters.filter(q => new Date(q.date).getFullYear() === lastYear);
+  const ytdSaved = ytdQuarters.reduce((s, q) => s + (q.totalSaved || q.contributions?.total || 0), 0);
+  const ytdW2 = ytdQuarters.reduce((s, q) => s + ((q.w2Annual || 350000) / 4), 0);
+  const ytdSavingsRate = ytdW2 > 0 ? ytdSaved / ytdW2 : null;
+  const prevYtdQuarters = prev ? quarters.filter(q => new Date(q.date).getFullYear() === new Date(prev.date).getFullYear() && new Date(q.date) <= new Date(prev.date)) : [];
+  const prevYtdSaved = prevYtdQuarters.reduce((s, q) => s + (q.totalSaved || q.contributions?.total || 0), 0);
+  const prevYtdW2 = prevYtdQuarters.reduce((s, q) => s + ((q.w2Annual || 350000) / 4), 0);
+  const prevYtdSR = prevYtdW2 > 0 ? prevYtdSaved / prevYtdW2 : null;
+  const srChgPts = (ytdSavingsRate !== null && prevYtdSR !== null) ? (ytdSavingsRate - prevYtdSR) * 100 : null;
+
+  // Principal paydown & debt ratio
+  const principalPaydown = last.principalPaydown || null;
+  const debtRatio = last.totalAssets > 0 ? last.totalDebt / last.totalAssets : null;
+  const prevDebtRatio = (prev && prev.totalAssets > 0) ? prev.totalDebt / prev.totalAssets : null;
+  const debtRatioChgPts = (debtRatio !== null && prevDebtRatio !== null) ? (debtRatio - prevDebtRatio) * 100 : null;
+
+  const fiPct = Math.min(100, (last.annualRentalCashFlow / FI_TARGET_CASH * 100));
+  const lastDate   = new Date(last.date);
+  const fiTargetDate = new Date(FI_TARGET_YEAR, 0, 1);
+  const monthsToFI = Math.max(0, (fiTargetDate.getFullYear() - lastDate.getFullYear()) * 12 + (fiTargetDate.getMonth() - lastDate.getMonth()));
+
+  const chgBadge = (chg, invertColor) => {
+    if (chg === null) return '<div class="sum-change" style="color:var(--text-muted);opacity:0.4;">▲ $0 vs last Q</div>';
+    const good = invertColor ? chg <= 0 : chg >= 0;
+    const arrow = chg >= 0 ? '▲' : '▼';
+    return `<div class="sum-change ${good?'pos':'neg'}">${arrow} ${fmt$(Math.abs(chg))} vs last Q</div>`;
+  };
+  const pctBadge = (chgPts, invertColor, suffix='pp') => {
+    if (chgPts === null) return `<div class="sum-change" style="color:var(--text-muted);opacity:0.4;">▲ 0.0${suffix} vs last Q</div>`;
+    const good = invertColor ? chgPts <= 0 : chgPts >= 0;
+    const arrow = chgPts >= 0 ? '▲' : '▼';
+    return `<div class="sum-change ${good?'pos':'neg'}">${arrow} ${Math.abs(chgPts).toFixed(1)}${suffix} vs last Q</div>`;
+  };
+
+  const card = (label, value, badge, sub='') =>
+    `<div class="sum-card"><div class="sum-label">${label}</div><div class="sum-value">${value}</div>${badge}${sub?`<div class="sum-sub">${sub}</div>`:''}</div>`;
+
+  $('summary-cards').innerHTML = `
+    <div class="kpi-row-label">Balance Sheet</div>
+    <div class="kpi-row">
+      ${card('Total Assets', `<span class="gold">${fmt$(last.totalAssets)}</span>`, chgBadge(prev ? last.totalAssets - prev.totalAssets : null, false))}
+      ${card('Total Debt', `<span class="neg">-${fmt$(last.totalDebt)}</span>`, chgBadge(debtChg, true))}
+      ${card('Net Worth', `<span class="gold">${fmt$(last.netWorth)}</span>`, chgBadge(nwChg, false))}
+    </div>
+    <div class="kpi-row-label">Asset Breakdown</div>
+    <div class="kpi-row">
+      ${card('Retirement Portfolio', fmt$(last.totalPortfolio), chgBadge(portChg, false), '401k · Roth · HSA · IRA')}
+      ${card('Other Financial Assets', fmt$(otherFinAssets), chgBadge(otherFinChg, false), 'I Bonds · Munis · Cash · Other')}
+      ${card('Property Equity', fmt$(propEquity), chgBadge(propEquityChg, false), 'Blended value − mortgages')}
+    </div>
+    <div class="kpi-row-label">Performance</div>
+    <div class="kpi-row">
+      ${card('YTD Savings Rate', ytdSavingsRate !== null ? `<span class="${ytdSavingsRate>=0.20?'green':'gold'}">${(ytdSavingsRate*100).toFixed(1)}%</span>` : '—', pctBadge(srChgPts, false), `${ytdQuarters.length} quarter${ytdQuarters.length!==1?'s':''} in ${lastYear}`)}
+      ${card('Principal Paydown', principalPaydown !== null ? `<span class="pos">${fmt$(principalPaydown)}</span>` : '<span class="muted" style="font-size:0.85rem;">First quarter</span>', principalPaydown !== null ? chgBadge(prev?.principalPaydown != null ? principalPaydown - prev.principalPaydown : null, false) : '<div class="sum-change" style="color:var(--text-muted);opacity:0.4;">▲ $0 vs last Q</div>', 'This quarter')}
+      ${card('Debt Ratio', debtRatio !== null ? `<span class="${debtRatio<=0.4?'green':debtRatio<=0.6?'gold':'neg'}">${(debtRatio*100).toFixed(1)}%</span>` : '—', pctBadge(debtRatioChgPts, true), 'Total Debt ÷ Total Assets')}
+    </div>
+  `;
+
+  const cfChg   = prev ? last.annualRentalCashFlow - prev.annualRentalCashFlow : null;
+  const prevFiPct = prev ? Math.min(100, prev.annualRentalCashFlow / FI_TARGET_CASH * 100) : null;
+  const fiPctChg = prevFiPct !== null ? fiPct - prevFiPct : null;
+
+  $('fi-progress-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;flex-wrap:wrap;">
+      <div>
+        <div class="sum-label">Annual Cash Flow</div>
+        <div class="sum-value ${last.annualRentalCashFlow>=0?'green':'neg'}" style="font-size:1.2rem;">${fmt$(last.annualRentalCashFlow)}</div>
+        ${chgBadge(cfChg, false)}
+      </div>
+      <div>
+        <div class="sum-label">FI Target ($115K)</div>
+        <div class="sum-value" style="font-size:1.2rem;">${fiPct.toFixed(0)}% there</div>
+        ${fiPctChg !== null ? `<div class="sum-change ${fiPctChg>=0?'pos':'neg'}">${fiPctChg>=0?'▲':'▼'} ${Math.abs(fiPctChg).toFixed(1)}% vs last Q</div>` : '<div class="sum-change" style="color:var(--text-muted);opacity:0.4;">▲ 0.0% vs last Q</div>'}
+      </div>
+      <div>
+        <div class="sum-label">Months to FI Target</div>
+        <div class="sum-value gold" style="font-size:1.2rem;">${monthsToFI} months</div>
+        <div class="sum-change" style="color:var(--text-muted);opacity:0.4;">▲ 0 vs last Q</div>
+      </div>
+    </div>
+    <div class="fi-bar-wrap" style="margin-top:16px;">
+      <div class="fi-bar-track" style="height:10px;"><div class="fi-bar-fill" style="width:${fiPct.toFixed(0)}%;"></div></div>
+      <div class="fi-bar-label"><span>$0</span><span>FI: $115K / yr at age 40</span></div>
+    </div>
+  `;
+
+  const labels = quarters.map(q => q.quarter);
+  const portData = quarters.map(q => q.totalPortfolio);
+  const nwData   = quarters.map(q => q.netWorth);
+  const cfData   = quarters.map(q => q.annualRentalCashFlow);
+  const initPort = quarters[0].totalPortfolio;
+  const marketGrowthData = quarters.map((q,i) => {
+    const contribSinceStart = quarters.slice(1,i+1).reduce((s,r)=>s+r.contributions.total,0);
+    return q.totalPortfolio - initPort - contribSinceStart;
+  });
+
+  function buildProjection(lastVal, annualRate, yearsForward) {
+    const qRate = Math.pow(1+annualRate, 1/4)-1;
+    const pts = [lastVal];
+    for (let i=1; i<=yearsForward*4; i++) pts.push(pts[pts.length-1]*(1+qRate));
+    return pts;
+  }
+
+  const curYear = new Date(last.date).getFullYear();
+  const portYearsLeft = DRAWDOWN_YEAR - curYear;
+  const portProj = buildProjection(last.totalPortfolio, PORTFOLIO_RETURN, portYearsLeft);
+  const portProjLabels = [];
+  for (let i=0; i<=portYearsLeft*4; i++) {
+    const yr = curYear + Math.floor(i/4);
+    const q  = (i%4)+1;
+    portProjLabels.push(`Q${q} ${yr}`);
+  }
+
+  const debtPayoffQuarters = Math.max(1, (DEBT_FREE_YEAR - curYear)*4);
+  const debtPerQ = last.totalDebt / debtPayoffQuarters;
+  const nwProjYears = Math.min(10, DEBT_FREE_YEAR - curYear + 2);
+  const nwProj = [];
+  let projDebt = last.totalDebt;
+  let projPort = last.totalPortfolio;
+  let projPropVal = last.totalPropertyValue;
+  const qPortRate = Math.pow(1.10, 1/4)-1;
+  const qPropRate  = Math.pow(1.04, 1/4)-1;
+  for (let i=0; i<=nwProjYears*4; i++) {
+    nwProj.push(projPort + projPropVal + (last.otherAssets?.total||0) - Math.max(0,projDebt));
+    projDebt  = Math.max(0, projDebt - debtPerQ);
+    projPort  *= (1+qPortRate);
+    projPropVal *= (1+qPropRate);
+  }
+
+  const cfProjYears = Math.min(10, FI_TARGET_YEAR - curYear + 3);
+  const cfProj = [last.annualRentalCashFlow];
+  let projCF = last.annualRentalCashFlow;
+  for (let i=1; i<=cfProjYears*4; i++) {
+    const yr = curYear + Math.floor(i/4);
+    if (i%4===0) {
+      projCF *= 1.035;
+      if (yr === 2027) projCF += 22000;
+      if (yr === 2030) projCF += 25000;
+    }
+    cfProj.push(projCF);
+  }
+
+  const chartDefaults = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { color:'#7a7060', font:{size:11}, boxWidth:12 } } },
+    scales: {
+      x: { grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#7a7060',font:{size:10},maxTicksLimit:8} },
+      y: { grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#7a7060',font:{size:10},callback:v=>fmt$(v)} },
+    },
+  };
+
+  Object.values(charts).forEach(c => { try { c.destroy(); } catch{} });
+  charts = {};
+
+  charts.portfolio = new Chart($('chart-portfolio'), {
+    type:'line',
+    data: {
+      labels: [...labels, ...portProjLabels.slice(1)],
+      datasets: [
+        { label:'Portfolio Value', data:[...portData,...Array(portProjLabels.length-1).fill(null)], borderColor:C.gold, backgroundColor:'rgba(207,172,103,0.1)', fill:true, tension:0.3, pointRadius:4, pointBackgroundColor:C.gold },
+        { label:'Projected (10%/yr)', data:[...Array(labels.length-1).fill(null), portData[portData.length-1], ...portProj.slice(1)], borderColor:'rgba(207,172,103,0.5)', borderDash:[6,4], backgroundColor:'transparent', tension:0.3, pointRadius:0 },
+        { label:`FI Milestone (${FI_TARGET_YEAR})`, data:[...labels,...portProjLabels.slice(1)].map(l=>l.includes(String(FI_TARGET_YEAR))?portProj[Math.round((FI_TARGET_YEAR-curYear)*4)]:null), borderColor:C.green, borderDash:[3,3], pointRadius:6, pointBackgroundColor:C.green, pointStyle:'triangle', showLine:false },
+      ],
+    },
+    options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, tooltip:{ callbacks:{ label: ctx => ' '+fmt$(ctx.raw) } } } },
+  });
+
+  charts.networth = new Chart($('chart-networth'), {
+    type:'line',
+    data: {
+      labels: [...labels, ...Array(nwProjYears*4).fill(null).map((_,i)=>{ const yr=curYear+Math.floor((i+1)/4); return `Q${((i+1)%4)+1} ${yr}`; })],
+      datasets: [
+        { label:'Net Worth', data:[...nwData,...Array(nwProjYears*4).fill(null)], borderColor:C.gold, backgroundColor:'rgba(207,172,103,0.08)', fill:true, tension:0.3, pointRadius:3, pointBackgroundColor:C.gold },
+        { label:'Projected', data:[...Array(labels.length-1).fill(null),nwData[nwData.length-1],...nwProj.slice(1)], borderColor:'rgba(207,172,103,0.45)', borderDash:[6,4], backgroundColor:'transparent', tension:0.3, pointRadius:0 },
+        { label:'Debt-Free 2030', data:[...Array(labels.length + nwProjYears*4)].map((_,i)=>{ const yr=i<labels.length?new Date(quarters[i]?.date).getFullYear():curYear+Math.floor((i-labels.length+1)/4); return yr===DEBT_FREE_YEAR?nwProj[Math.min(nwProj.length-1,(DEBT_FREE_YEAR-curYear)*4)]:null; }), borderColor:C.green, pointRadius:8, pointBackgroundColor:C.green, pointStyle:'star', showLine:false },
+      ],
+    },
+    options: { ...chartDefaults },
+  });
+
+  const cfLabels = [...labels, ...Array(cfProjYears*4).fill(null).map((_,i)=>{ const yr=curYear+Math.floor((i+1)/4); return `Q${((i+1)%4)+1} ${yr}`; })];
+  charts.cashflow = new Chart($('chart-cashflow'), {
+    type:'line',
+    data: {
+      labels: cfLabels,
+      datasets: [
+        { label:'Annual Cash Flow', data:[...cfData,...Array(cfProjYears*4).fill(null)], borderColor:C.green, backgroundColor:'rgba(76,175,125,0.1)', fill:true, tension:0.3, pointRadius:3, pointBackgroundColor:C.green },
+        { label:'Projected', data:[...Array(labels.length-1).fill(null),cfData[cfData.length-1],...cfProj.slice(1)], borderColor:'rgba(76,175,125,0.5)', borderDash:[6,4], backgroundColor:'transparent', tension:0.3, pointRadius:0 },
+        { label:'FI Target ($115K)', data:Array(cfLabels.length).fill(FI_TARGET_CASH), borderColor:'rgba(207,172,103,0.6)', borderDash:[3,3], pointRadius:0, borderWidth:1.5 },
+      ],
+    },
+    options: { ...chartDefaults },
+  });
+
+  charts.contrib = new Chart($('chart-contrib'), {
+    type:'bar',
+    data: {
+      labels,
+      datasets: [
+        { label:'Contributions', data:quarters.map(q=>q.contributions.total), backgroundColor:'rgba(207,172,103,0.7)', borderRadius:4 },
+        { label:'Market Growth', data:marketGrowthData, backgroundColor:marketGrowthData.map(v=>v>=0?'rgba(76,175,125,0.7)':'rgba(224,92,92,0.7)'), borderRadius:4 },
+      ],
+    },
+    options: { ...chartDefaults, scales: { x:{...chartDefaults.scales.x, stacked:false}, y:{...chartDefaults.scales.y} } },
+  });
+
+  // ── Equity Breakdown donut ─────────────────────────────────────────────
+  const port = last.portfolio;
+  const equitySlices = [
+    { label: 'Equities',    value: (port.fxaix_401k||0)+(port.fxaix_r401k||0)+(port.fssnx_hsa||0)+(port.swssx_ira||0)+(port.swisx_ira||0)+(port.vwo_ira||0), color: '#cfac67' },
+    { label: 'Real Estate', value: Math.max(0, propEquity),                                                                                                    color: '#2e86c1' },
+    { label: 'Crypto',      value: (port.bitb_hsa||0)+(port.etha_hsa||0)+(port.iblc_hsa||0),                                                                  color: '#922b21' },
+    { label: 'Muni Bonds',  value: last.otherAssets?.muni || 0,                                                                                               color: '#1e8449' },
+    { label: 'I Bonds',     value: last.otherAssets?.ibonds || 0,                                                                                             color: '#6c3483' },
+    { label: 'Cash',        value: last.otherAssets?.cash || 0,                                                                                               color: '#5d6d7e' },
+  ].filter(s => s.value > 0).sort((a, b) => b.value - a.value);
+  const equityTotal = equitySlices.reduce((s,x) => s+x.value, 0);
+
+  charts.equityBreakdown = new Chart($('chart-equity-breakdown'), {
+    type: 'doughnut',
+    data: {
+      labels: equitySlices.map(s => s.label),
+      datasets: [{ data: equitySlices.map(s => s.value), backgroundColor: equitySlices.map(s => s.color), borderColor: 'rgba(0,0,0,0.3)', borderWidth: 2, hoverOffset: 8 }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${fmt$(ctx.raw)} (${equityTotal>0?(ctx.raw/equityTotal*100).toFixed(1):'0'}%)` } },
+      },
+    },
+  });
+
+  $('equity-breakdown-legend').innerHTML = equitySlices.map(s => `
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:10px;height:10px;border-radius:50%;background:${s.color};flex-shrink:0;"></div>
+        <span style="font-size:0.78rem;color:var(--text-light);">${s.label}</span>
+      </div>
+      <div style="text-align:right;">
+        <span style="font-size:0.82rem;font-weight:600;color:#fff;">${fmt$(s.value)}</span>
+        <span style="font-size:0.7rem;color:var(--text-muted);margin-left:6px;">${equityTotal>0?(s.value/equityTotal*100).toFixed(1):'0'}%</span>
+      </div>
+    </div>
+  `).join('');
+
+  const acKeys = ['Large Cap','Small Cap','Intl Developed','Emerging Markets','Crypto – BTC','Crypto – ETH','Crypto – Infra'];
+  const acColors = [C.largecap,C.smallcap,C.intl,C.em,C.btc,C.eth,C.infra];
+  charts.assetclass = new Chart($('chart-assetclass'), {
+    type:'line',
+    data: {
+      labels,
+      datasets: acKeys.map((ac,i) => ({
+        label: ac,
+        data: quarters.map(q => {
+          const p = q.portfolio;
+          const vals = { 'Large Cap':p.fxaix_401k+p.fxaix_r401k, 'Small Cap':p.fssnx_hsa+p.swssx_ira, 'Intl Developed':p.swisx_ira, 'Emerging Markets':p.vwo_ira, 'Crypto – BTC':p.bitb_hsa, 'Crypto – ETH':p.etha_hsa, 'Crypto – Infra':p.iblc_hsa };
+          return vals[ac];
+        }),
+        borderColor: acColors[i], backgroundColor: 'transparent', tension:0.3, pointRadius:3, borderWidth:2,
+      })),
+    },
+    options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, legend:{ labels:{color:'#7a7060',font:{size:10},boxWidth:10} } } },
+  });
+}
+
+// ── HISTORY ────────────────────────────────────────────────────────────────
+function renderHistory() {
+  const quarters = getQuarters().reverse();
+  if (quarters.length === 0) {
+    $('history-content').innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><h2 class="empty-title">No History Yet</h2><p class="empty-sub">Complete your first quarterly review to start building your financial history.</p></div>`;
+    return;
+  }
+  $('history-content').innerHTML = quarters.map((q,i) => `
+    <div class="hist-card">
+      <div class="hist-header">
+        <div><div class="hist-q">${q.quarter}</div><div class="hist-date">${new Date(q.date).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})} · Age ${Math.floor(q.age)}</div></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-secondary" onclick="viewQuarter('${q.quarter}')">👁 View</button>
+          <button class="btn-gold-outline" onclick="loadQuarterIntoForm('${q.quarter}')">✏ Edit</button>
+          <button class="btn-danger" onclick="deleteQuarter('${q.quarter}')">Delete</button>
+        </div>
+      </div>
+      <div class="hist-metrics">
+        <div class="hist-m"><div class="hist-m-label">Net Worth</div><div class="hist-m-val gold">${fmt$(q.netWorth)}</div></div>
+        <div class="hist-m"><div class="hist-m-label">Portfolio</div><div class="hist-m-val">${fmt$(q.totalPortfolio)}</div></div>
+        <div class="hist-m"><div class="hist-m-label">Annual Cash Flow</div><div class="hist-m-val ${q.annualRentalCashFlow>=0?'pos':'neg'}">${fmt$(q.annualRentalCashFlow)}</div></div>
+        <div class="hist-m"><div class="hist-m-label">Total Debt</div><div class="hist-m-val neg">-${fmt$(q.totalDebt)}</div></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function deleteQuarter(quarterLabel) {
+  if (!confirm(`Delete ${quarterLabel}? This cannot be undone.`)) return;
+  const data = loadData();
+  data.quarters = data.quarters.filter(q => q.quarter !== quarterLabel);
+  saveData(data);
+  renderHistory();
+}
+
+function setFormReadOnly(readOnly) {
+  const allIds = [...DRAFT_FIELD_IDS, ...STICKY_IDS];
+  allIds.forEach(id => {
+    const el = $(id);
+    if (!el) return;
+    if (readOnly) {
+      el.setAttribute('readonly', true);
+      el.style.opacity = '0.6';
+      el.style.cursor = 'default';
+    } else {
+      el.removeAttribute('readonly');
+      el.style.opacity = '';
+      el.style.cursor = '';
+    }
+  });
+  const analyzeBtn = document.querySelector('button[onclick="runReview()"]');
+  const demoBtn = document.querySelector('button[onclick="prefillDemo()"]');
+  if (analyzeBtn) analyzeBtn.style.display = readOnly ? 'none' : '';
+  if (demoBtn) demoBtn.style.display = readOnly ? 'none' : '';
+  const status = $('draft-status');
+  if (status) status.textContent = readOnly ? 'Viewing read-only snapshot — go to History to edit.' : '';
+}
+
+function viewQuarter(quarterLabel) {
+  const q = loadData().quarters.find(x => x.quarter === quarterLabel);
+  if (!q) return;
+
+  // Reuse loadQuarterIntoForm logic to populate the form
+  loadQuarterIntoForm(quarterLabel);
+
+  // Then lock it read-only and show results
+  setFormReadOnly(true);
+  $('review-results').style.display = 'block';
+  renderReviewResults(q);
+  $('review-results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function loadQuarterIntoForm(quarterLabel) {
+  const q = loadData().quarters.find(x => x.quarter === quarterLabel);
+  if (!q) return;
+
+  if (q.rawInputs) {
+    // Clear DRAFT fields first — prevents stale values from fields that were added
+    // to DRAFT_FIELD_IDS after this snapshot was saved (e.g. nights, supplies).
+    // STICKY fields are intentionally NOT cleared: old snapshots may have empty
+    // strings for sticky fields added later, and current sticky storage is the
+    // correct fallback for those.
+    DRAFT_FIELD_IDS.forEach(id => {
+      const el = $(id);
+      if (el) el.value = '';
+    });
+    // Restore from rawInputs. For sticky fields, skip empty values so current
+    // sticky storage remains as the fallback.
+    Object.entries(q.rawInputs).forEach(([id, val]) => {
+      const el = $(id);
+      if (!el) return;
+      if (STICKY_IDS.includes(id) && !val) return;
+      el.value = val;
+    });
+  } else {
+    // Legacy path for snapshots saved before rawInputs was added
+    $('r_date').value = q.date;
+    const p = q.portfolio;
+    setMoney('h_fxaix_401k',  p.fxaix_401k);  setMoney('h_fxaix_r401k', p.fxaix_r401k);
+    setMoney('h_fssnx_hsa',   p.fssnx_hsa);   setMoney('h_bitb_hsa',    p.bitb_hsa);
+    setMoney('h_etha_hsa',    p.etha_hsa);     setMoney('h_iblc_hsa',    p.iblc_hsa);
+    setMoney('h_swssx_ira',   p.swssx_ira);    setMoney('h_swisx_ira',   p.swisx_ira);
+    setMoney('h_vwo_ira',     p.vwo_ira);
+    const c = q.contributions;
+    setMoney('c_401k', c.c401k); setMoney('c_r401k', c.r401k);
+    setMoney('c_hsa',  c.hsa);   setMoney('c_ira',   c.ira);
+    const oa = q.otherAssets || {};
+    setMoney('a_ibonds', oa.ibonds); setMoney('a_muni', oa.muni);
+    setMoney('a_cash',   oa.cash);   setMoney('a_other', oa.other);
+    setMoney('d_other',  q.otherDebts || 0);
+    if (q.w2Annual) setMoney('w2_annual', q.w2Annual);
+    // Note: property details, AVMs, and comps not available in legacy snapshots
+  }
+
+  recalcAllBlended();
+
+  // Open all accordions and switch to form
+  document.querySelectorAll('.acc-header').forEach(h => {
+    h.classList.add('open');
+    h.nextElementSibling.classList.add('open');
+  });
+  setFormReadOnly(false);
+  $('review-results').style.display = 'none';
+  switchTab('review');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  const status = $('draft-status');
+  if (status) status.textContent = `Loaded ${quarterLabel} — edit and click Analyze & Save to update.`;
+}
+
+function clearAllData() {
+  if (!confirm('Delete ALL quarterly data? This cannot be undone.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  renderHistory();
+  renderDashboard();
+}
+
+// ── PREFILL DEMO Q1 (prior quarter for trend arrow preview) ────────────────
+function prefillDemoQ1() {
+  const existingSticky = loadSticky();
+  const origSetMoney = setMoney;
+  const setMoneyDemo = (id, num) => {
+    if (STICKY_IDS.includes(id) && existingSticky[id]) return;
+    origSetMoney(id, num);
+  };
+  const setMoney = setMoneyDemo;
+
+  $('r_date').value = '2026-03-31';
+
+  // Portfolio — slightly lower than Q2
+  setMoney('h_fxaix_401k',  141200.00);
+  setMoney('h_fxaix_r401k', 880.00);
+  setMoney('h_fssnx_hsa',   9540.00);
+  setMoney('h_bitb_hsa',    4950.00);
+  setMoney('h_etha_hsa',    1880.00);
+  setMoney('h_iblc_hsa',    6300.00);
+  setMoney('h_swssx_ira',   34100.00);
+  setMoney('h_swisx_ira',   36200.00);
+  setMoney('h_vwo_ira',     13100.00);
+
+  // Contributions
+  setMoney('c_401k',  5775); setMoney('c_r401k', 0);
+  setMoney('c_hsa',   1000); setMoney('c_ira',   0);
+  setMoney('cn_401k', 5775); setMoney('cn_r401k', 0);
+  setMoney('cn_hsa',  1000); setMoney('cn_ira',  1500);
+
+  // Bradcliff
+  setMoney('brad_mortgage',  112500);
+  setMoney('brad_pi',        774);
+  setMoney('brad_cash_invested', 30000);
+  setMoney('brad_purchase_price', 0);
+  setMoney('brad_rent',      4350);
+  $('brad_months_occupied').value = '3';
+  setMoney('brad_pm',        348);
+  setMoney('brad_tax',       1500);
+  setMoney('brad_insurance', 900);
+
+  // Neely
+  setMoney('neely_cash_invested',  35000);
+  setMoney('neely_purchase_price', 0);
+  setMoney('neely_rent',   4275);
+  $('neely_months_occupied').value = '3';
+  setMoney('neely_pm',     342);
+  setMoney('neely_tax',    1300);
+  setMoney('neely_insurance', 800);
+
+  // Greenmount
+  setMoney('green_cash_invested',  30000);
+  setMoney('green_purchase_price', 0);
+  setMoney('green_rent',   3795);
+  $('green_months_occupied').value = '3';
+  setMoney('green_pm',     304);
+  setMoney('green_tax',    1140);
+  setMoney('green_insurance', 700);
+
+  // Holladay — slightly lower occupancy
+  setMoney('holl_mortgage',  395500);
+  setMoney('holl_pi',        1819);
+  setMoney('holl_cash_invested', 100000);
+  setMoney('holl_purchase_price', 0);
+  setMoney('holl_rent',      9000);  // slightly lower
+  $('holl_nights_avail').value = '90';
+  $('holl_nights_booked').value = '68';
+  setMoney('holl_tax',       5684);
+  setMoney('holl_insurance', 3600);
+  setMoney('holl_util',      1350);
+
+  // Broken Bow — weaker revenue quarter
+  setMoney('bb_mortgage1',  513500);
+  setMoney('bb_pi1',        4064);
+  setMoney('bb_mortgage2',  175200);
+  setMoney('bb_pi2',        781);
+  setMoney('bb_cash_invested', 50000);
+  setMoney('bb_purchase_price', 685000);
+  setMoney('bb_revenue',    14500);  // lower revenue
+  $('bb_nights_avail').value = '90';
+  $('bb_nights_booked').value = '42';
+  setMoney('bb_platform',   2400);
+  setMoney('bb_tax',        5687);
+  setMoney('bb_insurance',  3600);
+  setMoney('bb_rm',         2800);
+  setMoney('bb_util',       1600);
+  setMoney('bb_supplies',   900);
+  setMoney('bb_subs',       441);
+  setMoney('bb_lodging_tax', 540);
+
+  setMoney('w2_annual', 350000);
+  setMoney('a_ibonds',  48000);
+  setMoney('a_muni',    127000);
+  setMoney('a_cash',    12000);
+
+  setMoney('s_ibonds', 0);
+  setMoney('s_extra_principal', 2500);
+  setMoney('s_other',  0);
+
+  recalcAllBlended();
+  document.querySelectorAll('.acc-header').forEach(h => {
+    h.classList.add('open');
+    h.nextElementSibling.classList.add('open');
+  });
+
+  alert('Q1 2026 demo loaded. Click "Analyze & Save Quarter" to save it, then load the Q2 2026 demo to see trend arrows.');
+}
+
+// ── PREFILL DEMO ───────────────────────────────────────────────────────────
+function prefillDemo() {
+  // Sticky fields are never overwritten by demo — only set if not already saved
+  const existingSticky = loadSticky();
+  const origSetMoney = setMoney;
+  const setMoneyDemo = (id, num) => {
+    if (STICKY_IDS.includes(id) && existingSticky[id]) return; // preserve saved sticky
+    origSetMoney(id, num);
+  };
+  // Shadow setMoney locally for this function
+  const setMoney = setMoneyDemo;
+
+  $('r_date').value = '2026-06-30';
+
+  // Portfolio
+  setMoney('h_fxaix_401k',  150175.12);
+  setMoney('h_fxaix_r401k', 934.11);
+  setMoney('h_fssnx_hsa',   10112.91);
+  setMoney('h_bitb_hsa',    5677.25);
+  setMoney('h_etha_hsa',    2121.73);
+  setMoney('h_iblc_hsa',    6991.40);
+  setMoney('h_swssx_ira',   36188.49);
+  setMoney('h_swisx_ira',   38558.48);
+  setMoney('h_vwo_ira',     13878.52);
+
+  // Bradcliff — tax & insurance are annual
+  setMoney('brad_mortgage',       110000);
+  setMoney('brad_pi',             774);     // monthly P&I (sticky)
+  setMoney('brad_cash_invested',  30000);   // placeholder — update with actual
+  setMoney('brad_purchase_price', 0);       // update with actual purchase price
+  setMoney('brad_rent',           4350);    // $1,450 × 3 months
+  $('brad_months_occupied').value = '3';
+  setMoney('brad_pm',             348);     // 8%
+  setMoney('brad_tax',            1500);    // annual
+  setMoney('brad_insurance',      900);     // annual
+
+  // Neely — annual tax & insurance
+  setMoney('neely_cash_invested',  35000);  // placeholder — update with actual
+  setMoney('neely_purchase_price', 0);      // update with actual purchase price
+  setMoney('neely_rent',           4275);
+  $('neely_months_occupied').value = '3';
+  setMoney('neely_pm',             342);
+  setMoney('neely_tax',            1300);   // annual
+  setMoney('neely_insurance',      800);    // annual
+
+  // Greenmount — annual tax & insurance
+  setMoney('green_cash_invested',  30000);  // placeholder — update with actual
+  setMoney('green_purchase_price', 0);      // update with actual purchase price
+  setMoney('green_rent',           3795);
+  $('green_months_occupied').value = '3';
+  setMoney('green_pm',             304);
+  setMoney('green_tax',            1140);   // annual
+  setMoney('green_insurance',      700);    // annual
+
+  // Holladay — annual tax & insurance
+  setMoney('holl_mortgage',       393000);
+  setMoney('holl_pi',             1819);    // monthly P&I (sticky)
+  setMoney('holl_cash_invested',  100000);  // placeholder — update with actual
+  setMoney('holl_purchase_price', 0);       // update with actual purchase price
+  setMoney('holl_rent',           10500);   // $3,500 × 3 months
+  $('holl_nights_avail').value = '91';
+  $('holl_nights_booked').value = '78';
+  setMoney('holl_tax',            5684);    // annual
+  setMoney('holl_insurance',      3600);    // annual
+  setMoney('holl_util',           1200);
+
+  // Broken Bow — annual property tax & insurance
+  setMoney('bb_mortgage1',       511000);
+  setMoney('bb_pi1',             4064);     // monthly P&I primary (sticky)
+  setMoney('bb_mortgage2',       174000);
+  setMoney('bb_pi2',             781);      // monthly P&I seller note (sticky)
+  setMoney('bb_cash_invested',   50000);    // placeholder — update with actual
+  setMoney('bb_purchase_price',  685000);   // $511K + $174K acquisition price
+  setMoney('bb_revenue',         18000);    // ~$72K / 4
+  $('bb_nights_avail').value = '91';
+  $('bb_nights_booked').value = '52';
+  setMoney('bb_platform',        3000);
+  setMoney('bb_tax',             5687);     // annual property tax
+  setMoney('bb_insurance',       3600);     // annual
+  setMoney('bb_rm',              3062);
+  setMoney('bb_util',            1413);
+  setMoney('bb_supplies',        782);
+  setMoney('bb_subs',            441);
+  setMoney('bb_lodging_tax',     667);
+
+  // W-2
+  setMoney('w2_annual', 350000);
+
+  // Other assets
+  setMoney('a_ibonds', 48000);
+  setMoney('a_muni',   127000);
+  setMoney('a_cash',   15000);
+
+  recalcAllBlended();
+
+  // Open all accordions
+  document.querySelectorAll('.acc-header').forEach(h => {
+    h.classList.add('open');
+    h.nextElementSibling.classList.add('open');
+  });
+
+  alert('Q2 2026 starting values loaded. Pull your estimates and comps, then click Analyze.\n\nNotes:\n• Property tax and insurance are annual — form divides by 4 automatically.\n• Monthly P&I, Total Cash Invested, and W-2 salary are sticky — enter once and they persist.\n• P&I demo values are estimates — update with your actual payment amounts.\n• Cash invested placeholders need your real down payment + closing cost totals.');
+}
+
+// ── DEFAULTS ───────────────────────────────────────────────────────────────
+const DEFAULT_SQFT = {
+  brad: 1296, neely: 1794, green: 1134, holl: 2205, bb: 1444,
+};
+
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  $('r_date').value = new Date().toISOString().split('T')[0];
+
+  // Pre-populate sqft fields
+  Object.entries(DEFAULT_SQFT).forEach(([prefix, sqft]) => {
+    const el = $(prefix + '_sqft');
+    if (el && !el.value) el.value = sqft.toLocaleString('en-US');
+  });
+
+  ['brad','neely','green','holl','bb'].forEach(p => {
+    attachBlendedListeners(p, p+'_blended');
+  });
+
+  attachMoneyFormatters();
+  initSticky();
+  initAutosave();
+  restoreDraft();
+  renderDashboard();
+});
+</script>
+</body>
+</html>
