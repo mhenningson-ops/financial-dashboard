@@ -2125,12 +2125,12 @@ function renderDashboard() {
   // ── Equity Breakdown donut ─────────────────────────────────────────────
   const port = last.portfolio;
   const equitySlices = [
-    { label: 'Equities',    value: (port.fxaix_401k||0)+(port.fxaix_r401k||0)+(port.fssnx_hsa||0)+(port.swssx_ira||0)+(port.swisx_ira||0)+(port.vwo_ira||0), color: '#cfac67' },
-    { label: 'Real Estate', value: Math.max(0, propEquity),                                                                                                    color: '#2e86c1' },
-    { label: 'Crypto',      value: (port.bitb_hsa||0)+(port.etha_hsa||0)+(port.iblc_hsa||0),                                                                  color: '#922b21' },
-    { label: 'Muni Bonds',  value: last.otherAssets?.muni || 0,                                                                                               color: '#1e8449' },
-    { label: 'I Bonds',     value: last.otherAssets?.ibonds || 0,                                                                                             color: '#6c3483' },
-    { label: 'Cash',        value: last.otherAssets?.cash || 0,                                                                                               color: '#5d6d7e' },
+    { label: 'Equities',    value: (port.fxaix_401k||0)+(port.fxaix_r401k||0)+(port.fssnx_hsa||0)+(port.swssx_ira||0)+(port.swisx_ira||0)+(port.vwo_ira||0), color: '#c9a84c' },
+    { label: 'Real Estate', value: Math.max(0, propEquity),                                                                                                    color: '#2a5f8f' },
+    { label: 'Crypto',      value: (port.bitb_hsa||0)+(port.etha_hsa||0)+(port.iblc_hsa||0),                                                                  color: '#c4622a' },
+    { label: 'Muni Bonds',  value: last.otherAssets?.muni || 0,                                                                                               color: '#2d6b4a' },
+    { label: 'I Bonds',     value: last.otherAssets?.ibonds || 0,                                                                                             color: '#5c4b8a' },
+    { label: 'Cash',        value: last.otherAssets?.cash || 0,                                                                                               color: '#7a8fa6' },
   ].filter(s => s.value > 0).sort((a, b) => b.value - a.value);
   const equityTotal = equitySlices.reduce((s,x) => s+x.value, 0);
 
