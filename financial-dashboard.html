@@ -2082,7 +2082,7 @@ function renderDashboard() {
     type: 'doughnut',
     data: {
       labels: equitySlices.map(s => s.label),
-      datasets: [{ data: equitySlices.map(s => s.value), backgroundColor: equitySlices.map(s => s.color), borderColor: 'rgba(0,0,0,0.3)', borderWidth: 2, hoverOffset: 8 }],
+      datasets: [{ data: equitySlices.map(s => s.value), backgroundColor: equitySlices.map(s => s.color), borderWidth: 0, hoverOffset: 8 }],
     },
     options: {
       responsive: true, maintainAspectRatio: false,
@@ -2094,18 +2094,23 @@ function renderDashboard() {
     },
   });
 
-  $('equity-breakdown-legend').innerHTML = equitySlices.map(s => `
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div style="width:10px;height:10px;border-radius:50%;background:${s.color};flex-shrink:0;"></div>
-        <span style="font-size:0.78rem;color:var(--text-light);">${s.label}</span>
+  $('equity-breakdown-legend').innerHTML = equitySlices.map(s => {
+    const pct = equityTotal > 0 ? (s.value / equityTotal * 100) : 0;
+    return `
+    <div style="display:grid;grid-template-columns:130px 1fr auto;align-items:center;gap:10px;">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div style="width:9px;height:9px;border-radius:50%;background:${s.color};flex-shrink:0;"></div>
+        <span style="font-size:0.78rem;color:var(--text-light);white-space:nowrap;">${s.label}</span>
       </div>
-      <div style="text-align:right;">
+      <div style="height:5px;border-radius:3px;background:rgba(255,255,255,0.07);overflow:hidden;">
+        <div style="height:100%;width:${pct.toFixed(1)}%;background:${s.color};border-radius:3px;opacity:0.85;"></div>
+      </div>
+      <div style="text-align:right;white-space:nowrap;">
         <span style="font-size:0.82rem;font-weight:600;color:#fff;">${fmt$(s.value)}</span>
-        <span style="font-size:0.7rem;color:var(--text-muted);margin-left:6px;">${equityTotal>0?(s.value/equityTotal*100).toFixed(1):'0'}%</span>
+        <span style="font-size:0.7rem;color:var(--text-muted);margin-left:5px;">${pct.toFixed(1)}%</span>
       </div>
     </div>
-  `).join('');
+  `}).join('');
 
   const acKeys = ['Large Cap','Small Cap','Intl Developed','Emerging Markets','Crypto – BTC','Crypto – ETH','Crypto – Infra'];
   const acColors = [C.largecap,C.smallcap,C.intl,C.em,C.btc,C.eth,C.infra];
