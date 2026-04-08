@@ -307,6 +307,15 @@
   <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
   <button class="tab-btn" onclick="switchTab('review')">Quarterly Review</button>
   <button class="tab-btn" onclick="switchTab('history')">History</button>
+  <div style="flex:1;"></div>
+  <div style="position:relative;display:flex;align-items:center;" id="data-menu-wrap">
+    <button class="tab-btn" onclick="toggleDataMenu(event)" style="color:var(--gold);border-bottom:none;">Import/Export Data ▾</button>
+    <div id="data-menu" style="display:none;position:absolute;top:100%;right:0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);min-width:140px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
+      <div onclick="exportData();closeDataMenu()" style="padding:10px 16px;font-size:0.8rem;color:var(--text-light);cursor:pointer;border-bottom:1px solid var(--border);" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background=''">⬇ Export Data</div>
+      <div onclick="document.getElementById('import-file').click();closeDataMenu()" style="padding:10px 16px;font-size:0.8rem;color:var(--text-light);cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background=''">⬆ Import Data</div>
+    </div>
+    <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)">
+  </div>
 </div>
 
 <!-- ════════════════════════════════════════════
@@ -1096,6 +1105,53 @@ function loadData() {
 }
 function saveData(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 function getQuarters() { return loadData().quarters.sort((a,b)=>new Date(a.date)-new Date(b.date)); }
+
+// ── EXPORT / IMPORT ─────────────────────────────────────────────────────────
+function toggleDataMenu(e) {
+  e.stopPropagation();
+  const menu = $('data-menu');
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+function closeDataMenu() { $('data-menu').style.display = 'none'; }
+document.addEventListener('click', () => closeDataMenu());
+
+function exportData() {
+  const payload = {
+    exportedAt: new Date().toISOString(),
+    [STORAGE_KEY]: JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'),
+    [DRAFT_KEY]:   JSON.parse(localStorage.getItem(DRAFT_KEY)   || 'null'),
+    [STICKY_KEY]:  JSON.parse(localStorage.getItem(STICKY_KEY)  || 'null'),
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `cordoba-dashboard-${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const payload = JSON.parse(e.target.result);
+      if (payload[STORAGE_KEY]) localStorage.setItem(STORAGE_KEY, JSON.stringify(payload[STORAGE_KEY]));
+      if (payload[DRAFT_KEY])   localStorage.setItem(DRAFT_KEY,   JSON.stringify(payload[DRAFT_KEY]));
+      if (payload[STICKY_KEY])  localStorage.setItem(STICKY_KEY,  JSON.stringify(payload[STICKY_KEY]));
+      event.target.value = '';
+      alert('Import successful. Reloading...');
+      location.reload();
+    } catch {
+      alert('Import failed — file may be corrupted or not a valid dashboard export.');
+      event.target.value = '';
+    }
+  };
+  reader.readAsText(file);
+}
 
 // ── DRAFT AUTOSAVE ─────────────────────────────────────────────────────────
 const DRAFT_FIELD_IDS = [
