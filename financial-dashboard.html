@@ -2148,6 +2148,23 @@ function renderDashboard() {
         tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${fmt$(ctx.raw)} (${equityTotal>0?(ctx.raw/equityTotal*100).toFixed(1):'0'}%)` } },
       },
     },
+    plugins: [{
+      id: 'donutCenter',
+      afterDraw(chart) {
+        const { ctx, chartArea: { left, right, top, bottom } } = chart;
+        const cx = (left + right) / 2, cy = (top + bottom) / 2;
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        ctx.font = '600 11px Montserrat, sans-serif';
+        ctx.fillText('TOTAL', cx, cy - 12);
+        ctx.fillStyle = '#fff';
+        ctx.font = '700 16px Montserrat, sans-serif';
+        ctx.fillText(fmt$(equityTotal), cx, cy + 6);
+        ctx.restore();
+      }
+    }],
   });
 
   $('equity-breakdown-legend').innerHTML = equitySlices.map(s => {
