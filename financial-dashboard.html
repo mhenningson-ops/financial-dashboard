@@ -16,7 +16,7 @@
       --dark-1: #080e16; --dark-2: #0d1824; --dark-3: #122030; --dark-4: #1a2c3f;
       --gold: #cfac67; --gold-light: #e0c47a; --gold-dark: #ba995d;
       --gold-faint: rgba(207,172,103,0.12); --gold-faint2: rgba(207,172,103,0.06);
-      --text-light: #ddd8ce; --text-muted: #7a7060; --text-dark: #0f1a24;
+      --text-light: #ddd8ce; --text-muted: #a09880; --text-dark: #0f1a24;
       --green: #4caf7d; --green-faint: rgba(76,175,125,0.14);
       --red: #e05c5c; --red-faint: rgba(224,92,92,0.14);
       --blue: #5b9bd5; --orange: #e67e22; --purple: #9b59b6;
@@ -60,7 +60,7 @@
     .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
     .kpi-section { margin-bottom: 28px; }
     .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 12px; }
-    .kpi-row-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; opacity: 0.6; }
+    .kpi-row-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
     .sum-card { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; }
     .sum-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
     .sum-value { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; font-weight: 700; color: #fff; }
@@ -487,34 +487,45 @@
         <div class="acc-arrow">▼</div>
       </div>
       <div class="acc-body">
-        <div class="sub-section">
-          <div class="sub-section-title">Property Valuation</div>
-          <div class="field-group field-group-3">
-            <div class="field"><label>Sq Footage</label><input type="text" class="sqft-input" id="brad_sqft" placeholder="e.g. 1,400" /></div>
-            <div class="field">
-              <label>Zillow Estimate <a class="avm-link" href="https://www.zillow.com/homedetails/5274-Bradcliff-St-Memphis-TN-38109/42253057_zpid/" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="brad_zillow" placeholder="$0" />
-            </div>
-            <div class="field">
-              <label>Redfin Estimate <a class="avm-link" href="https://www.redfin.com/TN/Memphis/5274-Bradcliff-St-38109/home/60780027" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="brad_redfin" placeholder="$0" />
-            </div>
-            <div class="field">
-              <label>Chase Estimate <a class="avm-link" href="https://www.chase.com/personal/mortgage/calculators-resources/home-value-estimator" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="brad_chase" placeholder="$0" />
-            </div>
-            <div class="field">
-              <label>Bank of America Estimate <a class="avm-link" href="https://homevaluerealestatecenter.bankofamerica.com/" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="brad_bofa" placeholder="$0" />
-            </div>
+        <div class="sub-section" id="brad_val_section">
+          <div class="sub-section-title" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>Property Valuation</span>
+            <span id="brad_val_notice" style="display:none;font-size:0.72rem;color:var(--text-muted);font-weight:400;cursor:pointer;" onclick="expandValSection('brad')"></span>
           </div>
-          <div class="sub-section-title" style="margin-top:16px;">Recent Sold Comps (last 90 days, similar size)</div>
-          <div class="comp-row"><div><label>Comp 1 — Sq Ft</label><input type="text" class="sqft-input" id="brad_c1_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="brad_c1_price" placeholder="$0" /></div></div>
-          <div class="comp-row"><div><label>Comp 2 — Sq Ft</label><input type="text" class="sqft-input" id="brad_c2_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="brad_c2_price" placeholder="$0" /></div></div>
-          <div class="comp-row"><div><label>Comp 3 — Sq Ft</label><input type="text" class="sqft-input" id="brad_c3_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="brad_c3_price" placeholder="$0" /></div></div>
-          <div class="blended-display"><div><div class="blended-label">Blended Estimated Value</div><div class="note" style="margin-top:2px;">Weighted: Comps 35% · Redfin 25% · Zillow 20% · Chase 10% · BofA 10% (blank estimates excluded)</div></div><div class="blended-value" id="brad_blended">—</div></div>
-          <div class="field-group" style="margin-top:14px;">
-            <div class="field"><label>Purchase Price <span class="annual-note">— One-time entry for yield-on-cost cap rate</span></label><input type="text" class="money-input" id="brad_purchase_price" placeholder="$0" /></div>
+          <div id="brad_val_body">
+            <div id="brad_val_cb_row" style="display:none;margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);border:1px solid var(--border);">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.82rem;color:var(--text-muted);">
+                <input type="checkbox" id="brad_val_cb" onchange="toggleValUpdate('brad', this.checked)" style="cursor:pointer;accent-color:var(--gold);">
+                Update property valuations this quarter?
+              </label>
+            </div>
+            <div class="field-group field-group-3">
+              <div class="field"><label>Sq Footage</label><input type="text" class="sqft-input" id="brad_sqft" placeholder="e.g. 1,400" /></div>
+              <div class="field">
+                <label>Zillow Estimate <a class="avm-link" href="https://www.zillow.com/homedetails/5274-Bradcliff-St-Memphis-TN-38109/42253057_zpid/" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="brad_zillow" placeholder="$0" />
+              </div>
+              <div class="field">
+                <label>Redfin Estimate <a class="avm-link" href="https://www.redfin.com/TN/Memphis/5274-Bradcliff-St-38109/home/60780027" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="brad_redfin" placeholder="$0" />
+              </div>
+              <div class="field">
+                <label>Chase Estimate <a class="avm-link" href="https://www.chase.com/personal/mortgage/calculators-resources/home-value-estimator" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="brad_chase" placeholder="$0" />
+              </div>
+              <div class="field">
+                <label>Bank of America Estimate <a class="avm-link" href="https://homevaluerealestatecenter.bankofamerica.com/" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="brad_bofa" placeholder="$0" />
+              </div>
+            </div>
+            <div class="sub-section-title" style="margin-top:16px;">Recent Sold Comps (last 90 days, similar size)</div>
+            <div class="comp-row"><div><label>Comp 1 — Sq Ft</label><input type="text" class="sqft-input" id="brad_c1_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="brad_c1_price" placeholder="$0" /></div></div>
+            <div class="comp-row"><div><label>Comp 2 — Sq Ft</label><input type="text" class="sqft-input" id="brad_c2_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="brad_c2_price" placeholder="$0" /></div></div>
+            <div class="comp-row"><div><label>Comp 3 — Sq Ft</label><input type="text" class="sqft-input" id="brad_c3_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="brad_c3_price" placeholder="$0" /></div></div>
+            <div class="blended-display"><div><div class="blended-label">Blended Estimated Value</div><div class="note" style="margin-top:2px;">Weighted: Comps 35% · Redfin 25% · Zillow 20% · Chase 10% · BofA 10% (blank estimates excluded)</div></div><div class="blended-value" id="brad_blended">—</div></div>
+            <div class="field-group" style="margin-top:14px;">
+              <div class="field"><label>Purchase Price <span class="annual-note">— One-time entry for yield-on-cost cap rate</span></label><input type="text" class="money-input" id="brad_purchase_price" placeholder="$0" /></div>
+            </div>
           </div>
         </div>
         <div class="divider"></div>
@@ -551,34 +562,45 @@
         <div class="acc-arrow">▼</div>
       </div>
       <div class="acc-body">
-        <div class="sub-section">
-          <div class="sub-section-title">Property Valuation</div>
-          <div class="field-group field-group-3">
-            <div class="field"><label>Sq Footage</label><input type="text" class="sqft-input" id="neely_sqft" placeholder="e.g. 1,350" /></div>
-            <div class="field">
-              <label>Zillow Estimate <a class="avm-link" href="https://www.zillow.com/homes/5168-Neely-Rd-Memphis,-TN-38109_rb/42252538_zpid/" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="neely_zillow" placeholder="$0" />
-            </div>
-            <div class="field">
-              <label>Redfin Estimate <a class="avm-link" href="https://www.redfin.com/TN/Memphis/5168-Neely-Rd-38109/home/87717696" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="neely_redfin" placeholder="$0" />
-            </div>
-            <div class="field">
-              <label>Chase Estimate <a class="avm-link" href="https://www.chase.com/personal/mortgage/calculators-resources/home-value-estimator" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="neely_chase" placeholder="$0" />
-            </div>
-            <div class="field">
-              <label>Bank of America Estimate <a class="avm-link" href="https://homevaluerealestatecenter.bankofamerica.com/" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="neely_bofa" placeholder="$0" />
-            </div>
+        <div class="sub-section" id="neely_val_section">
+          <div class="sub-section-title" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>Property Valuation</span>
+            <span id="neely_val_notice" style="display:none;font-size:0.72rem;color:var(--text-muted);font-weight:400;cursor:pointer;" onclick="expandValSection('neely')"></span>
           </div>
-          <div class="sub-section-title" style="margin-top:16px;">Recent Sold Comps</div>
-          <div class="comp-row"><div><label>Comp 1 — Sq Ft</label><input type="text" class="sqft-input" id="neely_c1_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="neely_c1_price" placeholder="$0" /></div></div>
-          <div class="comp-row"><div><label>Comp 2 — Sq Ft</label><input type="text" class="sqft-input" id="neely_c2_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="neely_c2_price" placeholder="$0" /></div></div>
-          <div class="comp-row"><div><label>Comp 3 — Sq Ft</label><input type="text" class="sqft-input" id="neely_c3_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="neely_c3_price" placeholder="$0" /></div></div>
-          <div class="blended-display"><div><div class="blended-label">Blended Estimated Value</div></div><div class="blended-value" id="neely_blended">—</div></div>
-          <div class="field-group" style="margin-top:14px;">
-            <div class="field"><label>Purchase Price <span class="annual-note">— One-time entry for yield-on-cost cap rate</span></label><input type="text" class="money-input" id="neely_purchase_price" placeholder="$0" /></div>
+          <div id="neely_val_body">
+            <div id="neely_val_cb_row" style="display:none;margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);border:1px solid var(--border);">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.82rem;color:var(--text-muted);">
+                <input type="checkbox" id="neely_val_cb" onchange="toggleValUpdate('neely', this.checked)" style="cursor:pointer;accent-color:var(--gold);">
+                Update property valuations this quarter?
+              </label>
+            </div>
+            <div class="field-group field-group-3">
+              <div class="field"><label>Sq Footage</label><input type="text" class="sqft-input" id="neely_sqft" placeholder="e.g. 1,350" /></div>
+              <div class="field">
+                <label>Zillow Estimate <a class="avm-link" href="https://www.zillow.com/homes/5168-Neely-Rd-Memphis,-TN-38109_rb/42252538_zpid/" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="neely_zillow" placeholder="$0" />
+              </div>
+              <div class="field">
+                <label>Redfin Estimate <a class="avm-link" href="https://www.redfin.com/TN/Memphis/5168-Neely-Rd-38109/home/87717696" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="neely_redfin" placeholder="$0" />
+              </div>
+              <div class="field">
+                <label>Chase Estimate <a class="avm-link" href="https://www.chase.com/personal/mortgage/calculators-resources/home-value-estimator" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="neely_chase" placeholder="$0" />
+              </div>
+              <div class="field">
+                <label>Bank of America Estimate <a class="avm-link" href="https://homevaluerealestatecenter.bankofamerica.com/" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="neely_bofa" placeholder="$0" />
+              </div>
+            </div>
+            <div class="sub-section-title" style="margin-top:16px;">Recent Sold Comps</div>
+            <div class="comp-row"><div><label>Comp 1 — Sq Ft</label><input type="text" class="sqft-input" id="neely_c1_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="neely_c1_price" placeholder="$0" /></div></div>
+            <div class="comp-row"><div><label>Comp 2 — Sq Ft</label><input type="text" class="sqft-input" id="neely_c2_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="neely_c2_price" placeholder="$0" /></div></div>
+            <div class="comp-row"><div><label>Comp 3 — Sq Ft</label><input type="text" class="sqft-input" id="neely_c3_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="neely_c3_price" placeholder="$0" /></div></div>
+            <div class="blended-display"><div><div class="blended-label">Blended Estimated Value</div></div><div class="blended-value" id="neely_blended">—</div></div>
+            <div class="field-group" style="margin-top:14px;">
+              <div class="field"><label>Purchase Price <span class="annual-note">— One-time entry for yield-on-cost cap rate</span></label><input type="text" class="money-input" id="neely_purchase_price" placeholder="$0" /></div>
+            </div>
           </div>
         </div>
         <div class="divider"></div>
@@ -613,34 +635,45 @@
         <div class="acc-arrow">▼</div>
       </div>
       <div class="acc-body">
-        <div class="sub-section">
-          <div class="sub-section-title">Property Valuation</div>
-          <div class="field-group field-group-3">
-            <div class="field"><label>Sq Footage</label><input type="text" class="sqft-input" id="green_sqft" placeholder="e.g. 1,200" /></div>
-            <div class="field">
-              <label>Zillow Estimate <a class="avm-link" href="https://www.zillow.com/homes/4277-Greenmount-Ave-Memphis,-TN-38122_rb/42183341_zpid/" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="green_zillow" placeholder="$0" />
-            </div>
-            <div class="field">
-              <label>Redfin Estimate <a class="avm-link" href="https://www.redfin.com/TN/Memphis/4277-Greenmount-Ave-38122/home/87675907" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="green_redfin" placeholder="$0" />
-            </div>
-            <div class="field">
-              <label>Chase Estimate <a class="avm-link" href="https://www.chase.com/personal/mortgage/calculators-resources/home-value-estimator" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="green_chase" placeholder="$0" />
-            </div>
-            <div class="field">
-              <label>Bank of America Estimate <a class="avm-link" href="https://homevaluerealestatecenter.bankofamerica.com/" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="green_bofa" placeholder="$0" />
-            </div>
+        <div class="sub-section" id="green_val_section">
+          <div class="sub-section-title" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>Property Valuation</span>
+            <span id="green_val_notice" style="display:none;font-size:0.72rem;color:var(--text-muted);font-weight:400;cursor:pointer;" onclick="expandValSection('green')"></span>
           </div>
-          <div class="sub-section-title" style="margin-top:16px;">Recent Sold Comps</div>
-          <div class="comp-row"><div><label>Comp 1 — Sq Ft</label><input type="text" class="sqft-input" id="green_c1_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="green_c1_price" placeholder="$0" /></div></div>
-          <div class="comp-row"><div><label>Comp 2 — Sq Ft</label><input type="text" class="sqft-input" id="green_c2_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="green_c2_price" placeholder="$0" /></div></div>
-          <div class="comp-row"><div><label>Comp 3 — Sq Ft</label><input type="text" class="sqft-input" id="green_c3_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="green_c3_price" placeholder="$0" /></div></div>
-          <div class="blended-display"><div><div class="blended-label">Blended Estimated Value</div></div><div class="blended-value" id="green_blended">—</div></div>
-          <div class="field-group" style="margin-top:14px;">
-            <div class="field"><label>Purchase Price <span class="annual-note">— One-time entry for yield-on-cost cap rate</span></label><input type="text" class="money-input" id="green_purchase_price" placeholder="$0" /></div>
+          <div id="green_val_body">
+            <div id="green_val_cb_row" style="display:none;margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);border:1px solid var(--border);">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.82rem;color:var(--text-muted);">
+                <input type="checkbox" id="green_val_cb" onchange="toggleValUpdate('green', this.checked)" style="cursor:pointer;accent-color:var(--gold);">
+                Update property valuations this quarter?
+              </label>
+            </div>
+            <div class="field-group field-group-3">
+              <div class="field"><label>Sq Footage</label><input type="text" class="sqft-input" id="green_sqft" placeholder="e.g. 1,200" /></div>
+              <div class="field">
+                <label>Zillow Estimate <a class="avm-link" href="https://www.zillow.com/homes/4277-Greenmount-Ave-Memphis,-TN-38122_rb/42183341_zpid/" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="green_zillow" placeholder="$0" />
+              </div>
+              <div class="field">
+                <label>Redfin Estimate <a class="avm-link" href="https://www.redfin.com/TN/Memphis/4277-Greenmount-Ave-38122/home/87675907" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="green_redfin" placeholder="$0" />
+              </div>
+              <div class="field">
+                <label>Chase Estimate <a class="avm-link" href="https://www.chase.com/personal/mortgage/calculators-resources/home-value-estimator" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="green_chase" placeholder="$0" />
+              </div>
+              <div class="field">
+                <label>Bank of America Estimate <a class="avm-link" href="https://homevaluerealestatecenter.bankofamerica.com/" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="green_bofa" placeholder="$0" />
+              </div>
+            </div>
+            <div class="sub-section-title" style="margin-top:16px;">Recent Sold Comps</div>
+            <div class="comp-row"><div><label>Comp 1 — Sq Ft</label><input type="text" class="sqft-input" id="green_c1_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="green_c1_price" placeholder="$0" /></div></div>
+            <div class="comp-row"><div><label>Comp 2 — Sq Ft</label><input type="text" class="sqft-input" id="green_c2_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="green_c2_price" placeholder="$0" /></div></div>
+            <div class="comp-row"><div><label>Comp 3 — Sq Ft</label><input type="text" class="sqft-input" id="green_c3_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="green_c3_price" placeholder="$0" /></div></div>
+            <div class="blended-display"><div><div class="blended-label">Blended Estimated Value</div></div><div class="blended-value" id="green_blended">—</div></div>
+            <div class="field-group" style="margin-top:14px;">
+              <div class="field"><label>Purchase Price <span class="annual-note">— One-time entry for yield-on-cost cap rate</span></label><input type="text" class="money-input" id="green_purchase_price" placeholder="$0" /></div>
+            </div>
           </div>
         </div>
         <div class="divider"></div>
@@ -675,34 +708,45 @@
         <div class="acc-arrow">▼</div>
       </div>
       <div class="acc-body">
-        <div class="sub-section">
-          <div class="sub-section-title">Property Valuation</div>
-          <div class="field-group field-group-3">
-            <div class="field"><label>Sq Footage</label><input type="text" class="sqft-input" id="holl_sqft" placeholder="e.g. 2,200" /></div>
-            <div class="field">
-              <label>Zillow Estimate <a class="avm-link" href="https://www.zillow.com/homes/2123-E-6320-S-Salt-Lake-City,-UT-84121_rb/12871797_zpid/" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="holl_zillow" placeholder="$0" />
-            </div>
-            <div class="field">
-              <label>Redfin Estimate <a class="avm-link" href="https://www.redfin.com/UT/Holladay/2123-E-6320-S-84121/home/91810043" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="holl_redfin" placeholder="$0" />
-            </div>
-            <div class="field">
-              <label>Chase Estimate <a class="avm-link" href="https://www.chase.com/personal/mortgage/calculators-resources/home-value-estimator" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="holl_chase" placeholder="$0" />
-            </div>
-            <div class="field">
-              <label>Bank of America Estimate <a class="avm-link" href="https://homevaluerealestatecenter.bankofamerica.com/" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="holl_bofa" placeholder="$0" />
-            </div>
+        <div class="sub-section" id="holl_val_section">
+          <div class="sub-section-title" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>Property Valuation</span>
+            <span id="holl_val_notice" style="display:none;font-size:0.72rem;color:var(--text-muted);font-weight:400;cursor:pointer;" onclick="expandValSection('holl')"></span>
           </div>
-          <div class="sub-section-title" style="margin-top:16px;">Recent Sold Comps</div>
-          <div class="comp-row"><div><label>Comp 1 — Sq Ft</label><input type="text" class="sqft-input" id="holl_c1_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="holl_c1_price" placeholder="$0" /></div></div>
-          <div class="comp-row"><div><label>Comp 2 — Sq Ft</label><input type="text" class="sqft-input" id="holl_c2_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="holl_c2_price" placeholder="$0" /></div></div>
-          <div class="comp-row"><div><label>Comp 3 — Sq Ft</label><input type="text" class="sqft-input" id="holl_c3_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="holl_c3_price" placeholder="$0" /></div></div>
-          <div class="blended-display"><div><div class="blended-label">Blended Estimated Value</div></div><div class="blended-value" id="holl_blended">—</div></div>
-          <div class="field-group" style="margin-top:14px;">
-            <div class="field"><label>Purchase Price <span class="annual-note">— One-time entry for yield-on-cost cap rate</span></label><input type="text" class="money-input" id="holl_purchase_price" placeholder="$0" /></div>
+          <div id="holl_val_body">
+            <div id="holl_val_cb_row" style="display:none;margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);border:1px solid var(--border);">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.82rem;color:var(--text-muted);">
+                <input type="checkbox" id="holl_val_cb" onchange="toggleValUpdate('holl', this.checked)" style="cursor:pointer;accent-color:var(--gold);">
+                Update property valuations this quarter?
+              </label>
+            </div>
+            <div class="field-group field-group-3">
+              <div class="field"><label>Sq Footage</label><input type="text" class="sqft-input" id="holl_sqft" placeholder="e.g. 2,200" /></div>
+              <div class="field">
+                <label>Zillow Estimate <a class="avm-link" href="https://www.zillow.com/homes/2123-E-6320-S-Salt-Lake-City,-UT-84121_rb/12871797_zpid/" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="holl_zillow" placeholder="$0" />
+              </div>
+              <div class="field">
+                <label>Redfin Estimate <a class="avm-link" href="https://www.redfin.com/UT/Holladay/2123-E-6320-S-84121/home/91810043" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="holl_redfin" placeholder="$0" />
+              </div>
+              <div class="field">
+                <label>Chase Estimate <a class="avm-link" href="https://www.chase.com/personal/mortgage/calculators-resources/home-value-estimator" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="holl_chase" placeholder="$0" />
+              </div>
+              <div class="field">
+                <label>Bank of America Estimate <a class="avm-link" href="https://homevaluerealestatecenter.bankofamerica.com/" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="holl_bofa" placeholder="$0" />
+              </div>
+            </div>
+            <div class="sub-section-title" style="margin-top:16px;">Recent Sold Comps</div>
+            <div class="comp-row"><div><label>Comp 1 — Sq Ft</label><input type="text" class="sqft-input" id="holl_c1_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="holl_c1_price" placeholder="$0" /></div></div>
+            <div class="comp-row"><div><label>Comp 2 — Sq Ft</label><input type="text" class="sqft-input" id="holl_c2_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="holl_c2_price" placeholder="$0" /></div></div>
+            <div class="comp-row"><div><label>Comp 3 — Sq Ft</label><input type="text" class="sqft-input" id="holl_c3_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="holl_c3_price" placeholder="$0" /></div></div>
+            <div class="blended-display"><div><div class="blended-label">Blended Estimated Value</div></div><div class="blended-value" id="holl_blended">—</div></div>
+            <div class="field-group" style="margin-top:14px;">
+              <div class="field"><label>Purchase Price <span class="annual-note">— One-time entry for yield-on-cost cap rate</span></label><input type="text" class="money-input" id="holl_purchase_price" placeholder="$0" /></div>
+            </div>
           </div>
         </div>
         <div class="divider"></div>
@@ -741,34 +785,45 @@
         <div class="acc-arrow">▼</div>
       </div>
       <div class="acc-body">
-        <div class="sub-section">
-          <div class="sub-section-title">Property Valuation</div>
-          <div class="field-group field-group-3">
-            <div class="field"><label>Sq Footage</label><input type="text" class="sqft-input" id="bb_sqft" placeholder="e.g. 2,500" /></div>
-            <div class="field">
-              <label>Zillow Estimate <a class="avm-link" href="https://www.zillow.com/homes/200-Stevens-Rd-Broken-Bow,-OK-74728_rb/231580495_zpid/" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="bb_zillow" placeholder="$0" />
-            </div>
-            <div class="field">
-              <label>Redfin Estimate <a class="avm-link" href="https://www.redfin.com/OK/Broken-Bow/200-Stevens-Rd-74728/home/74201965" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="bb_redfin" placeholder="$0" />
-            </div>
-            <div class="field">
-              <label>Chase Estimate <a class="avm-link" href="https://www.chase.com/personal/mortgage/calculators-resources/home-value-estimator" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="bb_chase" placeholder="$0" />
-            </div>
-            <div class="field">
-              <label>Bank of America Estimate <a class="avm-link" href="https://homevaluerealestatecenter.bankofamerica.com/" target="_blank">↗</a></label>
-              <input type="text" class="money-input" id="bb_bofa" placeholder="$0" />
-            </div>
+        <div class="sub-section" id="bb_val_section">
+          <div class="sub-section-title" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>Property Valuation</span>
+            <span id="bb_val_notice" style="display:none;font-size:0.72rem;color:var(--text-muted);font-weight:400;cursor:pointer;" onclick="expandValSection('bb')"></span>
           </div>
-          <div class="sub-section-title" style="margin-top:16px;">Recent Sold Comps</div>
-          <div class="comp-row"><div><label>Comp 1 — Sq Ft</label><input type="text" class="sqft-input" id="bb_c1_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="bb_c1_price" placeholder="$0" /></div></div>
-          <div class="comp-row"><div><label>Comp 2 — Sq Ft</label><input type="text" class="sqft-input" id="bb_c2_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="bb_c2_price" placeholder="$0" /></div></div>
-          <div class="comp-row"><div><label>Comp 3 — Sq Ft</label><input type="text" class="sqft-input" id="bb_c3_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="bb_c3_price" placeholder="$0" /></div></div>
-          <div class="blended-display"><div><div class="blended-label">Blended Estimated Value</div></div><div class="blended-value" id="bb_blended">—</div></div>
-          <div class="field-group" style="margin-top:14px;">
-            <div class="field"><label>Purchase Price <span class="annual-note">— One-time entry for yield-on-cost cap rate</span></label><input type="text" class="money-input" id="bb_purchase_price" placeholder="$0" /></div>
+          <div id="bb_val_body">
+            <div id="bb_val_cb_row" style="display:none;margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);border:1px solid var(--border);">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.82rem;color:var(--text-muted);">
+                <input type="checkbox" id="bb_val_cb" onchange="toggleValUpdate('bb', this.checked)" style="cursor:pointer;accent-color:var(--gold);">
+                Update property valuations this quarter?
+              </label>
+            </div>
+            <div class="field-group field-group-3">
+              <div class="field"><label>Sq Footage</label><input type="text" class="sqft-input" id="bb_sqft" placeholder="e.g. 2,500" /></div>
+              <div class="field">
+                <label>Zillow Estimate <a class="avm-link" href="https://www.zillow.com/homes/200-Stevens-Rd-Broken-Bow,-OK-74728_rb/231580495_zpid/" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="bb_zillow" placeholder="$0" />
+              </div>
+              <div class="field">
+                <label>Redfin Estimate <a class="avm-link" href="https://www.redfin.com/OK/Broken-Bow/200-Stevens-Rd-74728/home/74201965" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="bb_redfin" placeholder="$0" />
+              </div>
+              <div class="field">
+                <label>Chase Estimate <a class="avm-link" href="https://www.chase.com/personal/mortgage/calculators-resources/home-value-estimator" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="bb_chase" placeholder="$0" />
+              </div>
+              <div class="field">
+                <label>Bank of America Estimate <a class="avm-link" href="https://homevaluerealestatecenter.bankofamerica.com/" target="_blank">↗</a></label>
+                <input type="text" class="money-input" id="bb_bofa" placeholder="$0" />
+              </div>
+            </div>
+            <div class="sub-section-title" style="margin-top:16px;">Recent Sold Comps</div>
+            <div class="comp-row"><div><label>Comp 1 — Sq Ft</label><input type="text" class="sqft-input" id="bb_c1_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="bb_c1_price" placeholder="$0" /></div></div>
+            <div class="comp-row"><div><label>Comp 2 — Sq Ft</label><input type="text" class="sqft-input" id="bb_c2_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="bb_c2_price" placeholder="$0" /></div></div>
+            <div class="comp-row"><div><label>Comp 3 — Sq Ft</label><input type="text" class="sqft-input" id="bb_c3_sqft" placeholder="sqft" /></div><div><label>Sold Price</label><input type="text" class="money-input" id="bb_c3_price" placeholder="$0" /></div></div>
+            <div class="blended-display"><div><div class="blended-label">Blended Estimated Value</div></div><div class="blended-value" id="bb_blended">—</div></div>
+            <div class="field-group" style="margin-top:14px;">
+              <div class="field"><label>Purchase Price <span class="annual-note">— One-time entry for yield-on-cost cap rate</span></label><input type="text" class="money-input" id="bb_purchase_price" placeholder="$0" /></div>
+            </div>
           </div>
         </div>
         <div class="divider"></div>
@@ -863,7 +918,7 @@
       <!-- Net Worth Summary -->
       <div class="result-card">
         <div class="result-title"><span class="step-pill">Overview</span> Quarter Snapshot</div>
-        <div class="summary-grid" id="res-summary" style="margin-bottom:0;"></div>
+        <div id="res-summary"></div>
       </div>
 
       <!-- Drift Check -->
@@ -1107,6 +1162,82 @@ function saveData(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)
 function getQuarters() { return loadData().quarters.sort((a,b)=>new Date(a.date)-new Date(b.date)); }
 
 // ── EXPORT / IMPORT ─────────────────────────────────────────────────────────
+// ── SEMI-ANNUAL PROPERTY VALUATIONS ────────────────────────────────────────
+const PROP_VAL_FIELDS = {
+  brad:  ['brad_sqft','brad_zillow','brad_redfin','brad_chase','brad_bofa','brad_c1_sqft','brad_c1_price','brad_c2_sqft','brad_c2_price','brad_c3_sqft','brad_c3_price'],
+  neely: ['neely_sqft','neely_zillow','neely_redfin','neely_chase','neely_bofa','neely_c1_sqft','neely_c1_price','neely_c2_sqft','neely_c2_price','neely_c3_sqft','neely_c3_price'],
+  green: ['green_sqft','green_zillow','green_redfin','green_chase','green_bofa','green_c1_sqft','green_c1_price','green_c2_sqft','green_c2_price','green_c3_sqft','green_c3_price'],
+  holl:  ['holl_sqft','holl_zillow','holl_redfin','holl_chase','holl_bofa','holl_c1_sqft','holl_c1_price','holl_c2_sqft','holl_c2_price','holl_c3_sqft','holl_c3_price'],
+  bb:    ['bb_sqft','bb_zillow','bb_redfin','bb_chase','bb_bofa','bb_c1_sqft','bb_c1_price','bb_c2_sqft','bb_c2_price','bb_c3_sqft','bb_c3_price'],
+};
+
+let _valPriorData = {};
+
+function initValuationMode() {
+  const quarters = getQuarters();
+  if (quarters.length === 0) return;
+  const prior = quarters[quarters.length - 1];
+  if (!prior?.rawInputs) return;
+
+  const dateVal = $('r_date')?.value;
+  const d = dateVal ? new Date(dateVal + 'T12:00:00') : new Date();
+  const qNum = Math.ceil((d.getMonth() + 1) / 3);
+  if (qNum === 1 || qNum === 3) return; // fresh quarter — leave blank
+
+  _valPriorData = prior.rawInputs;
+  const priorDate = new Date(prior.date + 'T12:00:00');
+  const priorQ = `Q${Math.ceil((priorDate.getMonth() + 1) / 3)} ${priorDate.getFullYear()}`;
+
+  Object.keys(PROP_VAL_FIELDS).forEach(p => {
+    const notice = $(`${p}_val_notice`);
+    const body = $(`${p}_val_body`);
+    if (notice) {
+      notice.innerHTML = `Carried from ${priorQ} — <span style="color:var(--gold);">expand ▼</span>`;
+      notice.style.display = '';
+    }
+    if (body) body.style.display = 'none';
+  });
+}
+
+function expandValSection(p) {
+  const notice = $(`${p}_val_notice`);
+  const body = $(`${p}_val_body`);
+  const cbRow = $(`${p}_val_cb_row`);
+  if (notice) notice.style.display = 'none';
+  if (body) body.style.display = '';
+  if (cbRow) cbRow.style.display = '';
+  setValFieldsState(p, false);
+}
+
+function setValFieldsState(p, editable) {
+  PROP_VAL_FIELDS[p].forEach(id => {
+    const el = $(id);
+    if (!el) return;
+    if (editable) {
+      el.value = '';
+      el.removeAttribute('readonly');
+      el.style.opacity = '';
+      el.style.cursor = '';
+    } else {
+      el.value = _valPriorData[id] || '';
+      el.setAttribute('readonly', true);
+      el.style.opacity = '0.5';
+      el.style.cursor = 'default';
+    }
+  });
+  updateBlended(p, p + '_blended');
+}
+
+function toggleValUpdate(p, checked) {
+  if (checked) {
+    setValFieldsState(p, true);
+  } else {
+    setValFieldsState(p, false);
+    const cb = $(`${p}_val_cb`);
+    if (cb) cb.checked = false;
+  }
+}
+
 function toggleDataMenu(e) {
   e.stopPropagation();
   const menu = $('data-menu');
@@ -1139,6 +1270,17 @@ function importData(event) {
   reader.onload = e => {
     try {
       const payload = JSON.parse(e.target.result);
+      const existing = loadData();
+      const existingLabels = new Set(existing.quarters.map(q => q.quarter));
+      const importLabels = (payload[STORAGE_KEY]?.quarters || []).map(q => q.quarter);
+      const duplicates = importLabels.filter(l => existingLabels.has(l));
+      if (duplicates.length > 0) {
+        const exportedAt = payload.exportedAt ? ` (exported ${new Date(payload.exportedAt).toLocaleDateString()})` : '';
+        if (!confirm(`This import${exportedAt} contains ${duplicates.length} quarter${duplicates.length !== 1 ? 's' : ''} that already exist: ${duplicates.join(', ')}.\n\nImporting will overwrite them. Continue?`)) {
+          event.target.value = '';
+          return;
+        }
+      }
       if (payload[STORAGE_KEY]) localStorage.setItem(STORAGE_KEY, JSON.stringify(payload[STORAGE_KEY]));
       if (payload[DRAFT_KEY])   localStorage.setItem(DRAFT_KEY,   JSON.stringify(payload[DRAFT_KEY]));
       if (payload[STICKY_KEY])  localStorage.setItem(STICKY_KEY,  JSON.stringify(payload[STICKY_KEY]));
@@ -1571,17 +1713,53 @@ function renderReviewResults(s) {
   const fiTarget  = new Date(FI_TARGET_YEAR, 0, 1);
   const monthsToFI = Math.max(0, (fiTarget.getFullYear() - sDate.getFullYear()) * 12 + (fiTarget.getMonth() - sDate.getMonth()));
 
+  // Derived KPI values
+  const rPropEquity    = (s.totalPropertyValue || 0) - (s.totalDebt || 0);
+  const rPrevPropEquity = prev ? (prev.totalPropertyValue || 0) - (prev.totalDebt || 0) : null;
+  const rOtherFin      = s.otherAssets?.total || 0;
+  const rPrevOtherFin  = prev?.otherAssets?.total ?? null;
+  const rDebtRatio     = s.totalAssets > 0 ? s.totalDebt / s.totalAssets : null;
+  const rPrevDebtRatio = (prev && prev.totalAssets > 0) ? prev.totalDebt / prev.totalAssets : null;
+  const rDebtRatioChg  = (rDebtRatio !== null && rPrevDebtRatio !== null) ? (rDebtRatio - rPrevDebtRatio) * 100 : null;
+  const allQR = getQuarters();
+  const rYear = new Date(s.date).getFullYear();
+  const rYtdQ = allQR.filter(q => new Date(q.date).getFullYear() === rYear && new Date(q.date) <= new Date(s.date));
+  const rYtdSaved = rYtdQ.reduce((a, q) => a + (q.totalSaved || q.contributions?.total || 0), 0);
+  const rYtdW2    = rYtdQ.reduce((a, q) => a + ((q.w2Annual || 350000) / 4), 0);
+  const rSR       = rYtdW2 > 0 ? rYtdSaved / rYtdW2 : null;
+  const prevYtdQR = prev ? allQR.filter(q => new Date(q.date).getFullYear() === new Date(prev.date).getFullYear() && new Date(q.date) <= new Date(prev.date)) : [];
+  const prevYtdSavedR = prevYtdQR.reduce((a, q) => a + (q.totalSaved || q.contributions?.total || 0), 0);
+  const prevYtdW2R    = prevYtdQR.reduce((a, q) => a + ((q.w2Annual || 350000) / 4), 0);
+  const rPrevSR       = prevYtdW2R > 0 ? prevYtdSavedR / prevYtdW2R : null;
+  const rSRChg        = (rSR !== null && rPrevSR !== null) ? (rSR - rPrevSR) * 100 : null;
+
+  const rCard = (label, value, badge, sub='') =>
+    `<div class="sum-card"><div class="sum-label">${label}</div><div class="sum-value">${value}</div>${badge}${sub ? `<div class="sum-sub">${sub}</div>` : ''}</div>`;
+  const rPctBadge = (chgPts, invert) => {
+    if (chgPts === null || chgPts === undefined) return '<div class="sum-change" style="color:var(--text-muted);opacity:0.4;">▲ 0.0% vs last Q</div>';
+    const good = invert ? chgPts <= 0 : chgPts >= 0;
+    return `<div class="sum-change ${good?'pos':'neg'}">${chgPts>=0?'▲':'▼'} ${Math.abs(chgPts).toFixed(1)}% vs last Q</div>`;
+  };
+
   $('res-summary').innerHTML = `
-    <div class="sum-card"><div class="sum-label">Net Worth</div><div class="sum-value gold">${fmt$(s.netWorth)}</div>${chgBadgeR(s.netWorth, prev?.netWorth, false)}</div>
-    <div class="sum-card"><div class="sum-label">Portfolio</div><div class="sum-value">${fmt$(s.totalPortfolio)}</div>${chgBadgeR(s.totalPortfolio, prev?.totalPortfolio, false)}</div>
-    <div class="sum-card"><div class="sum-label">Property Value</div><div class="sum-value">${fmt$(s.totalPropertyValue)}</div>${chgBadgeR(s.totalPropertyValue, prev?.totalPropertyValue, false)}</div>
-    <div class="sum-card"><div class="sum-label">Total Debt</div><div class="sum-value neg">-${fmt$(s.totalDebt)}</div>${chgBadgeR(s.totalDebt, prev?.totalDebt, true)}</div>
-    <div class="sum-card"><div class="sum-label">Annual Cash Flow</div><div class="sum-value ${s.annualRentalCashFlow>=0?'green':'neg'}">${fmt$(s.annualRentalCashFlow)}</div>
-      ${chgBadgeR(s.annualRentalCashFlow, prev?.annualRentalCashFlow, false)}
-      <div class="sum-sub" style="margin-top:4px;margin-bottom:6px;">YTD actuals + avg-ex-capex projection</div>
-      <div class="fi-bar-wrap"><div class="fi-bar-track"><div class="fi-bar-fill" style="width:${Math.min(100,Math.max(0,fiPctCur)).toFixed(0)}%"></div></div>
-      <div class="fi-bar-label"><span>0</span><span>FI: ${fmt$(FI_TARGET_CASH)}</span></div></div></div>
-    <div class="sum-card"><div class="sum-label">FI Progress</div><div class="sum-value">${fiPctCur.toFixed(0)}%</div>${chgBadgePct(fiPctCur, fiPctPrev)}<div class="sum-sub">Target: $115K by age 40</div></div>
+    <div class="kpi-row-label">Balance Sheet</div>
+    <div class="kpi-row">
+      ${rCard('Total Assets', `<span class="gold">${fmt$(s.totalAssets)}</span>`, chgBadgeR(s.totalAssets, prev?.totalAssets, false))}
+      ${rCard('Total Debt', `<span class="neg">-${fmt$(s.totalDebt)}</span>`, chgBadgeR(s.totalDebt, prev?.totalDebt, true))}
+      ${rCard('Net Worth', `<span class="gold">${fmt$(s.netWorth)}</span>`, chgBadgeR(s.netWorth, prev?.netWorth, false))}
+    </div>
+    <div class="kpi-row-label">Asset Breakdown</div>
+    <div class="kpi-row">
+      ${rCard('Retirement Portfolio', fmt$(s.totalPortfolio), chgBadgeR(s.totalPortfolio, prev?.totalPortfolio, false), '401k · Roth · HSA · IRA')}
+      ${rCard('Other Financial Assets', fmt$(rOtherFin), chgBadgeR(rOtherFin, rPrevOtherFin, false), 'I Bonds · Munis · Cash · Other')}
+      ${rCard('Property Equity', fmt$(rPropEquity), chgBadgeR(rPropEquity, rPrevPropEquity, false), 'Blended value − mortgages')}
+    </div>
+    <div class="kpi-row-label">Performance</div>
+    <div class="kpi-row">
+      ${rCard('YTD Savings Rate', rSR !== null ? `<span class="${rSR>=0.20?'green':'gold'}">${(rSR*100).toFixed(1)}%</span>` : '—', rPctBadge(rSRChg, false), `${rYtdQ.length} quarter${rYtdQ.length!==1?'s':''} in ${rYear}`)}
+      ${rCard('Principal Paydown', s.principalPaydown != null ? `<span class="pos">${fmt$(s.principalPaydown)}</span>` : '<span style="color:var(--text-muted);font-size:0.85rem;">First quarter</span>', s.principalPaydown != null ? chgBadgeR(s.principalPaydown, prev?.principalPaydown, false) : '<div class="sum-change" style="color:var(--text-muted);opacity:0.4;">▲ $0 vs last Q</div>', 'This quarter')}
+      ${rCard('Debt Ratio', rDebtRatio !== null ? `<span class="${rDebtRatio<=0.4?'green':rDebtRatio<=0.6?'gold':'neg'}">${(rDebtRatio*100).toFixed(1)}%</span>` : '—', rPctBadge(rDebtRatioChg, true), 'Total Debt ÷ Total Assets')}
+    </div>
   `;
 
   const port = s.portfolio;
@@ -1635,10 +1813,11 @@ function renderReviewResults(s) {
   let contribHTML = noNextContrib
     ? '<div class="status-msg">Enter your planned next-quarter contributions above to see allocation guidance.</div>'
     : '';
+  const contribColGroup = `<colgroup><col style="width:40%"><col style="width:15%"><col style="width:20%"><col style="width:25%"></colgroup>`;
   if (!noNextContrib) {
     for (const [acct, g] of Object.entries(acctGroups)) {
       contribHTML += `<div style="font-family:'Montserrat',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);padding:12px 0 8px;border-top:1px solid var(--border);margin-top:4px;">${acct} — Planned: ${fmt$d(g.contrib)}</div>
-      <table class="result-table"><thead><tr><th>Asset Class</th><th>Fund</th><th class="right">Alloc %</th><th class="right">$ Amount</th></tr></thead><tbody>`;
+      <table class="result-table" style="table-layout:fixed;width:100%;">${contribColGroup}<thead><tr><th>Asset Class</th><th>Fund</th><th class="right">Alloc %</th><th class="right">$ Amount</th></tr></thead><tbody>`;
       for (let i=0; i<g.keys.length; i++) {
         const key = g.keys[i]; const [fund,ac] = g.labels[i];
         const pct = getAllocPct(gaps, key, g.keys);
@@ -1666,6 +1845,7 @@ function renderReviewResults(s) {
     ]},
   ];
 
+  const tradeColGroup = `<colgroup><col style="width:28%"><col style="width:10%"><col style="width:15%"><col style="width:15%"><col style="width:15%"><col style="width:12%"></colgroup>`;
   let tradesHTML = '';
   for (const acct of tradeAccts) {
     const trades = acct.funds.map(f => ({ ...f, raw: f.acFlagged ? f.tgt - f.proj : 0 }));
@@ -1675,7 +1855,7 @@ function renderReviewResults(s) {
     const canTrade = sellPool > 0.01 && buyNeeded > 0.01;
 
     tradesHTML += `<div style="font-family:'Montserrat',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);padding:12px 0 8px;border-top:1px solid var(--border);margin-top:4px;">${acct.name}</div>
-    <table class="result-table"><thead><tr><th>Asset Class</th><th>Fund</th><th class="right">Target $</th><th class="right">Projected $</th><th class="right">Trade Amt</th><th class="right">Action</th></tr></thead><tbody>`;
+    <table class="result-table" style="table-layout:fixed;width:100%;">${tradeColGroup}<thead><tr><th>Asset Class</th><th>Fund</th><th class="right">Target $</th><th class="right">Projected $</th><th class="right">Trade Amt</th><th class="right">Action</th></tr></thead><tbody>`;
     for (const t of trades) {
       const exec = canTrade ? (t.raw<0?t.raw:t.raw*scale) : 0;
       const action = exec<-0.01 ? '<span class="badge-sell">SELL</span>' : exec>0.01 ? '<span class="badge-buy">BUY</span>' : '<span class="muted">—</span>';
@@ -2577,6 +2757,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initSticky();
   initAutosave();
   restoreDraft();
+  initValuationMode();
+  $('r_date').addEventListener('change', initValuationMode);
   renderDashboard();
 });
 </script>
