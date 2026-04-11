@@ -2775,7 +2775,7 @@ function renderHistory() {
       <div class="hist-metrics">
         <div class="hist-m"><div class="hist-m-label">Net Worth</div><div class="hist-m-val gold">${fmt$(q.netWorth)}</div></div>
         <div class="hist-m"><div class="hist-m-label">Portfolio</div><div class="hist-m-val">${fmt$(q.totalPortfolio)}</div></div>
-        <div class="hist-m"><div class="hist-m-label">Annual Cash Flow</div><div class="hist-m-val ${q.annualRentalCashFlow>=0?'pos':'neg'}">${fmt$(q.annualRentalCashFlow)}</div></div>
+        <div class="hist-m"><div class="hist-m-label">Annual Cash Flow</div><div class="hist-m-val ${q.annualRentalCashFlow>=0?'pos':'neg'}">${q.annualRentalCashFlow<0?'-':''}${fmt$(q.annualRentalCashFlow)}</div></div>
         <div class="hist-m"><div class="hist-m-label">Total Debt</div><div class="hist-m-val neg">-${fmt$(q.totalDebt)}</div></div>
       </div>
     </div>
