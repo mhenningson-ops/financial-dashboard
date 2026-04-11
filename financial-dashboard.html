@@ -232,6 +232,25 @@
     .status-msg { font-size: 0.75rem; color: var(--text-muted); font-style: italic; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); margin-top: 8px; }
     .status-msg.exec { color: var(--green); background: var(--green-faint); font-style: normal; font-weight: 500; }
 
+    /* ── EXPANDABLE KPI TILES ── */
+    .sum-card { position: relative; }
+    .sum-card.has-detail { cursor: pointer; transition: border-color 0.2s; }
+    .sum-card.has-detail:hover { border-color: rgba(207,172,103,0.28); }
+    .card-expand-icon { position: absolute; top: 12px; right: 14px; font-size: 0.78rem; color: var(--text-muted); line-height: 1; transition: color 0.2s, transform 0.2s; user-select: none; }
+    .sum-card.has-detail:hover .card-expand-icon { color: var(--gold); }
+    .card-detail { display: none; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .card-detail.open { display: block; }
+    .card-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .card-detail-row:last-child { border-bottom: none; }
+    .card-detail-label { font-size: 0.76rem; color: var(--text-muted); }
+    .card-detail-val { font-size: 0.79rem; font-weight: 600; color: #fff; font-family: 'Montserrat', sans-serif; text-align: right; }
+    .card-detail-val.pos { color: var(--green); }
+    .card-detail-val.neg { color: var(--red); }
+    .card-detail-val.gold { color: var(--gold); }
+    .card-detail-total { display: flex; justify-content: space-between; align-items: center; padding-top: 8px; margin-top: 4px; border-top: 1px solid rgba(207,172,103,0.2); }
+    .card-detail-total-label { font-size: 0.75rem; font-weight: 700; color: var(--gold); }
+    .card-detail-total-val { font-size: 0.82rem; font-weight: 700; color: var(--gold); font-family: 'Montserrat', sans-serif; }
+
     @media (max-width: 768px) {
       /* Layout */
       .page-sm, .page { padding: 16px 14px; }
@@ -384,6 +403,20 @@
           <div class="chart-title">Portfolio by Asset Type</div>
           <div class="chart-sub">Value of each holding over time</div>
           <div class="chart-canvas-wrap"><canvas id="chart-assetclass"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Charts row 4: W-2 income trend + per-property equity -->
+      <div class="chart-grid chart-grid-2" style="margin-bottom:20px;">
+        <div class="chart-wrap">
+          <div class="chart-title">W-2 Income Trend</div>
+          <div class="chart-sub">Trending annualized W-2 income by quarter</div>
+          <div class="chart-canvas-wrap"><canvas id="chart-w2trend"></canvas></div>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-title">Property Equity Over Time</div>
+          <div class="chart-sub">Equity per property (blended value − mortgage balance)</div>
+          <div class="chart-canvas-wrap"><canvas id="chart-propequity"></canvas></div>
         </div>
       </div>
 
@@ -875,11 +908,19 @@
           </div>
         </div>
         <div class="sub-section">
-          <div class="sub-section-title">W-2 Income</div>
-          <div class="field-group">
+          <div class="sub-section-title">Income This Quarter</div>
+          <div class="field-group field-group-3">
             <div class="field">
-              <label>Annual W-2 Salary <span class="annual-note">— Used to calculate savings rate</span></label>
-              <input type="text" class="money-input" id="w2_annual" placeholder="$0 / year" />
+              <label>Base W-2 <span class="annual-note">— Regular salary only</span></label>
+              <input type="text" class="money-input" id="w2_base" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>RSU / Bonus <span class="annual-note">— Reported on W-2</span></label>
+              <input type="text" class="money-input" id="w2_rsu" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>Spiff / Other <span class="annual-note">— Prepaid cards, side income</span></label>
+              <input type="text" class="money-input" id="w2_spiff" placeholder="$0" />
             </div>
           </div>
         </div>
@@ -1318,6 +1359,7 @@ const DRAFT_FIELD_IDS = [
   'bb_mortgage1','bb_mortgage2','bb_revenue','bb_nights_avail','bb_nights_booked','bb_platform','bb_rm','bb_util','bb_supplies','bb_subs','bb_capex','bb_lodging_tax',
   'a_ibonds','a_muni','a_cash','a_other','d_other',
   's_ibonds','s_extra_principal','s_other',
+  'w2_base','w2_rsu','w2_spiff',
 ];
 
 let draftTimer = null;
@@ -1368,7 +1410,6 @@ const STICKY_IDS = [
   'green_tax','green_insurance','green_cash_invested','green_purchase_price',
   'holl_tax','holl_insurance','holl_pi','holl_cash_invested','holl_purchase_price',
   'bb_tax','bb_insurance','bb_pi1','bb_pi2','bb_cash_invested','bb_purchase_price',
-  'w2_annual',
 ];
 
 function loadSticky() {
@@ -1634,10 +1675,13 @@ function runReview() {
   };
   otherSavings.total = otherSavings.ibonds + otherSavings.extraPrincipal + otherSavings.other;
 
-  // W-2 savings rate — account contributions + other savings vs. quarterly gross
-  const w2Annual = v('w2_annual') || 350000;
+  // W-2 savings rate — account contributions + other savings vs. total quarterly income
+  const w2Base     = v('w2_base');
+  const w2Rsu      = v('w2_rsu');
+  const w2Spiff    = v('w2_spiff');
+  const w2Quarterly = w2Base + w2Rsu + w2Spiff;
   const totalSaved = contrib.total + otherSavings.total;
-  const savingsRate = w2Annual > 0 ? totalSaved / (w2Annual / 4) : 0;
+  const savingsRate = w2Quarterly > 0 ? totalSaved / w2Quarterly : 0;
 
   // Principal paydown vs prior quarter
   const quarterLabel = getQuarter(dateStr);
@@ -1670,7 +1714,7 @@ function runReview() {
     totalAssets, totalDebt, netWorth,
     annualRentalCashFlow: annualCashFlow,
     annualCFPerProp,
-    w2Annual, savingsRate, principalPaydown,
+    w2Quarterly, w2Base, w2Rsu, w2Spiff, savingsRate, principalPaydown,
     otherSavings, totalSaved,
     contributionsNext: contribNext,
     rawInputs,
@@ -1725,40 +1769,171 @@ function renderReviewResults(s) {
   const rYear = new Date(s.date).getFullYear();
   const rYtdQ = allQR.filter(q => new Date(q.date).getFullYear() === rYear && new Date(q.date) <= new Date(s.date));
   const rYtdSaved = rYtdQ.reduce((a, q) => a + (q.totalSaved || q.contributions?.total || 0), 0);
-  const rYtdW2    = rYtdQ.reduce((a, q) => a + ((q.w2Annual || 350000) / 4), 0);
+  const rYtdW2    = rYtdQ.reduce((a, q) => a + (q.w2Quarterly || 0), 0);
   const rSR       = rYtdW2 > 0 ? rYtdSaved / rYtdW2 : null;
   const prevYtdQR = prev ? allQR.filter(q => new Date(q.date).getFullYear() === new Date(prev.date).getFullYear() && new Date(q.date) <= new Date(prev.date)) : [];
   const prevYtdSavedR = prevYtdQR.reduce((a, q) => a + (q.totalSaved || q.contributions?.total || 0), 0);
-  const prevYtdW2R    = prevYtdQR.reduce((a, q) => a + ((q.w2Annual || 350000) / 4), 0);
+  const prevYtdW2R    = prevYtdQR.reduce((a, q) => a + (q.w2Quarterly || 0), 0);
   const rPrevSR       = prevYtdW2R > 0 ? prevYtdSavedR / prevYtdW2R : null;
   const rSRChg        = (rSR !== null && rPrevSR !== null) ? (rSR - rPrevSR) * 100 : null;
+  const rYtdPP        = rYtdQ.reduce((a, q) => a + (q.principalPaydown || 0), 0);
+  const rYtdQNum      = rYtdQ.length;
 
-  const rCard = (label, value, badge, sub='') =>
-    `<div class="sum-card"><div class="sum-label">${label}</div><div class="sum-value">${value}</div>${badge}${sub ? `<div class="sum-sub">${sub}</div>` : ''}</div>`;
+  const rCard = (label, value, badge, sub='', detail='', id='') => {
+    const has = detail && id;
+    return `<div class="sum-card${has?' has-detail':''}"${has?` onclick="toggleCardDetail('${id}')"`:''}>` +
+      (has ? `<div class="card-expand-icon" id="${id}-icon">+</div>` : '') +
+      `<div class="sum-label">${label}</div><div class="sum-value">${value}</div>${badge}` +
+      (sub ? `<div class="sum-sub">${sub}</div>` : '') +
+      (has ? `<div class="card-detail" id="${id}-detail">${detail}</div>` : '') +
+      `</div>`;
+  };
   const rPctBadge = (chgPts, invert) => {
     if (chgPts === null || chgPts === undefined) return '<div class="sum-change" style="color:var(--text-muted);opacity:0.4;">▲ 0.0% vs last Q</div>';
     const good = invert ? chgPts <= 0 : chgPts >= 0;
     return `<div class="sum-change ${good?'pos':'neg'}">${chgPts>=0?'▲':'▼'} ${Math.abs(chgPts).toFixed(1)}% vs last Q</div>`;
   };
 
+  // Detail helpers for Q snapshot
+  const rdr  = (lbl, val, cls='') => `<div class="card-detail-row"><span class="card-detail-label">${lbl}</span><span class="card-detail-val${cls?' '+cls:''}">${val}</span></div>`;
+  const rdrt = (lbl, val, cls='gold') => `<div class="card-detail-total"><span class="card-detail-total-label">${lbl}</span><span class="card-detail-total-val ${cls}">${val}</span></div>`;
+
+  // Q snapshot drill-down content
+  const sp = s.properties || {};
+  const pnm = { bradcliff:'Bradcliff', neely:'Neely', greenmount:'Greenmount', holladay:'Holladay', brokenBow:'Broken Bow' };
+
+  const rdTotalAssets = [
+    rdr('Retirement Portfolio', fmt$(s.totalPortfolio)),
+    rdr('Other Financial Assets', fmt$(rOtherFin)),
+    rdr('Property Values', fmt$(s.totalPropertyValue || 0)),
+    (s.otherAssets?.other||0) > 0 ? rdr('Other Assets', fmt$(s.otherAssets.other)) : '',
+    rdrt('Total Assets', fmt$(s.totalAssets)),
+  ].join('');
+
+  const rdTotalDebt = [
+    (sp.bradcliff?.mortgage||0)  > 0 ? rdr('Bradcliff', `-${fmt$(sp.bradcliff.mortgage)}`, 'neg') : '',
+    (sp.holladay?.mortgage||0)   > 0 ? rdr('Holladay',  `-${fmt$(sp.holladay.mortgage)}`, 'neg') : '',
+    (sp.brokenBow?.mortgage1||0) > 0 ? rdr('Broken Bow (1st)', `-${fmt$(sp.brokenBow.mortgage1)}`, 'neg') : '',
+    (sp.brokenBow?.mortgage2||0) > 0 ? rdr('Broken Bow (2nd)', `-${fmt$(sp.brokenBow.mortgage2)}`, 'neg') : '',
+    (s.otherDebts||0) > 0 ? rdr('Other Debt', `-${fmt$(s.otherDebts)}`, 'neg') : '',
+    rdrt('Total Debt', `-${fmt$(s.totalDebt)}`, 'neg'),
+  ].join('');
+
+  const rdNetWorth = [
+    rdr('Total Assets',  fmt$(s.totalAssets), 'gold'),
+    rdr('Total Debt',   `-${fmt$(s.totalDebt)}`, 'neg'),
+    rdrt('Net Worth', fmt$(s.netWorth)),
+  ].join('');
+
+  const sp2 = s.portfolio || {};
+  const rdRetirement = [
+    rdr('FXAIX – 401(k)',      fmt$(sp2.fxaix_401k  || 0)),
+    rdr('FXAIX – Roth 401(k)', fmt$(sp2.fxaix_r401k || 0)),
+    rdr('FSSNX – HSA',         fmt$(sp2.fssnx_hsa   || 0)),
+    rdr('BITB – HSA',          fmt$(sp2.bitb_hsa    || 0)),
+    rdr('ETHA – HSA',          fmt$(sp2.etha_hsa    || 0)),
+    rdr('IBLC – HSA',          fmt$(sp2.iblc_hsa    || 0)),
+    rdr('SWSSX – Roth IRA',    fmt$(sp2.swssx_ira   || 0)),
+    rdr('SWISX – Roth IRA',    fmt$(sp2.swisx_ira   || 0)),
+    rdr('VWO – Roth IRA',      fmt$(sp2.vwo_ira     || 0)),
+    rdrt('Total Portfolio', fmt$(s.totalPortfolio)),
+  ].join('');
+
+  const soa = s.otherAssets || {};
+  const rdOtherFin = [
+    (soa.ibonds||0) > 0 ? rdr('I Bonds',    fmt$(soa.ibonds)) : '',
+    (soa.muni||0)   > 0 ? rdr('Muni Bonds', fmt$(soa.muni))   : '',
+    (soa.cash||0)   > 0 ? rdr('Cash',       fmt$(soa.cash))   : '',
+    (soa.other||0)  > 0 ? rdr('Other',      fmt$(soa.other))  : '',
+    rdrt('Total', fmt$(soa.total || 0)),
+  ].join('');
+
+  const rdPropEquity = [
+    ...Object.entries(sp).map(([key, prop]) => {
+      const mort = key==='brokenBow' ? (prop.mortgage1||0)+(prop.mortgage2||0) : (prop.mortgage||0);
+      const eq = (prop.value||0) - mort;
+      return rdr(pnm[key]||key, fmt$(eq), eq >= 0 ? 'pos' : 'neg');
+    }),
+    rdrt('Total Equity', fmt$(rPropEquity)),
+  ].join('');
+
+  const rdTotalIncome = [
+    rdr('Base W-2',   fmt$(s.w2Base  || 0)),
+    rdr('RSU / Bonus', fmt$(s.w2Rsu  || 0)),
+    rdr('Spiff / Other', fmt$(s.w2Spiff || 0)),
+    rdrt('Total Income', fmt$(s.w2Quarterly || 0)),
+  ].join('');
+
+  const rdSavingsRate = [
+    rdr('401(k)',      fmt$(s.contributions?.c401k || 0)),
+    rdr('Roth 401(k)', fmt$(s.contributions?.r401k || 0)),
+    rdr('HSA',         fmt$(s.contributions?.hsa   || 0)),
+    rdr('Roth IRA',    fmt$(s.contributions?.ira   || 0)),
+    (s.otherSavings?.ibonds||0)        > 0 ? rdr('I Bonds',        fmt$(s.otherSavings.ibonds))        : '',
+    (s.otherSavings?.extraPrincipal||0)> 0 ? rdr('Extra Principal', fmt$(s.otherSavings.extraPrincipal)): '',
+    (s.otherSavings?.other||0)         > 0 ? rdr('Other Savings',   fmt$(s.otherSavings.other))         : '',
+    rdrt('Total Saved', fmt$(s.totalSaved || 0)),
+    (s.w2Quarterly||0) > 0 ? rdr('W-2 Income', fmt$(s.w2Quarterly)) : '',
+  ].join('');
+
+  const rdPrincipalPaydown = prev
+    ? [
+        ...Object.entries(sp).map(([key, prop]) => {
+          const curMort  = key==='brokenBow' ? (prop.mortgage1||0)+(prop.mortgage2||0) : (prop.mortgage||0);
+          const prevProp = prev.properties?.[key];
+          const prevMort = key==='brokenBow' ? ((prevProp?.mortgage1||0)+(prevProp?.mortgage2||0)) : (prevProp?.mortgage||0);
+          const pp = prevMort - curMort;
+          return pp > 0 ? rdr(pnm[key]||key, fmt$(pp), 'pos') : '';
+        }),
+        s.principalPaydown != null ? rdrt('Total Paydown', fmt$(s.principalPaydown), 'pos') : '',
+      ].join('')
+    : rdr('No prior quarter', '—', '');
+
+  const rdDebtRatio = [
+    rdr('Total Debt',   fmt$(s.totalDebt)),
+    rdr('Total Assets', fmt$(s.totalAssets)),
+    rdrt('Debt Ratio', rDebtRatio !== null ? `${(rDebtRatio*100).toFixed(1)}%` : '—'),
+  ].join('');
+
   $('res-summary').innerHTML = `
     <div class="kpi-row-label">Balance Sheet</div>
     <div class="kpi-row">
-      ${rCard('Total Assets', `<span class="gold">${fmt$(s.totalAssets)}</span>`, chgBadgeR(s.totalAssets, prev?.totalAssets, false))}
-      ${rCard('Total Debt', `<span class="neg">-${fmt$(s.totalDebt)}</span>`, chgBadgeR(s.totalDebt, prev?.totalDebt, true))}
-      ${rCard('Net Worth', `<span class="gold">${fmt$(s.netWorth)}</span>`, chgBadgeR(s.netWorth, prev?.netWorth, false))}
+      ${rCard('Total Assets', `<span class="gold">${fmt$(s.totalAssets)}</span>`, chgBadgeR(s.totalAssets, prev?.totalAssets, false), '', rdTotalAssets, 'qs-assets')}
+      ${rCard('Total Debt', `<span class="neg">-${fmt$(s.totalDebt)}</span>`, chgBadgeR(s.totalDebt, prev?.totalDebt, true), '', rdTotalDebt, 'qs-debt')}
+      ${rCard('Net Worth', `<span class="gold">${fmt$(s.netWorth)}</span>`, chgBadgeR(s.netWorth, prev?.netWorth, false), '', rdNetWorth, 'qs-nw')}
     </div>
     <div class="kpi-row-label">Asset Breakdown</div>
     <div class="kpi-row">
-      ${rCard('Retirement Portfolio', fmt$(s.totalPortfolio), chgBadgeR(s.totalPortfolio, prev?.totalPortfolio, false), '401k · Roth · HSA · IRA')}
-      ${rCard('Other Financial Assets', fmt$(rOtherFin), chgBadgeR(rOtherFin, rPrevOtherFin, false), 'I Bonds · Munis · Cash · Other')}
-      ${rCard('Property Equity', fmt$(rPropEquity), chgBadgeR(rPropEquity, rPrevPropEquity, false), 'Blended value − mortgages')}
+      ${rCard('Retirement Portfolio', fmt$(s.totalPortfolio), chgBadgeR(s.totalPortfolio, prev?.totalPortfolio, false), '401k · Roth · HSA · IRA', rdRetirement, 'qs-retire')}
+      ${rCard('Other Financial Assets', fmt$(rOtherFin), chgBadgeR(rOtherFin, rPrevOtherFin, false), 'I Bonds · Munis · Cash · Other', rdOtherFin, 'qs-otherfin')}
+      ${rCard('Property Equity', fmt$(rPropEquity), chgBadgeR(rPropEquity, rPrevPropEquity, false), 'Blended value − mortgages', rdPropEquity, 'qs-propequity')}
     </div>
     <div class="kpi-row-label">Performance</div>
-    <div class="kpi-row">
-      ${rCard('YTD Savings Rate', rSR !== null ? `<span class="${rSR>=0.20?'green':'gold'}">${(rSR*100).toFixed(1)}%</span>` : '—', rPctBadge(rSRChg, false), `${rYtdQ.length} quarter${rYtdQ.length!==1?'s':''} in ${rYear}`)}
-      ${rCard('Principal Paydown', s.principalPaydown != null ? `<span class="pos">${fmt$(s.principalPaydown)}</span>` : '<span style="color:var(--text-muted);font-size:0.85rem;">First quarter</span>', s.principalPaydown != null ? chgBadgeR(s.principalPaydown, prev?.principalPaydown, false) : '<div class="sum-change" style="color:var(--text-muted);opacity:0.4;">▲ $0 vs last Q</div>', 'This quarter')}
-      ${rCard('Debt Ratio', rDebtRatio !== null ? `<span class="${rDebtRatio<=0.4?'green':rDebtRatio<=0.6?'gold':'neg'}">${(rDebtRatio*100).toFixed(1)}%</span>` : '—', rPctBadge(rDebtRatioChg, true), 'Total Debt ÷ Total Assets')}
+    <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);">
+      ${rCard('Total Income',
+        s.w2Quarterly > 0 ? fmt$(s.w2Quarterly) : '—',
+        chgBadgeR(s.w2Quarterly || null, prev?.w2Quarterly || null, false),
+        `<span style="color:var(--text-muted);">Base:</span> ${fmt$(s.w2Base||0)} · <span style="color:var(--text-muted);">RSU/Bonus:</span> ${fmt$(s.w2Rsu||0)} · <span style="color:var(--text-muted);">Spiff:</span> ${fmt$(s.w2Spiff||0)}`,
+        rdTotalIncome, 'qs-income'
+      )}
+      ${rCard('Savings Rate',
+        rSR !== null ? `<span class="${rSR>=0.20?'green':'gold'}">${(rSR*100).toFixed(1)}%</span>` : '—',
+        rPctBadge(rSRChg, false),
+        `<span style="color:var(--text-muted);">This Q:</span> ${s.savingsRate != null ? (s.savingsRate*100).toFixed(1)+'%' : '—'} &nbsp;·&nbsp; <span style="color:var(--text-muted);">YTD (${rYtdQNum}Q):</span> ${rSR !== null ? (rSR*100).toFixed(1)+'%' : '—'}`,
+        rdSavingsRate, 'qs-sr'
+      )}
+      ${rCard('Principal Paydown',
+        s.principalPaydown != null ? `<span class="pos">${fmt$(s.principalPaydown)}</span>` : '<span style="color:var(--text-muted);font-size:0.85rem;">First quarter</span>',
+        s.principalPaydown != null ? chgBadgeR(s.principalPaydown, prev?.principalPaydown, false) : '<div class="sum-change" style="color:var(--text-muted);opacity:0.4;">▲ $0 vs last Q</div>',
+        `<span style="color:var(--text-muted);">This Q:</span> ${s.principalPaydown != null ? fmt$(s.principalPaydown) : '—'} &nbsp;·&nbsp; <span style="color:var(--text-muted);">YTD:</span> ${fmt$(rYtdPP)}`,
+        rdPrincipalPaydown, 'qs-pp'
+      )}
+      ${rCard('Debt Ratio',
+        rDebtRatio !== null ? `<span class="${rDebtRatio<=0.4?'green':rDebtRatio<=0.6?'gold':'neg'}">${(rDebtRatio*100).toFixed(1)}%</span>` : '—',
+        rPctBadge(rDebtRatioChg, true),
+        'Total Debt ÷ Total Assets',
+        rdDebtRatio, 'qs-dr'
+      )}
     </div>
   `;
 
@@ -2020,7 +2195,20 @@ function renderReviewResults(s) {
   $('res-prop-ops').innerHTML = propOpsHTML;
 
   // ── Debt Paydown & Savings Rate ───────────────────────────────────────────
-  const w2Q = (s.w2Annual || 350000) / 4;
+  const w2Q = s.w2Quarterly || 0;
+  // Trending annual W-2: sum YTD quarterly income, scale to full year
+  const w2Year = new Date(s.date).getFullYear();
+  const w2YtdQ = quarters.filter(q => new Date(q.date).getFullYear() === w2Year && new Date(q.date) <= new Date(s.date));
+  const w2YtdSum = w2YtdQ.reduce((a, q) => a + (q.w2Quarterly || 0), 0);
+  const w2QNum = w2YtdQ.length;
+  const w2Trending = w2QNum > 0 ? w2YtdSum * (4 / w2QNum) : 0;
+  const prevW2Trending = prev ? (() => {
+    const pYear = new Date(prev.date).getFullYear();
+    const pQ = quarters.filter(q => new Date(q.date).getFullYear() === pYear && new Date(q.date) <= new Date(prev.date));
+    const pSum = pQ.reduce((a, q) => a + (q.w2Quarterly || 0), 0);
+    return pQ.length > 0 ? pSum * (4 / pQ.length) : 0;
+  })() : null;
+  const w2TrendArrow = ta(w2Trending, prevW2Trending, false);
   const sr = s.savingsRate || 0;
   const pp = s.principalPaydown;
   const os = s.otherSavings || {};
@@ -2036,7 +2224,7 @@ function renderReviewResults(s) {
       <div>
         <div class="sum-label">Total Saved This Quarter</div>
         <div class="sum-value" style="font-size:1.1rem;">${fmt$(totalSaved)}${tsArrow}</div>
-        <div class="sum-sub">W-2 Quarterly Gross: ${fmt$(w2Q)}</div>
+        <div class="sum-sub">Total Income: ${fmt$(w2Q)} · Trending Annual: ${fmt$(w2Trending)}${w2TrendArrow}</div>
       </div>
       <div>
         <div class="sum-label">Savings Rate</div>
@@ -2062,6 +2250,15 @@ function renderReviewResults(s) {
       </tbody>
     </table>
   `;
+}
+
+// ── CARD DRILL-DOWN ────────────────────────────────────────────────────────
+function toggleCardDetail(id) {
+  const detail = document.getElementById(id + '-detail');
+  const icon   = document.getElementById(id + '-icon');
+  if (!detail) return;
+  const open = detail.classList.toggle('open');
+  if (icon) icon.textContent = open ? '−' : '+';
 }
 
 // ── DASHBOARD ──────────────────────────────────────────────────────────────
@@ -2098,11 +2295,11 @@ function renderDashboard() {
   const lastYear = new Date(last.date).getFullYear();
   const ytdQuarters = quarters.filter(q => new Date(q.date).getFullYear() === lastYear);
   const ytdSaved = ytdQuarters.reduce((s, q) => s + (q.totalSaved || q.contributions?.total || 0), 0);
-  const ytdW2 = ytdQuarters.reduce((s, q) => s + ((q.w2Annual || 350000) / 4), 0);
+  const ytdW2 = ytdQuarters.reduce((s, q) => s + (q.w2Quarterly || 0), 0);
   const ytdSavingsRate = ytdW2 > 0 ? ytdSaved / ytdW2 : null;
   const prevYtdQuarters = prev ? quarters.filter(q => new Date(q.date).getFullYear() === new Date(prev.date).getFullYear() && new Date(q.date) <= new Date(prev.date)) : [];
   const prevYtdSaved = prevYtdQuarters.reduce((s, q) => s + (q.totalSaved || q.contributions?.total || 0), 0);
-  const prevYtdW2 = prevYtdQuarters.reduce((s, q) => s + ((q.w2Annual || 350000) / 4), 0);
+  const prevYtdW2 = prevYtdQuarters.reduce((s, q) => s + (q.w2Quarterly || 0), 0);
   const prevYtdSR = prevYtdW2 > 0 ? prevYtdSaved / prevYtdW2 : null;
   const srChgPts = (ytdSavingsRate !== null && prevYtdSR !== null) ? (ytdSavingsRate - prevYtdSR) * 100 : null;
 
@@ -2130,27 +2327,144 @@ function renderDashboard() {
     return `<div class="sum-change ${good?'pos':'neg'}">${arrow} ${Math.abs(chgPts).toFixed(1)}${suffix} vs last Q</div>`;
   };
 
-  const card = (label, value, badge, sub='') =>
-    `<div class="sum-card"><div class="sum-label">${label}</div><div class="sum-value">${value}</div>${badge}${sub?`<div class="sum-sub">${sub}</div>`:''}</div>`;
+  const card = (label, value, badge, sub='', detail='', id='') => {
+    const has = detail && id;
+    return `<div class="sum-card${has?' has-detail':''}"${has?` onclick="toggleCardDetail('${id}')"`:''}>` +
+      (has ? `<div class="card-expand-icon" id="${id}-icon">+</div>` : '') +
+      `<div class="sum-label">${label}</div><div class="sum-value">${value}</div>${badge}` +
+      (sub ? `<div class="sum-sub">${sub}</div>` : '') +
+      (has ? `<div class="card-detail" id="${id}-detail">${detail}</div>` : '') +
+      `</div>`;
+  };
+
+  // Detail row helpers
+  const dr  = (lbl, val, cls='') => `<div class="card-detail-row"><span class="card-detail-label">${lbl}</span><span class="card-detail-val${cls?' '+cls:''}">${val}</span></div>`;
+  const drt = (lbl, val, cls='gold') => `<div class="card-detail-total"><span class="card-detail-total-label">${lbl}</span><span class="card-detail-total-val ${cls}">${val}</span></div>`;
+
+  // Drill-down content — Total Assets
+  const dp = last.properties || {};
+  const dTotalAssets = [
+    dr('Retirement Portfolio', fmt$(last.totalPortfolio)),
+    dr('Other Financial Assets', fmt$(otherFinAssets)),
+    dr('Property Values', fmt$(last.totalPropertyValue || 0)),
+    (last.otherAssets?.other||0) > 0 ? dr('Other Assets', fmt$(last.otherAssets.other)) : '',
+    drt('Total Assets', fmt$(last.totalAssets)),
+  ].join('');
+
+  // Drill-down — Total Debt
+  const dTotalDebt = [
+    (dp.bradcliff?.mortgage||0) > 0 ? dr('Bradcliff', `-${fmt$(dp.bradcliff.mortgage)}`, 'neg') : '',
+    (dp.holladay?.mortgage||0)  > 0 ? dr('Holladay',  `-${fmt$(dp.holladay.mortgage)}`, 'neg') : '',
+    (dp.brokenBow?.mortgage1||0)> 0 ? dr('Broken Bow (1st)', `-${fmt$(dp.brokenBow.mortgage1)}`, 'neg') : '',
+    (dp.brokenBow?.mortgage2||0)> 0 ? dr('Broken Bow (2nd)', `-${fmt$(dp.brokenBow.mortgage2)}`, 'neg') : '',
+    (last.otherDebts||0) > 0 ? dr('Other Debt', `-${fmt$(last.otherDebts)}`, 'neg') : '',
+    drt('Total Debt', `-${fmt$(last.totalDebt)}`, 'neg'),
+  ].join('');
+
+  // Drill-down — Net Worth
+  const dNetWorth = [
+    dr('Total Assets',  fmt$(last.totalAssets), 'gold'),
+    dr('Total Debt',   `-${fmt$(last.totalDebt)}`, 'neg'),
+    drt('Net Worth', fmt$(last.netWorth)),
+  ].join('');
+
+  // Drill-down — Retirement Portfolio
+  const lp = last.portfolio || {};
+  const dRetirement = [
+    dr('FXAIX – 401(k)',       fmt$(lp.fxaix_401k  || 0)),
+    dr('FXAIX – Roth 401(k)',  fmt$(lp.fxaix_r401k || 0)),
+    dr('FSSNX – HSA',          fmt$(lp.fssnx_hsa   || 0)),
+    dr('BITB – HSA',           fmt$(lp.bitb_hsa    || 0)),
+    dr('ETHA – HSA',           fmt$(lp.etha_hsa    || 0)),
+    dr('IBLC – HSA',           fmt$(lp.iblc_hsa    || 0)),
+    dr('SWSSX – Roth IRA',     fmt$(lp.swssx_ira   || 0)),
+    dr('SWISX – Roth IRA',     fmt$(lp.swisx_ira   || 0)),
+    dr('VWO – Roth IRA',       fmt$(lp.vwo_ira     || 0)),
+    drt('Total Portfolio', fmt$(last.totalPortfolio)),
+  ].join('');
+
+  // Drill-down — Other Financial Assets
+  const oa = last.otherAssets || {};
+  const dOtherFin = [
+    (oa.ibonds||0) > 0 ? dr('I Bonds',    fmt$(oa.ibonds)) : '',
+    (oa.muni||0)   > 0 ? dr('Muni Bonds', fmt$(oa.muni))   : '',
+    (oa.cash||0)   > 0 ? dr('Cash',       fmt$(oa.cash))   : '',
+    (oa.other||0)  > 0 ? dr('Other',      fmt$(oa.other))  : '',
+    drt('Total', fmt$(oa.total || 0)),
+  ].join('');
+
+  // Drill-down — Property Equity
+  const propNameMap = { bradcliff:'Bradcliff', neely:'Neely', greenmount:'Greenmount', holladay:'Holladay', brokenBow:'Broken Bow' };
+  const dPropEquity = [
+    ...Object.entries(dp).map(([key, prop]) => {
+      const mort = key === 'brokenBow' ? (prop.mortgage1||0)+(prop.mortgage2||0) : (prop.mortgage||0);
+      const eq = (prop.value||0) - mort;
+      return dr(propNameMap[key]||key, fmt$(eq), eq >= 0 ? 'pos' : 'neg');
+    }),
+    drt('Total Equity', fmt$(propEquity)),
+  ].join('');
+
+  // Drill-down — YTD Savings Rate
+  const ytdC = ytdQuarters.reduce((a, q) => ({
+    c401k: a.c401k + (q.contributions?.c401k||0),
+    r401k: a.r401k + (q.contributions?.r401k||0),
+    hsa:   a.hsa   + (q.contributions?.hsa||0),
+    ira:   a.ira   + (q.contributions?.ira||0),
+    ibonds:       a.ibonds       + (q.otherSavings?.ibonds||0),
+    extraPrincipal: a.extraPrincipal + (q.otherSavings?.extraPrincipal||0),
+    other:        a.other        + (q.otherSavings?.other||0),
+  }), {c401k:0,r401k:0,hsa:0,ira:0,ibonds:0,extraPrincipal:0,other:0});
+  const dSavingsRate = [
+    dr('401(k)',           fmt$(ytdC.c401k)),
+    dr('Roth 401(k)',      fmt$(ytdC.r401k)),
+    dr('HSA',              fmt$(ytdC.hsa)),
+    dr('Roth IRA',         fmt$(ytdC.ira)),
+    ytdC.ibonds > 0        ? dr('I Bonds',        fmt$(ytdC.ibonds))        : '',
+    ytdC.extraPrincipal > 0? dr('Extra Principal', fmt$(ytdC.extraPrincipal)): '',
+    ytdC.other > 0         ? dr('Other Savings',   fmt$(ytdC.other))         : '',
+    drt('Total Saved', fmt$(ytdSaved)),
+    ytdW2 > 0 ? dr('YTD W-2 Income', fmt$(ytdW2)) : '',
+  ].join('');
+
+  // Drill-down — Principal Paydown
+  const dPrincipalPaydown = prev
+    ? [
+        ...Object.entries(dp).map(([key, prop]) => {
+          const curMort  = key==='brokenBow' ? (prop.mortgage1||0)+(prop.mortgage2||0) : (prop.mortgage||0);
+          const prevProp = prev.properties?.[key];
+          const prevMort = key==='brokenBow' ? ((prevProp?.mortgage1||0)+(prevProp?.mortgage2||0)) : (prevProp?.mortgage||0);
+          const pp = prevMort - curMort;
+          return pp > 0 ? dr(propNameMap[key]||key, fmt$(pp), 'pos') : '';
+        }),
+        principalPaydown != null ? drt('Total Paydown', fmt$(principalPaydown), 'pos') : '',
+      ].join('')
+    : dr('No prior quarter', '—', '');
+
+  // Drill-down — Debt Ratio
+  const dDebtRatio = [
+    dr('Total Debt',   fmt$(last.totalDebt)),
+    dr('Total Assets', fmt$(last.totalAssets)),
+    drt('Debt Ratio', debtRatio !== null ? `${(debtRatio*100).toFixed(1)}%` : '—'),
+  ].join('');
 
   $('summary-cards').innerHTML = `
     <div class="kpi-row-label">Balance Sheet</div>
     <div class="kpi-row">
-      ${card('Total Assets', `<span class="gold">${fmt$(last.totalAssets)}</span>`, chgBadge(prev ? last.totalAssets - prev.totalAssets : null, false))}
-      ${card('Total Debt', `<span class="neg">-${fmt$(last.totalDebt)}</span>`, chgBadge(debtChg, true))}
-      ${card('Net Worth', `<span class="gold">${fmt$(last.netWorth)}</span>`, chgBadge(nwChg, false))}
+      ${card('Total Assets', `<span class="gold">${fmt$(last.totalAssets)}</span>`, chgBadge(prev ? last.totalAssets - prev.totalAssets : null, false), '', dTotalAssets, 'dash-assets')}
+      ${card('Total Debt', `<span class="neg">-${fmt$(last.totalDebt)}</span>`, chgBadge(debtChg, true), '', dTotalDebt, 'dash-debt')}
+      ${card('Net Worth', `<span class="gold">${fmt$(last.netWorth)}</span>`, chgBadge(nwChg, false), '', dNetWorth, 'dash-nw')}
     </div>
     <div class="kpi-row-label">Asset Breakdown</div>
     <div class="kpi-row">
-      ${card('Retirement Portfolio', fmt$(last.totalPortfolio), chgBadge(portChg, false), '401k · Roth · HSA · IRA')}
-      ${card('Other Financial Assets', fmt$(otherFinAssets), chgBadge(otherFinChg, false), 'I Bonds · Munis · Cash · Other')}
-      ${card('Property Equity', fmt$(propEquity), chgBadge(propEquityChg, false), 'Blended value − mortgages')}
+      ${card('Retirement Portfolio', fmt$(last.totalPortfolio), chgBadge(portChg, false), '401k · Roth · HSA · IRA', dRetirement, 'dash-retire')}
+      ${card('Other Financial Assets', fmt$(otherFinAssets), chgBadge(otherFinChg, false), 'I Bonds · Munis · Cash · Other', dOtherFin, 'dash-otherfin')}
+      ${card('Property Equity', fmt$(propEquity), chgBadge(propEquityChg, false), 'Blended value − mortgages', dPropEquity, 'dash-propequity')}
     </div>
     <div class="kpi-row-label">Performance</div>
     <div class="kpi-row">
-      ${card('YTD Savings Rate', ytdSavingsRate !== null ? `<span class="${ytdSavingsRate>=0.20?'green':'gold'}">${(ytdSavingsRate*100).toFixed(1)}%</span>` : '—', pctBadge(srChgPts, false), `${ytdQuarters.length} quarter${ytdQuarters.length!==1?'s':''} in ${lastYear}`)}
-      ${card('Principal Paydown', principalPaydown !== null ? `<span class="pos">${fmt$(principalPaydown)}</span>` : '<span class="muted" style="font-size:0.85rem;">First quarter</span>', principalPaydown !== null ? chgBadge(prev?.principalPaydown != null ? principalPaydown - prev.principalPaydown : null, false) : '<div class="sum-change" style="color:var(--text-muted);opacity:0.4;">▲ $0 vs last Q</div>', 'This quarter')}
-      ${card('Debt Ratio', debtRatio !== null ? `<span class="${debtRatio<=0.4?'green':debtRatio<=0.6?'gold':'neg'}">${(debtRatio*100).toFixed(1)}%</span>` : '—', pctBadge(debtRatioChgPts, true), 'Total Debt ÷ Total Assets')}
+      ${card('YTD Savings Rate', ytdSavingsRate !== null ? `<span class="${ytdSavingsRate>=0.20?'green':'gold'}">${(ytdSavingsRate*100).toFixed(1)}%</span>` : '—', pctBadge(srChgPts, false), `${ytdQuarters.length} quarter${ytdQuarters.length!==1?'s':''} in ${lastYear}`, dSavingsRate, 'dash-sr')}
+      ${card('Principal Paydown', principalPaydown !== null ? `<span class="pos">${fmt$(principalPaydown)}</span>` : '<span class="muted" style="font-size:0.85rem;">First quarter</span>', principalPaydown !== null ? chgBadge(prev?.principalPaydown != null ? principalPaydown - prev.principalPaydown : null, false) : '<div class="sum-change" style="color:var(--text-muted);opacity:0.4;">▲ $0 vs last Q</div>', 'This quarter', dPrincipalPaydown, 'dash-pp')}
+      ${card('Debt Ratio', debtRatio !== null ? `<span class="${debtRatio<=0.4?'green':debtRatio<=0.6?'gold':'neg'}">${(debtRatio*100).toFixed(1)}%</span>` : '—', pctBadge(debtRatioChgPts, true), 'Total Debt ÷ Total Assets', dDebtRatio, 'dash-dr')}
     </div>
   `;
 
@@ -2383,6 +2697,57 @@ function renderDashboard() {
     },
     options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, legend:{ labels:{color:'#7a7060',font:{size:10},boxWidth:10} } } },
   });
+
+  // ── W-2 Income Trend ──────────────────────────────────────────────────────
+  // Compute trending annual W-2 per quarter
+  const w2TrendData = quarters.map((q, i) => {
+    const yr = new Date(q.date).getFullYear();
+    const ytdQ = quarters.slice(0, i + 1).filter(qq => new Date(qq.date).getFullYear() === yr);
+    const ytdSum = ytdQ.reduce((a, qq) => a + (qq.w2Quarterly || (qq.w2Annual ? qq.w2Annual / 4 : 0)), 0);
+    return ytdQ.length > 0 ? ytdSum * (4 / ytdQ.length) : null;
+  });
+
+  charts.w2trend = new Chart($('chart-w2trend'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Trending Annual W-2', data: w2TrendData, borderColor: C.gold, backgroundColor: 'rgba(207,172,103,0.08)', fill: true, tension: 0.3, pointRadius: 4, pointBackgroundColor: C.gold },
+      ],
+    },
+    options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, tooltip: { callbacks: { label: ctx => ` ${fmt$(ctx.raw)}` } } } },
+  });
+
+  // ── Per-Property Equity Trend ─────────────────────────────────────────────
+  const propDefs2 = [
+    { key: 'bradcliff',  label: 'Bradcliff',  color: '#c9a84c' },
+    { key: 'neely',      label: 'Neely',      color: '#2a5f8f' },
+    { key: 'greenmount', label: 'Greenmount', color: '#2d6b4a' },
+    { key: 'holladay',   label: 'Holladay',   color: '#c4622a' },
+    { key: 'brokenBow',  label: 'Broken Bow', color: '#5c4b8a' },
+  ];
+
+  charts.propequity = new Chart($('chart-propequity'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: propDefs2.map(p => ({
+        label: p.label,
+        data: quarters.map(q => {
+          const prop = q.properties?.[p.key];
+          if (!prop) return null;
+          const val = prop.blendedValue || 0;
+          const debt = p.key === 'brokenBow'
+            ? (prop.mortgage1 || 0) + (prop.mortgage2 || 0)
+            : (prop.mortgage || 0);
+          return val > 0 ? Math.max(0, val - debt) : null;
+        }),
+        borderColor: p.color, backgroundColor: 'transparent', tension: 0.3, pointRadius: 3, borderWidth: 2,
+        spanGaps: true,
+      })),
+    },
+    options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, legend: { labels: { color: '#a09880', font: { size: 10 }, boxWidth: 10 } }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmt$(ctx.raw)}` } } } },
+  });
 }
 
 // ── HISTORY ────────────────────────────────────────────────────────────────
@@ -2495,7 +2860,12 @@ function loadQuarterIntoForm(quarterLabel) {
     setMoney('a_ibonds', oa.ibonds); setMoney('a_muni', oa.muni);
     setMoney('a_cash',   oa.cash);   setMoney('a_other', oa.other);
     setMoney('d_other',  q.otherDebts || 0);
-    if (q.w2Annual) setMoney('w2_annual', q.w2Annual);
+    if (q.w2Base)      setMoney('w2_base',  q.w2Base);
+    if (q.w2Rsu)       setMoney('w2_rsu',   q.w2Rsu);
+    if (q.w2Spiff)     setMoney('w2_spiff', q.w2Spiff);
+    // Legacy fallback
+    else if (q.w2Quarterly && !q.w2Base) setMoney('w2_base', q.w2Quarterly);
+    else if (q.w2Annual && !q.w2Base)    setMoney('w2_base', q.w2Annual / 4);
     // Note: property details, AVMs, and comps not available in legacy snapshots
   }
 
@@ -2611,7 +2981,9 @@ function prefillDemoQ1() {
   setMoney('bb_subs',       441);
   setMoney('bb_lodging_tax', 540);
 
-  setMoney('w2_annual', 350000);
+  setMoney('w2_base', 75000);
+  setMoney('w2_rsu',  10000);
+  setMoney('w2_spiff', 2500);
   setMoney('a_ibonds',  48000);
   setMoney('a_muni',    127000);
   setMoney('a_cash',    12000);
@@ -2715,7 +3087,9 @@ function prefillDemo() {
   setMoney('bb_lodging_tax',     667);
 
   // W-2
-  setMoney('w2_annual', 350000);
+  setMoney('w2_base', 75000);
+  setMoney('w2_rsu',  10000);
+  setMoney('w2_spiff', 2500);
 
   // Other assets
   setMoney('a_ibonds', 48000);
