@@ -1826,16 +1826,15 @@ function renderReviewResults(s) {
   ].join('');
 
   const sp2 = s.portfolio || {};
+  const rd401k   = (sp2.fxaix_401k  || 0);
+  const rdR401k  = (sp2.fxaix_r401k || 0);
+  const rdHsa    = (sp2.fssnx_hsa||0) + (sp2.bitb_hsa||0) + (sp2.etha_hsa||0) + (sp2.iblc_hsa||0);
+  const rdIra    = (sp2.swssx_ira||0) + (sp2.swisx_ira||0) + (sp2.vwo_ira||0);
   const rdRetirement = [
-    rdr('FXAIX – 401(k)',      fmt$(sp2.fxaix_401k  || 0)),
-    rdr('FXAIX – Roth 401(k)', fmt$(sp2.fxaix_r401k || 0)),
-    rdr('FSSNX – HSA',         fmt$(sp2.fssnx_hsa   || 0)),
-    rdr('BITB – HSA',          fmt$(sp2.bitb_hsa    || 0)),
-    rdr('ETHA – HSA',          fmt$(sp2.etha_hsa    || 0)),
-    rdr('IBLC – HSA',          fmt$(sp2.iblc_hsa    || 0)),
-    rdr('SWSSX – Roth IRA',    fmt$(sp2.swssx_ira   || 0)),
-    rdr('SWISX – Roth IRA',    fmt$(sp2.swisx_ira   || 0)),
-    rdr('VWO – Roth IRA',      fmt$(sp2.vwo_ira     || 0)),
+    rdr('401(k)',      fmt$(rd401k)),
+    rdr('Roth 401(k)', fmt$(rdR401k)),
+    rdr('HSA',         fmt$(rdHsa)),
+    rdr('Roth IRA',    fmt$(rdIra)),
     rdrt('Total Portfolio', fmt$(s.totalPortfolio)),
   ].join('');
 
@@ -2370,16 +2369,15 @@ function renderDashboard() {
 
   // Drill-down — Retirement Portfolio
   const lp = last.portfolio || {};
+  const d401k  = (lp.fxaix_401k  || 0);
+  const dR401k = (lp.fxaix_r401k || 0);
+  const dHsa   = (lp.fssnx_hsa||0) + (lp.bitb_hsa||0) + (lp.etha_hsa||0) + (lp.iblc_hsa||0);
+  const dIra   = (lp.swssx_ira||0) + (lp.swisx_ira||0) + (lp.vwo_ira||0);
   const dRetirement = [
-    dr('FXAIX – 401(k)',       fmt$(lp.fxaix_401k  || 0)),
-    dr('FXAIX – Roth 401(k)',  fmt$(lp.fxaix_r401k || 0)),
-    dr('FSSNX – HSA',          fmt$(lp.fssnx_hsa   || 0)),
-    dr('BITB – HSA',           fmt$(lp.bitb_hsa    || 0)),
-    dr('ETHA – HSA',           fmt$(lp.etha_hsa    || 0)),
-    dr('IBLC – HSA',           fmt$(lp.iblc_hsa    || 0)),
-    dr('SWSSX – Roth IRA',     fmt$(lp.swssx_ira   || 0)),
-    dr('SWISX – Roth IRA',     fmt$(lp.swisx_ira   || 0)),
-    dr('VWO – Roth IRA',       fmt$(lp.vwo_ira     || 0)),
+    dr('401(k)',       fmt$(d401k)),
+    dr('Roth 401(k)',  fmt$(dR401k)),
+    dr('HSA',          fmt$(dHsa)),
+    dr('Roth IRA',     fmt$(dIra)),
     drt('Total Portfolio', fmt$(last.totalPortfolio)),
   ].join('');
 
