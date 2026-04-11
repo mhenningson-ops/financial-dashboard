@@ -1908,13 +1908,30 @@ function renderReviewResults(s) {
       ${rCard('Property Equity', fmt$(rPropEquity), chgBadgeR(rPropEquity, rPrevPropEquity, false), 'Blended value − mortgages', rdPropEquity, 'qs-propequity')}
     </div>
     <div class="kpi-row-label">Performance</div>
-    <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);">
+    <div class="kpi-row" style="grid-template-columns:repeat(5,1fr);">
       ${rCard('Total Income',
         s.w2Quarterly > 0 ? fmt$(s.w2Quarterly) : '—',
         chgBadgeR(s.w2Quarterly || null, prev?.w2Quarterly || null, false),
         `<span style="color:var(--text-muted);">Base:</span> ${fmt$(s.w2Base||0)} · <span style="color:var(--text-muted);">RSU/Bonus:</span> ${fmt$(s.w2Rsu||0)} · <span style="color:var(--text-muted);">Spiff:</span> ${fmt$(s.w2Spiff||0)}`,
         rdTotalIncome, 'qs-income'
       )}
+      ${(() => {
+        const cf = s.annualRentalCashFlow;
+        const cfPrev = prev?.annualRentalCashFlow ?? null;
+        const cfPropNm = { bradcliff:'Bradcliff', neely:'Neely', greenmount:'Greenmount', holladay:'Holladay', brokenBow:'Broken Bow' };
+        const rdCF = [
+          ...Object.entries(s.annualCFPerProp || {}).map(([key, val]) =>
+            rdr(cfPropNm[key]||key, `${val<0?'-':''}${fmt$(val)}`, val>=0?'pos':'neg')
+          ),
+          rdrt('Annual Total', `${cf<0?'-':''}${fmt$(cf)}`, cf>=0?'pos':'neg'),
+        ].join('');
+        return rCard('Annual Cash Flow',
+          `<span class="${cf>=0?'pos':'neg'}">${cf<0?'-':''}${fmt$(cf)}</span>`,
+          chgBadgeR(cf, cfPrev, false),
+          `${fiPctCur.toFixed(0)}% of FI target`,
+          rdCF, 'qs-cf'
+        );
+      })()}
       ${rCard('Savings Rate',
         rSR !== null ? `<span class="${rSR>=0.20?'green':'gold'}">${(rSR*100).toFixed(1)}%</span>` : '—',
         rPctBadge(rSRChg, false),
