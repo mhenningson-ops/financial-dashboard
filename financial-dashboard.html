@@ -2459,7 +2459,14 @@ function renderDashboard() {
       ${card('Property Equity', fmt$(propEquity), chgBadge(propEquityChg, false), 'Blended value − mortgages', dPropEquity, 'dash-propequity')}
     </div>
     <div class="kpi-row-label">Performance</div>
-    <div class="kpi-row">
+    <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);">
+      ${card('Total Income',
+        (last.w2Quarterly||0) > 0 ? fmt$(last.w2Quarterly) : '—',
+        chgBadge(prev ? (last.w2Quarterly||0) - (prev.w2Quarterly||0) : null, false),
+        (() => { const ytdW2Sum = ytdQuarters.reduce((a,q)=>a+(q.w2Quarterly||0),0); const qn = ytdQuarters.length; const trending = qn > 0 ? ytdW2Sum*(4/qn) : 0; return `Trending annual: ${fmt$(trending)}`; })(),
+        [dr('Base W-2', fmt$(last.w2Base||0)), dr('RSU / Bonus', fmt$(last.w2Rsu||0)), dr('Spiff / Other', fmt$(last.w2Spiff||0)), drt('This Quarter', fmt$(last.w2Quarterly||0))].join(''),
+        'dash-income'
+      )}
       ${card('YTD Savings Rate', ytdSavingsRate !== null ? `<span class="${ytdSavingsRate>=0.20?'green':'gold'}">${(ytdSavingsRate*100).toFixed(1)}%</span>` : '—', pctBadge(srChgPts, false), `${ytdQuarters.length} quarter${ytdQuarters.length!==1?'s':''} in ${lastYear}`, dSavingsRate, 'dash-sr')}
       ${card('Principal Paydown', principalPaydown !== null ? `<span class="pos">${fmt$(principalPaydown)}</span>` : '<span class="muted" style="font-size:0.85rem;">First quarter</span>', principalPaydown !== null ? chgBadge(prev?.principalPaydown != null ? principalPaydown - prev.principalPaydown : null, false) : '<div class="sum-change" style="color:var(--text-muted);opacity:0.4;">▲ $0 vs last Q</div>', 'This quarter', dPrincipalPaydown, 'dash-pp')}
       ${card('Debt Ratio', debtRatio !== null ? `<span class="${debtRatio<=0.4?'green':debtRatio<=0.6?'gold':'neg'}">${(debtRatio*100).toFixed(1)}%</span>` : '—', pctBadge(debtRatioChgPts, true), 'Total Debt ÷ Total Assets', dDebtRatio, 'dash-dr')}
