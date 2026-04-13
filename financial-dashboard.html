@@ -2529,7 +2529,7 @@ function renderDashboard() {
   $('fi-progress-content').innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;flex-wrap:wrap;">
       <div>
-        <div class="sum-label">Annual Cash Flow</div>
+        <div class="sum-label">Trending Annual Cash Flow</div>
         <div class="sum-value ${last.annualRentalCashFlow>=0?'green':'neg'}" style="font-size:1.2rem;">${fmt$(last.annualRentalCashFlow)}</div>
         ${chgBadge(cfChg, false)}
       </div>
