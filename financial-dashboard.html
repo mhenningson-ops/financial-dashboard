@@ -250,6 +250,7 @@
     .card-detail-total { display: flex; justify-content: space-between; align-items: center; padding-top: 8px; margin-top: 4px; border-top: 1px solid rgba(207,172,103,0.2); }
     .card-detail-total-label { font-size: 0.75rem; font-weight: 700; color: var(--gold); }
     .card-detail-total-val { font-size: 0.82rem; font-weight: 700; color: var(--gold); font-family: 'Montserrat', sans-serif; }
+    .card-detail-section { font-family: 'Montserrat', sans-serif; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); padding: 8px 0 4px; border-top: 1px solid var(--border); margin-top: 4px; }
 
     @media (max-width: 768px) {
       /* Layout */
@@ -1836,6 +1837,16 @@ function renderReviewResults(s) {
     rdr('HSA',         fmt$(rdHsa)),
     rdr('Roth IRA',    fmt$(rdIra)),
     rdrt('Total Portfolio', fmt$(s.totalPortfolio)),
+    '<div class="card-detail-section">By Fund</div>',
+    rdr('FXAIX — Large Cap (401k)',       fmt$(sp2.fxaix_401k  || 0)),
+    rdr('FXAIX — Large Cap (Roth 401k)',  fmt$(sp2.fxaix_r401k || 0)),
+    rdr('FSSNX — Small Cap (HSA)',        fmt$(sp2.fssnx_hsa   || 0)),
+    rdr('BITB — Crypto BTC (HSA)',        fmt$(sp2.bitb_hsa    || 0)),
+    rdr('ETHA — Crypto ETH (HSA)',        fmt$(sp2.etha_hsa    || 0)),
+    rdr('IBLC — Crypto Infra (HSA)',      fmt$(sp2.iblc_hsa    || 0)),
+    rdr('SWSSX — Small Cap (Roth IRA)',   fmt$(sp2.swssx_ira   || 0)),
+    rdr('SWISX — Intl Developed (Roth IRA)', fmt$(sp2.swisx_ira || 0)),
+    rdr('VWO — Emerging Markets (Roth IRA)', fmt$(sp2.vwo_ira  || 0)),
   ].join('');
 
   const soa = s.otherAssets || {};
@@ -2396,6 +2407,16 @@ function renderDashboard() {
     dr('HSA',          fmt$(dHsa)),
     dr('Roth IRA',     fmt$(dIra)),
     drt('Total Portfolio', fmt$(last.totalPortfolio)),
+    '<div class="card-detail-section">By Fund</div>',
+    dr('FXAIX — Large Cap (401k)',        fmt$(lp.fxaix_401k  || 0)),
+    dr('FXAIX — Large Cap (Roth 401k)',   fmt$(lp.fxaix_r401k || 0)),
+    dr('FSSNX — Small Cap (HSA)',         fmt$(lp.fssnx_hsa   || 0)),
+    dr('BITB — Crypto BTC (HSA)',         fmt$(lp.bitb_hsa    || 0)),
+    dr('ETHA — Crypto ETH (HSA)',         fmt$(lp.etha_hsa    || 0)),
+    dr('IBLC — Crypto Infra (HSA)',       fmt$(lp.iblc_hsa    || 0)),
+    dr('SWSSX — Small Cap (Roth IRA)',    fmt$(lp.swssx_ira   || 0)),
+    dr('SWISX — Intl Developed (Roth IRA)', fmt$(lp.swisx_ira || 0)),
+    dr('VWO — Emerging Markets (Roth IRA)', fmt$(lp.vwo_ira   || 0)),
   ].join('');
 
   // Drill-down — Other Financial Assets
