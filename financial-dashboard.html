@@ -253,6 +253,24 @@
     .card-detail-total-val { font-size: 0.82rem; font-weight: 700; color: var(--gold); font-family: 'Montserrat', sans-serif; }
     .card-detail-section { font-family: 'Montserrat', sans-serif; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); padding: 20px 0 4px; }
 
+    /* ── GOAL TRACKER ── */
+    .goal-year { margin-bottom: 28px; }
+    .goal-year-label { font-family: 'Montserrat', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+    .goal-list { display: flex; flex-direction: column; gap: 10px; }
+    .goal-item { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; align-items: flex-start; gap: 14px; transition: border-color 0.2s; }
+    .goal-item:hover { border-color: rgba(207,172,103,0.28); }
+    .goal-status { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; margin-top: 1px; }
+    .goal-status.complete { background: var(--green); border-color: var(--green); color: #fff; }
+    .goal-status.active { background: var(--gold-faint); border-color: var(--gold); color: var(--gold); }
+    .goal-status.pending { background: transparent; border-color: rgba(255,255,255,0.15); color: transparent; }
+    .goal-status.decision { background: rgba(91,155,213,0.15); border-color: #5b9bd5; color: #5b9bd5; }
+    .goal-body { flex: 1; min-width: 0; }
+    .goal-title { font-size: 0.88rem; font-weight: 600; color: #fff; margin-bottom: 3px; }
+    .goal-meta { font-size: 0.74rem; color: var(--text-muted); }
+    .goal-date { font-family: 'Montserrat', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; color: var(--text-muted); flex-shrink: 0; margin-top: 3px; }
+    .goal-item.complete-item { opacity: 0.6; }
+    .goal-item.complete-item .goal-title { text-decoration: line-through; color: var(--text-muted); }
+
     @media (max-width: 768px) {
       /* Layout */
       .page-sm, .page { padding: 16px 14px; }
@@ -328,6 +346,7 @@
   <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
   <button class="tab-btn" onclick="switchTab('review')">Quarterly Review</button>
   <button class="tab-btn" onclick="switchTab('history')">History</button>
+  <button class="tab-btn" onclick="switchTab('goals')">Goals</button>
   <div style="flex:1;"></div>
   <div style="position:relative;display:flex;align-items:center;" id="data-menu-wrap">
     <button class="tab-btn" onclick="toggleDataMenu(event)" style="color:var(--gold);border-bottom:none;">Import/Export Data ▾</button>
@@ -438,6 +457,127 @@
       </div>
 
     </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB: GOALS
+═════════════════════════════════════════════ -->
+<div id="tab-goals" class="tab-content">
+  <div class="page-sm">
+    <div style="margin-bottom:32px;">
+      <h2 style="font-size:1.4rem;color:#fff;margin-bottom:6px;">Strategic Goals</h2>
+      <p style="font-size:0.82rem;color:var(--text-muted);">Key milestones on the path to financial independence by Dec 31, 2028.</p>
+    </div>
+
+    <!-- 2026 -->
+    <div class="goal-year">
+      <div class="goal-year-label">2026</div>
+      <div class="goal-list">
+        <div class="goal-item">
+          <div class="goal-status active">→</div>
+          <div class="goal-body">
+            <div class="goal-title">Pay off Bradcliff mortgage</div>
+            <div class="goal-meta">Frees $754/mo P&I · $9,051/yr cash flow improvement · Remaining balance ~$110K</div>
+          </div>
+          <div class="goal-date">Dec 2026</div>
+        </div>
+        <div class="goal-item">
+          <div class="goal-status active">→</div>
+          <div class="goal-body">
+            <div class="goal-title">Improve Broken Bow revenue to $90K+ annualized</div>
+            <div class="goal-meta">Sauna, cold plunge, cornhole, ping pong, pet-friendly — all completed for $8K · Current: $67.5K/yr</div>
+          </div>
+          <div class="goal-date">Q3 2026</div>
+        </div>
+        <div class="goal-item">
+          <div class="goal-status decision">?</div>
+          <div class="goal-body">
+            <div class="goal-title">Decide: sell or hold Broken Bow</div>
+            <div class="goal-meta">Hold if Q3 annualized revenue ≥$90K · Sell if &lt;$80K · $80-90K borderline · Review after peak season data</div>
+          </div>
+          <div class="goal-date">Q3 2026</div>
+        </div>
+        <div class="goal-item">
+          <div class="goal-status active">→</div>
+          <div class="goal-body">
+            <div class="goal-title">Redirect all extra cash to refi lump sum savings</div>
+            <div class="goal-meta">Post-Bradcliff payoff · Buy IBMP munis through end of 2026 for tax efficiency · Switch to T-bills in 2027</div>
+          </div>
+          <div class="goal-date">Ongoing 2026</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2027 -->
+    <div class="goal-year">
+      <div class="goal-year-label">2027</div>
+      <div class="goal-list">
+        <div class="goal-item">
+          <div class="goal-status pending"></div>
+          <div class="goal-body">
+            <div class="goal-title">Continue building refi lump sum</div>
+            <div class="goal-meta">Muni bonds ($127.5K) mature Dec 2027 · Redirect Bradcliff P&I savings + W-2 discretionary · Switch new savings to T-bills</div>
+          </div>
+          <div class="goal-date">All of 2027</div>
+        </div>
+        <div class="goal-item">
+          <div class="goal-status decision">?</div>
+          <div class="goal-body">
+            <div class="goal-title">Decide: sell or hold Holladay</div>
+            <div class="goal-meta">Tenants out Aug 1, 2027 · If selling: ~$381K net equity to redeploy into cash-purchased Utah STR + Memphis LTRs · Possible future primary residence — do not force</div>
+          </div>
+          <div class="goal-date">Aug 2027</div>
+        </div>
+        <div class="goal-item">
+          <div class="goal-status pending"></div>
+          <div class="goal-body">
+            <div class="goal-title">Get real estate license</div>
+            <div class="goal-meta">Only if selling BB or Holladay · Saves ~$4.5K per transaction as buyer's/listing agent</div>
+          </div>
+          <div class="goal-date">If needed 2027</div>
+        </div>
+        <div class="goal-item">
+          <div class="goal-status decision">?</div>
+          <div class="goal-body">
+            <div class="goal-title">Refi Broken Bow primary @ 6%</div>
+            <div class="goal-meta">Prepayment penalty ends Dec 2027 · Deploy ~$222-249K lump sum · New balance ~$254-281K · New P&I ~$1,523-1,683/mo · Saves ~$29-31K/yr vs. current</div>
+          </div>
+          <div class="goal-date">Dec 2027</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2028 -->
+    <div class="goal-year">
+      <div class="goal-year-label">2028</div>
+      <div class="goal-list">
+        <div class="goal-item">
+          <div class="goal-status pending"></div>
+          <div class="goal-body">
+            <div class="goal-title">Pay 20% of BB secondary balance to extend balloon</div>
+            <div class="goal-meta">~$32-35K lump sum · Extends balloon from Dec 2028 → Dec 2033 · Rate converts to 6% on Jan 1, 2029 · New P&I ~$784/mo</div>
+          </div>
+          <div class="goal-date">Dec 2028</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FI Target -->
+    <div class="goal-year">
+      <div class="goal-year-label">FI Target</div>
+      <div class="goal-list">
+        <div class="goal-item">
+          <div class="goal-status active">→</div>
+          <div class="goal-body">
+            <div class="goal-title">Reach $115K annual rental cash flow</div>
+            <div class="goal-meta">Family FI target (married + kids) · Current: -$29,925/yr · Dec 2028 projected: $73-83K depending on BB/Holladay resolution</div>
+          </div>
+          <div class="goal-date">Dec 31, 2028</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -1461,7 +1601,7 @@ function toggleAcc(header) {
 // ── TABS ───────────────────────────────────────────────────────────────────
 function switchTab(name) {
   document.querySelectorAll('.tab-btn').forEach((b,i) => {
-    const names = ['dashboard','review','history'];
+    const names = ['dashboard','review','history','goals'];
     b.classList.toggle('active', names[i] === name);
   });
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
