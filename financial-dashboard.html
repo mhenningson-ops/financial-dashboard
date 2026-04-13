@@ -242,8 +242,8 @@
     .card-detail.open { display: block; }
     .card-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
     .card-detail-row:last-child { border-bottom: none; }
-    .card-detail-label { font-size: 0.76rem; color: var(--text-muted); }
-    .card-detail-val { font-size: 0.79rem; font-weight: 600; color: #fff; font-family: 'Montserrat', sans-serif; text-align: right; }
+    .card-detail-label { font-size: 0.76rem; color: var(--text-muted); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 8px; }
+    .card-detail-val { font-size: 0.79rem; font-weight: 600; color: #fff; font-family: 'Montserrat', sans-serif; text-align: right; flex-shrink: 0; white-space: nowrap; }
     .card-detail-val.pos { color: var(--green); }
     .card-detail-val.neg { color: var(--red); }
     .card-detail-val.gold { color: var(--gold); }
