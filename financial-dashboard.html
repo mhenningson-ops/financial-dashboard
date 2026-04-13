@@ -240,10 +240,13 @@
     .sum-card.has-detail:hover .card-expand-icon { color: var(--gold); }
     .card-detail { display: none; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
     .card-detail.open { display: block; }
-    .card-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .card-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
     .card-detail-row:last-child { border-bottom: none; }
+    .card-detail-row.sm { padding: 4px 0; opacity: 0.75; }
     .card-detail-label { font-size: 0.76rem; color: var(--text-muted); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 8px; }
+    .card-detail-row.sm .card-detail-label { font-size: 0.72rem; }
     .card-detail-val { font-size: 0.79rem; font-weight: 600; color: #fff; font-family: 'Montserrat', sans-serif; text-align: right; flex-shrink: 0; white-space: nowrap; }
+    .card-detail-row.sm .card-detail-val { font-size: 0.74rem; }
     .card-detail-val.pos { color: var(--green); }
     .card-detail-val.neg { color: var(--red); }
     .card-detail-val.gold { color: var(--gold); }
@@ -1797,6 +1800,7 @@ function renderReviewResults(s) {
 
   // Detail helpers for Q snapshot
   const rdr  = (lbl, val, cls='') => `<div class="card-detail-row"><span class="card-detail-label">${lbl}</span><span class="card-detail-val${cls?' '+cls:''}">${val}</span></div>`;
+  const rdrsm = (lbl, val, cls='') => `<div class="card-detail-row sm"><span class="card-detail-label">${lbl}</span><span class="card-detail-val${cls?' '+cls:''}">${val}</span></div>`;
   const rdrt = (lbl, val, cls='gold') => `<div class="card-detail-total"><span class="card-detail-total-label">${lbl}</span><span class="card-detail-total-val ${cls}">${val}</span></div>`;
 
   // Q snapshot drill-down content
@@ -1850,7 +1854,7 @@ function renderReviewResults(s) {
       ['Emerging Markets — VWO (Roth IRA)',sp2.vwo_ira     || 0],
     ].sort((a, b) => b[1] - a[1]).map(([lbl, val]) => {
       const pct = s.totalPortfolio > 0 ? (val / s.totalPortfolio * 100).toFixed(1) : '0.0';
-      return rdr(lbl, `${fmt$(val)} (${pct}%)`);
+      return rdrsm(lbl, `${fmt$(val)} (${pct}%)`);
     }),
   ].join('');
 
@@ -2371,6 +2375,7 @@ function renderDashboard() {
 
   // Detail row helpers
   const dr  = (lbl, val, cls='') => `<div class="card-detail-row"><span class="card-detail-label">${lbl}</span><span class="card-detail-val${cls?' '+cls:''}">${val}</span></div>`;
+  const drsm = (lbl, val, cls='') => `<div class="card-detail-row sm"><span class="card-detail-label">${lbl}</span><span class="card-detail-val${cls?' '+cls:''}">${val}</span></div>`;
   const drt = (lbl, val, cls='gold') => `<div class="card-detail-total"><span class="card-detail-total-label">${lbl}</span><span class="card-detail-total-val ${cls}">${val}</span></div>`;
 
   // Drill-down content — Total Assets
@@ -2425,7 +2430,7 @@ function renderDashboard() {
       ['Emerging Markets — VWO (Roth IRA)',lp.vwo_ira     || 0],
     ].sort((a, b) => b[1] - a[1]).map(([lbl, val]) => {
       const pct = last.totalPortfolio > 0 ? (val / last.totalPortfolio * 100).toFixed(1) : '0.0';
-      return dr(lbl, `${fmt$(val)} (${pct}%)`);
+      return drsm(lbl, `${fmt$(val)} (${pct}%)`);
     }),
   ].join('');
 
