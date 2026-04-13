@@ -1834,6 +1834,7 @@ function renderReviewResults(s) {
   const rdHsa    = (sp2.fssnx_hsa||0) + (sp2.bitb_hsa||0) + (sp2.etha_hsa||0) + (sp2.iblc_hsa||0);
   const rdIra    = (sp2.swssx_ira||0) + (sp2.swisx_ira||0) + (sp2.vwo_ira||0);
   const rdRetirement = [
+    '<div class="card-detail-section" style="border-top:none;margin-top:0;padding-top:0;">By Account</div>',
     rdr('401(k)',      fmt$(rd401k)),
     rdr('Roth 401(k)', fmt$(rdR401k)),
     rdr('HSA',         fmt$(rdHsa)),
@@ -2409,6 +2410,7 @@ function renderDashboard() {
   const dHsa   = (lp.fssnx_hsa||0) + (lp.bitb_hsa||0) + (lp.etha_hsa||0) + (lp.iblc_hsa||0);
   const dIra   = (lp.swssx_ira||0) + (lp.swisx_ira||0) + (lp.vwo_ira||0);
   const dRetirement = [
+    '<div class="card-detail-section" style="border-top:none;margin-top:0;padding-top:0;">By Account</div>',
     dr('401(k)',       fmt$(d401k)),
     dr('Roth 401(k)',  fmt$(dR401k)),
     dr('HSA',          fmt$(dHsa)),
