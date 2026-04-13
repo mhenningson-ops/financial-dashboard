@@ -1110,7 +1110,7 @@
 // ── CONSTANTS ──────────────────────────────────────────────────────────────
 const BIRTH_YEAR = 1989;
 const FI_TARGET_CASH = 115000;
-const FI_TARGET_YEAR = 2029;
+const FI_TARGET_YEAR = 2028;
 const DEBT_FREE_YEAR = 2030;
 const DRAWDOWN_AGE   = 59.5;
 const DRAWDOWN_YEAR  = BIRTH_YEAR + DRAWDOWN_AGE;
@@ -1756,7 +1756,7 @@ function renderReviewResults(s) {
   const fiPctCur  = Math.min(100, s.annualRentalCashFlow / FI_TARGET_CASH * 100);
   const fiPctPrev = prev ? Math.min(100, prev.annualRentalCashFlow / FI_TARGET_CASH * 100) : null;
   const sDate     = new Date(s.date);
-  const fiTarget  = new Date(FI_TARGET_YEAR, 0, 1);
+  const fiTarget  = new Date(FI_TARGET_YEAR, 11, 31);
   const monthsToFI = Math.max(0, (fiTarget.getFullYear() - sDate.getFullYear()) * 12 + (fiTarget.getMonth() - sDate.getMonth()));
 
   // Derived KPI values
@@ -2344,7 +2344,7 @@ function renderDashboard() {
 
   const fiPct = Math.min(100, (last.annualRentalCashFlow / FI_TARGET_CASH * 100));
   const lastDate   = new Date(last.date);
-  const fiTargetDate = new Date(FI_TARGET_YEAR, 0, 1);
+  const fiTargetDate = new Date(FI_TARGET_YEAR, 11, 31);
   const monthsToFI = Math.max(0, (fiTargetDate.getFullYear() - lastDate.getFullYear()) * 12 + (fiTargetDate.getMonth() - lastDate.getMonth()));
 
   const chgBadge = (chg, invertColor) => {
