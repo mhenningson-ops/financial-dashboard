@@ -527,8 +527,10 @@
         <!-- Refi BB → Secondary Paydown (reconverge at y=240) -->
         <path d="M 740,200 Q 760,200 770,240 L 780,240" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none" stroke-dasharray="5,3"/>
 
-        <!-- Lower path: Sell/Redeploy → reconverge -->
-        <path d="M 530,300 Q 760,300 770,240 L 780,240" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none" stroke-dasharray="5,3"/>
+        <!-- Lower path: Redeploy → Holladay Decision (lower) -->
+        <line x1="530" y1="300" x2="601" y2="300" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
+        <!-- Lower Holladay Decision → FI Target (bypasses BB refi/secondary) -->
+        <path d="M 629,300 Q 740,300 760,240 L 831,240" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
 
         <!-- Secondary Paydown → FI Target -->
         <line x1="800" y1="240" x2="828" y2="240" stroke="#4caf7d" stroke-width="2" marker-end="url(#arrow-green)"/>
@@ -571,12 +573,19 @@
         <text x="510" y="322" text-anchor="middle" fill="#a09880" font-size="9" font-family="Inter,sans-serif" font-weight="600">Redeploy Capital</text>
         <text x="510" y="332" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">into Other Real Estate</text>
 
-        <!-- NODE 5: Holladay Decision -->
+        <!-- NODE 5a: Holladay Decision (upper / Hold BB path) -->
         <circle cx="615" cy="200" r="14" fill="#0d1824" stroke="#5b9bd5" stroke-width="1.5"/>
         <text x="615" y="204" text-anchor="middle" fill="#5b9bd5" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">?</text>
         <text x="615" y="178" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Holladay:</text>
         <text x="615" y="168" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Sell or Hold?</text>
         <text x="615" y="224" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Aug 2027</text>
+
+        <!-- NODE 5b: Holladay Decision (lower / Sell BB path) -->
+        <circle cx="615" cy="300" r="14" fill="#0d1824" stroke="#5b9bd5" stroke-width="1.5"/>
+        <text x="615" y="304" text-anchor="middle" fill="#5b9bd5" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">?</text>
+        <text x="615" y="322" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Holladay:</text>
+        <text x="615" y="332" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Sell or Hold?</text>
+        <text x="615" y="346" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Aug 2027</text>
 
         <!-- NODE 6: Refi BB -->
         <circle cx="725" cy="200" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
