@@ -1848,7 +1848,10 @@ function renderReviewResults(s) {
       ['SWSSX — Small Cap (Roth IRA)',        sp2.swssx_ira   || 0],
       ['SWISX — Intl Developed (Roth IRA)',   sp2.swisx_ira   || 0],
       ['VWO — Emerging Markets (Roth IRA)',   sp2.vwo_ira     || 0],
-    ].sort((a, b) => b[1] - a[1]).map(([lbl, val]) => rdr(lbl, fmt$(val))),
+    ].sort((a, b) => b[1] - a[1]).map(([lbl, val]) => {
+      const pct = s.totalPortfolio > 0 ? (val / s.totalPortfolio * 100).toFixed(1) : '0.0';
+      return rdr(lbl, `${fmt$(val)} <span style="color:var(--text-muted);font-size:0.72rem;margin-left:5px;">${pct}%</span>`);
+    }),
   ].join('');
 
   const soa = s.otherAssets || {};
@@ -2420,7 +2423,10 @@ function renderDashboard() {
       ['SWSSX — Small Cap (Roth IRA)',        lp.swssx_ira   || 0],
       ['SWISX — Intl Developed (Roth IRA)',   lp.swisx_ira   || 0],
       ['VWO — Emerging Markets (Roth IRA)',   lp.vwo_ira     || 0],
-    ].sort((a, b) => b[1] - a[1]).map(([lbl, val]) => dr(lbl, fmt$(val))),
+    ].sort((a, b) => b[1] - a[1]).map(([lbl, val]) => {
+      const pct = last.totalPortfolio > 0 ? (val / last.totalPortfolio * 100).toFixed(1) : '0.0';
+      return dr(lbl, `${fmt$(val)} <span style="color:var(--text-muted);font-size:0.72rem;margin-left:5px;">${pct}%</span>`);
+    }),
   ].join('');
 
   // Drill-down — Other Financial Assets
