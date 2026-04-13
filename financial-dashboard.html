@@ -611,6 +611,115 @@
       </svg>
     </div>
 
+    <!-- BROKEN BOW DECISION BRIEF -->
+    <div class="card" style="margin-bottom:32px;cursor:pointer;position:relative;" onclick="toggleCardDetail('bb-brief')">
+      <div class="card-expand-icon" id="bb-brief-icon">+</div>
+      <div class="chart-title" style="margin-bottom:2px;">Broken Bow: Oct 2026 Decision Brief</div>
+      <div class="chart-sub">Hold vs. sell framework · 1031 exit math · Key numbers for October</div>
+      <div class="card-detail" id="bb-brief-detail" style="font-size:0.82rem;line-height:1.6;">
+
+        <!-- Decision Rule -->
+        <div style="background:rgba(207,172,103,0.07);border:1px solid rgba(207,172,103,0.2);border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;">
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Decision Rule — Annualized Revenue</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+            <div style="text-align:center;padding:10px;background:rgba(76,175,125,0.1);border:1px solid rgba(76,175,125,0.3);border-radius:6px;">
+              <div style="font-size:0.78rem;font-weight:700;color:#4caf7d;">≥ $90K</div>
+              <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;">HOLD</div>
+            </div>
+            <div style="text-align:center;padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:6px;">
+              <div style="font-size:0.78rem;font-weight:700;color:#ddd8ce;">$80–90K</div>
+              <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;">BORDERLINE</div>
+            </div>
+            <div style="text-align:center;padding:10px;background:rgba(229,57,53,0.1);border:1px solid rgba(229,57,53,0.3);border-radius:6px;">
+              <div style="font-size:0.78rem;font-weight:700;color:#e57373;">< $80K</div>
+              <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;">SELL</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hold vs Sell columns -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+
+          <!-- HOLD -->
+          <div>
+            <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4caf7d;margin-bottom:10px;">If Hold</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="color:var(--text-muted);">Save all extra cash for refi lump sum</div>
+              <div style="color:var(--text-muted);">Dec 2027: prepayment penalty expires · munis mature (~$127.5K)</div>
+              <div style="color:var(--text-muted);">Refi primary @ 6% · new P&I ~$1,523–1,683/mo (down from $4,137)</div>
+              <div style="color:var(--text-muted);">Dec 2028: pay 20% of secondary (~$32–35K) to extend balloon 5 yrs</div>
+            </div>
+          </div>
+
+          <!-- SELL -->
+          <div>
+            <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#e57373;margin-bottom:10px;">If Sell — Preferred: 1031 → $491K+</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="color:var(--text-muted);">Sell ASAP — every month costs ~$4K in negative CF</div>
+              <div style="color:var(--text-muted);">Cash to close: ~$46,500 (incl. $25,580 prepayment penalty)</div>
+              <div style="color:var(--text-muted);">Secondary deferred — not due at closing, balloon Dec 2028</div>
+              <div style="color:var(--text-muted);">1031 into ≥$491K defers ~$79K recapture tax · 45 days to ID replacement</div>
+              <div style="color:var(--text-muted);">25% down on $491K: $122,750 down · $368,250 @ 6.25% · P&I ~$2,268/mo</div>
+              <div style="color:var(--text-muted);">Cost seg new property → fresh 100% bonus dep (~$50–60K W-2 offset)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scenario Cost Table -->
+        <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Scenario Cost Comparison</div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.76rem;">
+            <thead>
+              <tr style="color:var(--text-muted);font-size:0.68rem;">
+                <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Scenario</th>
+                <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Cash to Close</th>
+                <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Recapture Tax</th>
+                <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Hold Cost</th>
+                <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Replacement RE</th>
+                <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Total†</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:7px 8px;color:#ddd8ce;">Sell Now, No 1031</td>
+                <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$46,498</td>
+                <td style="padding:7px 8px;text-align:right;color:#e57373;">$79,415</td>
+                <td style="padding:7px 8px;text-align:right;color:var(--text-muted);">—</td>
+                <td style="padding:7px 8px;text-align:right;color:var(--text-muted);">—</td>
+                <td style="padding:7px 8px;text-align:right;font-weight:700;color:#ddd8ce;">$151,493</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:7px 8px;color:#ddd8ce;">Sell Dec 2027, No 1031</td>
+                <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$13,349</td>
+                <td style="padding:7px 8px;text-align:right;color:#e57373;">$102,975</td>
+                <td style="padding:7px 8px;text-align:right;color:#e57373;">$80,000</td>
+                <td style="padding:7px 8px;text-align:right;color:var(--text-muted);">—</td>
+                <td style="padding:7px 8px;text-align:right;font-weight:700;color:#ddd8ce;">$196,324</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);background:rgba(207,172,103,0.05);">
+                <td style="padding:7px 8px;color:var(--gold);font-weight:600;">1031 → $491K ★ Preferred</td>
+                <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$46,498</td>
+                <td style="padding:7px 8px;text-align:right;color:#4caf7d;">$0 deferred</td>
+                <td style="padding:7px 8px;text-align:right;color:var(--text-muted);">—</td>
+                <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$132,570*</td>
+                <td style="padding:7px 8px;text-align:right;font-weight:700;color:var(--gold);">$204,648*</td>
+              </tr>
+              <tr>
+                <td style="padding:7px 8px;color:#ddd8ce;">1031 → $649.9K</td>
+                <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$46,498</td>
+                <td style="padding:7px 8px;text-align:right;color:#4caf7d;">$0 deferred</td>
+                <td style="padding:7px 8px;text-align:right;color:var(--text-muted);">—</td>
+                <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$175,473*</td>
+                <td style="padding:7px 8px;text-align:right;font-weight:700;color:#ddd8ce;">$247,551*</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="font-size:0.68rem;color:var(--text-muted);margin-top:8px;">† Excludes secondary note (~$190,514 total through Dec 2028 — same across all scenarios) · *Replacement RE cash acquires equity, not a pure cost · Cash to close includes $25,580 prepayment penalty</div>
+
+      </div>
+    </div>
+
     <!-- 2026 -->
     <div class="goal-year">
       <div class="goal-year-label">2026</div>
