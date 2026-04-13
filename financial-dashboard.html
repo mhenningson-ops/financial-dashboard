@@ -1839,15 +1839,15 @@ function renderReviewResults(s) {
     rdrt('Total Portfolio', fmt$(s.totalPortfolio)),
     '<div class="card-detail-section">By Fund</div>',
     ...[
-      ['FXAIX — Large Cap (401k)',            sp2.fxaix_401k  || 0],
-      ['FXAIX — Large Cap (Roth 401k)',       sp2.fxaix_r401k || 0],
-      ['FSSNX — Small Cap (HSA)',             sp2.fssnx_hsa   || 0],
-      ['BITB — Crypto BTC (HSA)',             sp2.bitb_hsa    || 0],
-      ['ETHA — Crypto ETH (HSA)',             sp2.etha_hsa    || 0],
-      ['IBLC — Crypto Infra (HSA)',           sp2.iblc_hsa    || 0],
-      ['SWSSX — Small Cap (Roth IRA)',        sp2.swssx_ira   || 0],
-      ['SWISX — Intl Developed (Roth IRA)',   sp2.swisx_ira   || 0],
-      ['VWO — Emerging Markets (Roth IRA)',   sp2.vwo_ira     || 0],
+      ['Large Cap — FXAIX (401k)',sp2.fxaix_401k  || 0],
+      ['Large Cap — FXAIX (Roth 401k)',sp2.fxaix_r401k || 0],
+      ['Small Cap — FSSNX (HSA)',sp2.fssnx_hsa   || 0],
+      ['Crypto BTC — BITB (HSA)',sp2.bitb_hsa    || 0],
+      ['Crypto ETH — ETHA (HSA)',sp2.etha_hsa    || 0],
+      ['Crypto Infra — IBLC (HSA)',sp2.iblc_hsa    || 0],
+      ['Small Cap — SWSSX (Roth IRA)',sp2.swssx_ira   || 0],
+      ['Intl Developed — SWISX (Roth IRA)',sp2.swisx_ira   || 0],
+      ['Emerging Markets — VWO (Roth IRA)',sp2.vwo_ira     || 0],
     ].sort((a, b) => b[1] - a[1]).map(([lbl, val]) => {
       const pct = s.totalPortfolio > 0 ? (val / s.totalPortfolio * 100).toFixed(1) : '0.0';
       return rdr(lbl, `${fmt$(val)} (${pct}%)`);
@@ -2414,15 +2414,15 @@ function renderDashboard() {
     drt('Total Portfolio', fmt$(last.totalPortfolio)),
     '<div class="card-detail-section">By Fund</div>',
     ...[
-      ['FXAIX — Large Cap (401k)',            lp.fxaix_401k  || 0],
-      ['FXAIX — Large Cap (Roth 401k)',       lp.fxaix_r401k || 0],
-      ['FSSNX — Small Cap (HSA)',             lp.fssnx_hsa   || 0],
-      ['BITB — Crypto BTC (HSA)',             lp.bitb_hsa    || 0],
-      ['ETHA — Crypto ETH (HSA)',             lp.etha_hsa    || 0],
-      ['IBLC — Crypto Infra (HSA)',           lp.iblc_hsa    || 0],
-      ['SWSSX — Small Cap (Roth IRA)',        lp.swssx_ira   || 0],
-      ['SWISX — Intl Developed (Roth IRA)',   lp.swisx_ira   || 0],
-      ['VWO — Emerging Markets (Roth IRA)',   lp.vwo_ira     || 0],
+      ['Large Cap — FXAIX (401k)',lp.fxaix_401k  || 0],
+      ['Large Cap — FXAIX (Roth 401k)',lp.fxaix_r401k || 0],
+      ['Small Cap — FSSNX (HSA)',lp.fssnx_hsa   || 0],
+      ['Crypto BTC — BITB (HSA)',lp.bitb_hsa    || 0],
+      ['Crypto ETH — ETHA (HSA)',lp.etha_hsa    || 0],
+      ['Crypto Infra — IBLC (HSA)',lp.iblc_hsa    || 0],
+      ['Small Cap — SWSSX (Roth IRA)',lp.swssx_ira   || 0],
+      ['Intl Developed — SWISX (Roth IRA)',lp.swisx_ira   || 0],
+      ['Emerging Markets — VWO (Roth IRA)',lp.vwo_ira     || 0],
     ].sort((a, b) => b[1] - a[1]).map(([lbl, val]) => {
       const pct = last.totalPortfolio > 0 ? (val / last.totalPortfolio * 100).toFixed(1) : '0.0';
       return dr(lbl, `${fmt$(val)} (${pct}%)`);
