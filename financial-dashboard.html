@@ -2187,6 +2187,8 @@ function runReview() {
     totalAssets, totalDebt, netWorth,
     annualRentalCashFlow: annualCashFlow,
     annualCFPerProp,
+    quarterlyCashFlow: propKeys.reduce((s, key) => s + (props[key]?.netCF || 0), 0),
+    quarterlyCFPerProp: Object.fromEntries(propKeys.map(key => [key, props[key]?.netCF || 0])),
     w2Quarterly, w2Base, w2Rsu, w2Spiff, savingsRate, principalPaydown,
     otherSavings, totalSaved,
     contributionsNext: contribNext,
@@ -2404,19 +2406,20 @@ function renderReviewResults(s) {
         rdTotalIncome, 'qs-income'
       )}
       ${(() => {
-        const cf = s.annualRentalCashFlow;
-        const cfPrev = prev?.annualRentalCashFlow ?? null;
+        const cf = s.quarterlyCashFlow ?? (s.annualRentalCashFlow / 4);
+        const cfPrev = prev ? (prev.quarterlyCashFlow ?? (prev.annualRentalCashFlow / 4)) : null;
         const cfPropNm = { bradcliff:'Bradcliff', neely:'Neely', greenmount:'Greenmount', holladay:'Holladay', brokenBow:'Broken Bow' };
+        const perProp = s.quarterlyCFPerProp || Object.fromEntries(Object.entries(s.annualCFPerProp || {}).map(([k,v]) => [k, v/4]));
         const rdCF = [
-          ...Object.entries(s.annualCFPerProp || {}).map(([key, val]) =>
+          ...Object.entries(perProp).map(([key, val]) =>
             rdr(cfPropNm[key]||key, `${val<0?'-':''}${fmt$(val)}`, val>=0?'pos':'neg')
           ),
-          rdrt('Annual Total', `${cf<0?'-':''}${fmt$(cf)}`, cf>=0?'pos':'neg'),
+          rdrt('Quarterly Total', `${cf<0?'-':''}${fmt$(cf)}`, cf>=0?'pos':'neg'),
         ].join('');
-        return rCard('Annual Cash Flow',
+        return rCard('Quarterly Cash Flow',
           `<span class="${cf>=0?'pos':'neg'}">${cf<0?'-':''}${fmt$(cf)}</span>`,
           chgBadgeR(cf, cfPrev, false),
-          `${fiPctCur.toFixed(0)}% of FI target`,
+          `Annualized: ${cf>=0?'':'-'}${fmt$(Math.abs(cf*4))} &nbsp;·&nbsp; ${(cf*4/115000*100).toFixed(0)}% of FI target`,
           rdCF, 'qs-cf'
         );
       })()}
