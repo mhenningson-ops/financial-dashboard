@@ -471,9 +471,12 @@
     </div>
 
     <!-- SVG TIMELINE -->
-    <div class="card" style="margin-bottom:32px;overflow-x:auto;">
+    <div class="card" style="margin-bottom:32px;overflow-x:auto;cursor:pointer;position:relative;" onclick="toggleCardDetail('roadmap')">
+      <div class="card-expand-icon" id="roadmap-icon">+</div>
       <div class="chart-title" style="margin-bottom:4px;">Strategic Roadmap</div>
       <div class="chart-sub" style="margin-bottom:20px;">Decision forks and key milestones through Dec 2028</div>
+
+      <div class="card-detail" id="roadmap-detail">
 
       <!-- Legend -->
       <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
@@ -662,14 +665,14 @@
         <div style="background:var(--dark-2);padding:16px 18px;">
           <div style="font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">You Are Here</div>
           <div style="font-size:0.82rem;font-weight:600;color:#ddd8ce;margin-bottom:4px;">Building Cash Reserve</div>
-          <div style="font-size:0.75rem;color:var(--text-muted);line-height:1.6;">Redirect discretionary savings away from Bradcliff payoff through October 2026. Building toward the full ~$175–180K refi lump sum — $127.5K already saved in muni bonds, remainder accumulating in cash.</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);line-height:1.6;">October 2026 is the decision point. If Broken Bow isn't trending toward $80,000+ in revenue, sell. ~$179,000 will be needed ($46,500 to sell Broken Bow + $132,570 for 1031 down payment and closing costs of the new property(ies).<br><br>If holding, building toward the ~$225,000 refinance lump sum ($127,500 already in muni bonds).</div>
         </div>
 
         <!-- Next Decision -->
         <div style="background:var(--dark-2);padding:16px 18px;">
           <div style="font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#5b9bd5;margin-bottom:8px;">Next Decision — Oct 2026</div>
           <div style="font-size:0.82rem;font-weight:600;color:#ddd8ce;margin-bottom:4px;">Broken Bow: Hold or Sell?</div>
-          <div style="font-size:0.75rem;color:var(--text-muted);line-height:1.6;">Review annualized revenue after peak summer season. <span style="color:#4caf7d;font-weight:600;">≥$90K → hold and refi.</span> <span style="color:#e57373;font-weight:600;">&lt;$80K → sell and 1031.</span> $80–90K is borderline — hold only if further upside is credible.</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);line-height:1.6;">Review annualized revenue in October 2026. <span style="color:#4caf7d;font-weight:600;">≥$90K → hold and refinance.</span> <span style="color:#e57373;font-weight:600;">&lt;$80K → sell and 1031 exchange.</span> $80–90K is borderline — hold only if further upside is credible.</div>
         </div>
 
         <!-- Key Numbers -->
@@ -677,132 +680,232 @@
           <div style="font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Key Numbers to Watch</div>
           <div style="display:flex;flex-direction:column;gap:6px;">
             <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
-              <span style="color:var(--text-muted);">Refi lump sum target</span>
-              <span style="color:#ddd8ce;font-weight:600;">$175–180K</span>
+              <span style="color:var(--text-muted);">Cash reserve</span>
+              <span style="color:#ddd8ce;font-weight:600;">~$179,000</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
-              <span style="color:var(--text-muted);">Hold revenue threshold</span>
-              <span style="color:#ddd8ce;font-weight:600;">$90K/yr</span>
+              <span style="color:var(--text-muted);">Refinance target</span>
+              <span style="color:#ddd8ce;font-weight:600;">$225,000</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
+              <span style="color:var(--text-muted);">Revenue target</span>
+              <span style="color:#ddd8ce;font-weight:600;">$90,000/yr</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
               <span style="color:var(--text-muted);">1031 replacement minimum</span>
-              <span style="color:#ddd8ce;font-weight:600;">$491K</span>
+              <span style="color:#ddd8ce;font-weight:600;">$491,000</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:0.75rem;">
-              <span style="color:var(--text-muted);">Prepayment penalty expires</span>
+              <span style="color:var(--text-muted);">Prepayment penalty ends</span>
               <span style="color:#ddd8ce;font-weight:600;">Dec 2027</span>
             </div>
           </div>
         </div>
 
       </div>
+      </div><!-- end card-detail roadmap -->
     </div>
 
-    <!-- 2026 -->
-    <div class="goal-year">
-      <div class="goal-year-label">2026</div>
-      <div class="goal-list">
-        <div class="goal-item">
-          <div class="goal-status active">→</div>
-          <div class="goal-body">
-            <div class="goal-title">Pay off Bradcliff mortgage</div>
-            <div class="goal-meta">Frees $754/mo P&I · $9,051/yr cash flow improvement · Remaining balance ~$110K</div>
-          </div>
-          <div class="goal-date">Dec 2026</div>
+    <!-- REFI LUMP SUM PROJECTION -->
+    <div class="card" style="margin-bottom:32px;cursor:pointer;position:relative;" onclick="toggleCardDetail('refi-projection')">
+      <div class="card-expand-icon" id="refi-projection-icon">+</div>
+      <div class="chart-title" style="margin-bottom:2px;">Broken Bow Refi Lump Sum Projection</div>
+      <div class="chart-sub">Hold scenario · Dec 2027 target · BB revenue ≥$90K</div>
+
+      <!-- Progress bar -->
+      <div id="lump-sum-progress" style="margin-top:16px;"></div>
+
+      <!-- Summary bar -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);border-radius:var(--radius);overflow:hidden;margin-top:16px;">
+        <div style="background:var(--dark-2);padding:14px 16px;text-align:center;">
+          <div style="font-size:0.68rem;color:var(--text-muted);margin-bottom:4px;">Target</div>
+          <div style="font-size:1rem;font-weight:700;color:#ddd8ce;">$225K</div>
         </div>
-        <div class="goal-item">
-          <div class="goal-status active">→</div>
-          <div class="goal-body">
-            <div class="goal-title">Improve Broken Bow revenue to $90K+ annualized</div>
-            <div class="goal-meta">Sauna, cold plunge, cornhole, ping pong, pet-friendly — all completed for $8K · Current: $67.5K/yr</div>
-          </div>
-          <div class="goal-date">Oct 2026</div>
+        <div style="background:var(--dark-2);padding:14px 16px;text-align:center;">
+          <div style="font-size:0.68rem;color:var(--text-muted);margin-bottom:4px;">Projected Available</div>
+          <div style="font-size:1rem;font-weight:700;color:#4caf7d;">$270,997</div>
         </div>
-        <div class="goal-item">
-          <div class="goal-status decision">?</div>
-          <div class="goal-body">
-            <div class="goal-title">Decide: sell or hold Broken Bow</div>
-            <div class="goal-meta">Hold if annualized revenue ≥$90K · Sell if &lt;$80K · $80-90K borderline · If selling: must 1031 exchange into ≥$649.9K real estate to avoid depreciation recapture (80% bonus dep. taken year 1)</div>
-          </div>
-          <div class="goal-date">Oct 2026</div>
-        </div>
-        <div class="goal-item">
-          <div class="goal-status active">→</div>
-          <div class="goal-body">
-            <div class="goal-title">Redirect all extra cash to refi lump sum savings</div>
-            <div class="goal-meta">Post-Bradcliff payoff · Buy IBMP munis through end of 2026 for tax efficiency · Switch to T-bills in 2027</div>
-          </div>
-          <div class="goal-date">Ongoing 2026</div>
+        <div style="background:var(--dark-2);padding:14px 16px;text-align:center;">
+          <div style="font-size:0.68rem;color:var(--text-muted);margin-bottom:4px;">Surplus</div>
+          <div style="font-size:1rem;font-weight:700;color:#4caf7d;">~$46K</div>
         </div>
       </div>
-    </div>
 
-    <!-- 2027 -->
-    <div class="goal-year">
-      <div class="goal-year-label">2027</div>
-      <div class="goal-list">
-        <div class="goal-item">
-          <div class="goal-status pending"></div>
-          <div class="goal-body">
-            <div class="goal-title">Continue building refi lump sum</div>
-            <div class="goal-meta">Muni bonds ($127.5K) mature Dec 2027 · Redirect Bradcliff P&I savings + W-2 discretionary · Switch new savings to T-bills</div>
-          </div>
-          <div class="goal-date">All of 2027</div>
-        </div>
-        <div class="goal-item">
-          <div class="goal-status decision">?</div>
-          <div class="goal-body">
-            <div class="goal-title">Decide: sell or hold Holladay</div>
-            <div class="goal-meta">Tenants out Aug 1, 2027 · If selling: ~$381K net equity to redeploy into cash-purchased Utah STR + Memphis LTRs · Possible future primary residence — do not force</div>
-          </div>
-          <div class="goal-date">Aug 2027</div>
-        </div>
-        <div class="goal-item">
-          <div class="goal-status pending"></div>
-          <div class="goal-body">
-            <div class="goal-title">Get real estate license</div>
-            <div class="goal-meta">Only if selling BB or Holladay · Saves ~$4.5K per transaction as buyer's/listing agent</div>
-          </div>
-          <div class="goal-date">If needed 2027</div>
-        </div>
-        <div class="goal-item">
-          <div class="goal-status decision">?</div>
-          <div class="goal-body">
-            <div class="goal-title">Refi Broken Bow primary @ 6%</div>
-            <div class="goal-meta">Prepayment penalty ends Dec 2027 · Deploy ~$222-249K lump sum · New balance ~$254-281K · New P&I ~$1,523-1,683/mo · Saves ~$29-31K/yr vs. current</div>
-          </div>
-          <div class="goal-date">Dec 2027</div>
-        </div>
-      </div>
-    </div>
+      <div class="card-detail" id="refi-projection-detail" style="font-size:0.82rem;line-height:1.7;color:var(--text-muted);">
 
-    <!-- 2028 -->
-    <div class="goal-year">
-      <div class="goal-year-label">2028</div>
-      <div class="goal-list">
-        <div class="goal-item">
-          <div class="goal-status pending"></div>
-          <div class="goal-body">
-            <div class="goal-title">Pay 20% of BB secondary balance to extend balloon</div>
-            <div class="goal-meta">~$32-35K lump sum · Extends balloon from Dec 2028 → Dec 2033 · Rate converts to 6% on Jan 1, 2029 · New P&I ~$784/mo</div>
-          </div>
-          <div class="goal-date">Dec 2028</div>
+        <!-- Projected vs Actual milestones -->
+        <div style="margin-bottom:24px;">
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Projected vs Actual</div>
+          <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:10px;">Actual = muni bonds + (cash − $15,000 operational reserve)</div>
+          <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+            <thead>
+              <tr style="color:var(--text-muted);font-size:0.68rem;">
+                <th style="text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);font-weight:500;">Quarter</th>
+                <th style="text-align:right;padding:5px 8px;border-bottom:1px solid var(--border);font-weight:500;">Projected</th>
+                <th style="text-align:right;padding:5px 8px;border-bottom:1px solid var(--border);font-weight:500;">Actual</th>
+                <th style="text-align:right;padding:5px 8px;border-bottom:1px solid var(--border);font-weight:500;">Status</th>
+              </tr>
+            </thead>
+            <tbody id="lump-sum-milestones"></tbody>
+          </table>
         </div>
-      </div>
-    </div>
 
-    <!-- FI Target -->
-    <div class="goal-year">
-      <div class="goal-year-label">FI Target</div>
-      <div class="goal-list">
-        <div class="goal-item">
-          <div class="goal-status active">→</div>
-          <div class="goal-body">
-            <div class="goal-title">Reach $115K annual rental cash flow</div>
-            <div class="goal-meta">Family FI target (married + kids) · Current: -$29,925/yr · Dec 2028 projected: $73-83K depending on BB/Holladay resolution</div>
-          </div>
-          <div class="goal-date">Dec 31, 2028</div>
+        <!-- Phase 1 -->
+        <div style="margin-bottom:24px;">
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Phase 1 — Bradcliff Payoff (Apr–Dec 2026)</div>
+          <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+            <thead>
+              <tr style="color:var(--text-muted);font-size:0.68rem;">
+                <th style="text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);font-weight:500;">Source</th>
+                <th style="text-align:right;padding:5px 8px;border-bottom:1px solid var(--border);font-weight:500;">Monthly</th>
+                <th style="text-align:right;padding:5px 8px;border-bottom:1px solid var(--border);font-weight:500;">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:6px 8px;color:var(--text-muted);">W-2 discretionary</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$10,305</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$92,745</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:6px 8px;color:var(--text-muted);">Bradcliff Cash Flow (pre-payoff)</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$184</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$1,656</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:6px 8px;color:var(--text-muted);">Neely Cash Flow</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$586</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$5,274</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:6px 8px;color:var(--text-muted);">Greenmount Cash Flow</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$919</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$8,271</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:6px 8px;color:var(--text-muted);">Holladay Cash Flow</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$375</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$3,375</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:6px 8px;color:var(--text-muted);">Broken Bow Cash Flow — Apr–Jun ($67.5K revenue)</td>
+                <td style="padding:6px 8px;text-align:right;color:#e57373;">−$4,008</td>
+                <td style="padding:6px 8px;text-align:right;color:#e57373;">−$12,024</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                <td style="padding:6px 8px;color:var(--text-muted);">Broken Bow Cash Flow — Jul–Dec ($90K revenue)</td>
+                <td style="padding:6px 8px;text-align:right;color:#e57373;">−$2,414</td>
+                <td style="padding:6px 8px;text-align:right;color:#e57373;">−$14,484</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);">
+                <td style="padding:6px 8px;font-weight:600;color:#ddd8ce;">Cash Flow subtotal (9 months)</td>
+                <td style="padding:6px 8px;text-align:right;color:var(--text-muted);">—</td>
+                <td style="padding:6px 8px;text-align:right;font-weight:600;color:#ddd8ce;">$84,813</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:6px 8px;color:var(--text-muted);">2025 Tax Refund</td>
+                <td style="padding:6px 8px;text-align:right;color:var(--text-muted);">—</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">~$39,200</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                <td style="padding:6px 8px;color:var(--text-muted);">Bradcliff payoff</td>
+                <td style="padding:6px 8px;text-align:right;color:var(--text-muted);">—</td>
+                <td style="padding:6px 8px;text-align:right;color:#e57373;">−$110,080</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 8px;font-weight:600;color:#ddd8ce;">Leftover Dec 2026</td>
+                <td style="padding:6px 8px;text-align:right;color:var(--text-muted);">—</td>
+                <td style="padding:6px 8px;text-align:right;font-weight:700;color:#4caf7d;">~$13,933</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+
+        <!-- Phase 2 -->
+        <div style="margin-bottom:24px;">
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Phase 2 — Lump Sum Accumulation (Jan–Dec 2027)</div>
+          <div style="font-size:0.78rem;margin-bottom:10px;">Post-Bradcliff payoff · BB at $90K ADR-driven revenue · 68.9% occupancy · self-managed · 15% platform fee</div>
+          <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+            <thead>
+              <tr style="color:var(--text-muted);font-size:0.68rem;">
+                <th style="text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);font-weight:500;">Source</th>
+                <th style="text-align:right;padding:5px 8px;border-bottom:1px solid var(--border);font-weight:500;">Monthly</th>
+                <th style="text-align:right;padding:5px 8px;border-bottom:1px solid var(--border);font-weight:500;">× 12 mo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:6px 8px;color:var(--text-muted);">W-2 discretionary</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$10,305</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$123,660</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:6px 8px;color:var(--text-muted);">Bradcliff Cash Flow (post-payoff)</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$938</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$11,256</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:6px 8px;color:var(--text-muted);">Neely Cash Flow</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$586</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$7,032</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:6px 8px;color:var(--text-muted);">Greenmount Cash Flow</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$919</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$11,028</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:6px 8px;color:var(--text-muted);">Holladay Cash Flow</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$375</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$4,500</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                <td style="padding:6px 8px;color:var(--text-muted);">Broken Bow Cash Flow ($90K revenue)</td>
+                <td style="padding:6px 8px;text-align:right;color:#e57373;">−$2,414</td>
+                <td style="padding:6px 8px;text-align:right;color:#e57373;">−$28,968</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 8px;font-weight:600;color:#ddd8ce;">Monthly savings · 2027 total</td>
+                <td style="padding:6px 8px;text-align:right;font-weight:600;color:#ddd8ce;">$10,709</td>
+                <td style="padding:6px 8px;text-align:right;font-weight:700;color:#ddd8ce;">$128,508</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Full lump sum -->
+        <div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Full Lump Sum (Dec 2027)</div>
+          <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+            <tbody>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:6px 8px;color:var(--text-muted);">Muni bonds (mature Dec 2027)</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$127,556</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:6px 8px;color:var(--text-muted);">2026 savings</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$13,933</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                <td style="padding:6px 8px;color:var(--text-muted);">2027 savings</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$128,508</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);">
+                <td style="padding:6px 8px;font-weight:600;color:#ddd8ce;">Total available</td>
+                <td style="padding:6px 8px;text-align:right;font-weight:700;color:#4caf7d;">$270,997</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:6px 8px;color:var(--text-muted);">Target</td>
+                <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$225K</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 8px;font-weight:600;color:#ddd8ce;">Surplus</td>
+                <td style="padding:6px 8px;text-align:right;font-weight:700;color:#4caf7d;">~$46K</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
       </div>
     </div>
 
@@ -838,7 +941,7 @@
           <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4caf7d;margin-bottom:10px;">Hold path</div>
           <div style="font-size:0.82rem;">If revenue meets or exceeds $90,000 annualized, continue holding and redirect all available cash to build a refinance lump sum. Muni bonds (IBMP) should be purchased through year-end 2026 for tax efficiency, then switched to T-bills in 2027.</div>
           <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;font-size:0.82rem;">
-            <div><span style="color:#ddd8ce;font-weight:600;">December 2027:</span> Prepayment penalty expires and muni bonds mature (~$127,500). Refinance the primary mortgage at 6%, 30-year term, applying a ~$222,000–$249,000 lump sum to reduce the outstanding balance. New principal and interest drops from $4,137 to ~$1,523–$1,683 per month.</div>
+            <div><span style="color:#ddd8ce;font-weight:600;">December 2027:</span> Prepayment penalty expires and muni bonds mature (~$127,500). Refinance the primary mortgage at 6%, 30-year term, applying a ~$225,000 lump sum to reduce the outstanding balance. New principal and interest drops from $4,137 to ~$1,523–$1,683 per month.</div>
             <div><span style="color:#ddd8ce;font-weight:600;">December 2028:</span> Pay 20% of the secondary balance (~$32,000–$35,000) to extend the balloon payment five years. Rate converts to 6%; new principal and interest ~$784 per month. Remaining balloon due December 2033.</div>
           </div>
         </div>
@@ -896,6 +999,14 @@
                 <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$132,570*</td>
                 <td style="padding:7px 8px;text-align:right;font-weight:700;color:var(--gold);">$179,068*</td>
               </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:7px 8px;color:#ddd8ce;">Sell December 2027, 1031 exchange into $491,000</td>
+                <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$13,349</td>
+                <td style="padding:7px 8px;text-align:right;color:#4caf7d;">$0 deferred**</td>
+                <td style="padding:7px 8px;text-align:right;color:#e57373;">$80,000</td>
+                <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$132,570*</td>
+                <td style="padding:7px 8px;text-align:right;font-weight:700;color:#ddd8ce;">$225,919*</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -903,7 +1014,8 @@
           <div>† Total excludes the secondary note, which represents a ~$190,514 obligation through December 2028 (monthly payments plus balloon) that is consistent across all scenarios.</div>
           <div>* Replacement real estate cash of $132,570 acquires $122,750 in equity at 25% down on a $491,000 property. The net incremental cost versus walking away is $9,820 in closing costs — not the full $132,570.</div>
           <div>‡ Cash to close includes the $25,580 prepayment penalty on the primary mortgage.</div>
-          <div>§ Hold cost represents the cumulative negative cash flow incurred during the hold period prior to sale (~$4,000 per month). Hold cost is $0 for sell-now scenarios and $80,000 for the December 2027 scenario (20 months at ~$4,000 per month).</div>
+          <div>§ Hold cost represents the cumulative negative cash flow incurred during the hold period prior to sale (~$4,000 per month). Hold cost is $0 for sell-now scenarios and $80,000 for the December 2027 scenario (20 months at ~$4,000 per month). Hold cost assumption is based on $67,500 annualized revenue — re-model in October 2026 using actual revenue data.</div>
+          <div>** Deferred recapture increases to ~$102,975 by December 2027 (vs. ~$79,415 if selling now) due to two additional years of depreciation. Scenario 4 defers ~$24K more than Scenario 3 but costs ~$56K more in hold losses — not recommended unless meaningful appreciation is expected.</div>
         </div>
 
       </div>
@@ -1381,10 +1493,10 @@
           </div>
         </div>
         <div class="sub-section">
-          <div class="sub-section-title">Income This Quarter</div>
+          <div class="sub-section-title">YTD Income</div>
           <div class="field-group field-group-3">
             <div class="field">
-              <label>Base W-2 <span class="annual-note">— Regular salary only</span></label>
+              <label>Gross W-2 Base + Commissions</label>
               <input type="text" class="money-input" id="w2_base" placeholder="$0" />
             </div>
             <div class="field">
@@ -1394,6 +1506,23 @@
             <div class="field">
               <label>Spiff / Other <span class="annual-note">— Prepaid cards, side income</span></label>
               <input type="text" class="money-input" id="w2_spiff" placeholder="$0" />
+            </div>
+            <div class="field">
+              <label>Taxes Withheld <span class="annual-note">— Federal + state + FICA</span></label>
+              <input type="text" class="money-input" id="w2_taxes" placeholder="$0" />
+            </div>
+          </div>
+        </div>
+        <div class="sub-section">
+          <div class="sub-section-title">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input type="checkbox" id="tax_refund_toggle" onchange="toggleTaxRefund(this.checked)" style="cursor:pointer;accent-color:var(--gold);">
+              <span id="tax_refund_label" style="color:var(--text-muted);">Tax Refund</span>
+            </label>
+          </div>
+          <div id="tax_refund_body" style="display:none;margin-top:10px;">
+            <div class="field-group">
+              <div class="field"><label>Refund Amount</label><input type="text" class="money-input" id="w2_tax_refund" placeholder="$0" /></div>
             </div>
           </div>
         </div>
@@ -1417,7 +1546,6 @@
     <div style="margin-top:28px;">
       <button class="btn-primary" onclick="runReview()">Analyze &amp; Save Quarter</button>
       <button class="btn-secondary" style="width:100%;margin-top:10px;display:block;text-align:center;" onclick="prefillDemo()">Load Q2 2026 Starting Values</button>
-      <button class="btn-secondary" style="width:100%;margin-top:6px;display:block;text-align:center;opacity:0.6;" onclick="prefillDemoQ1()">Load Q1 2026 Demo (for trend arrow preview)</button>
       <div id="draft-status" style="text-align:center;font-size:0.68rem;color:var(--text-muted);margin-top:10px;height:16px;"></div>
     </div>
 
@@ -1742,6 +1870,12 @@ function setValFieldsState(p, editable) {
   updateBlended(p, p + '_blended');
 }
 
+function toggleTaxRefund(checked) {
+  $('tax_refund_body').style.display = checked ? '' : 'none';
+  $('tax_refund_label').style.color = checked ? '' : 'var(--text-muted)';
+  if (!checked) setMoney('w2_tax_refund', 0);
+}
+
 function toggleValUpdate(p, checked) {
   if (checked) {
     setValFieldsState(p, true);
@@ -1832,7 +1966,7 @@ const DRAFT_FIELD_IDS = [
   'bb_mortgage1','bb_mortgage2','bb_revenue','bb_nights_avail','bb_nights_booked','bb_platform','bb_rm','bb_util','bb_supplies','bb_subs','bb_capex','bb_lodging_tax',
   'a_ibonds','a_muni','a_cash','a_other','d_other',
   's_ibonds','s_extra_principal','s_other',
-  'w2_base','w2_rsu','w2_spiff',
+  'w2_base','w2_rsu','w2_spiff','w2_taxes','w2_tax_refund',
 ];
 
 let draftTimer = null;
@@ -1939,6 +2073,101 @@ function switchTab(name) {
   $('tab-'+name).classList.add('active');
   if (name === 'dashboard') renderDashboard();
   if (name === 'history')   renderHistory();
+  if (name === 'goals')     renderLumpSumProjection();
+  localStorage.setItem('activeTab', name);
+}
+
+function renderLumpSumProjection() {
+  const quarters = getQuarters();
+  const TARGET = 225000;
+  const OP_RESERVE = 15000;
+
+  function actual(s) {
+    if (!s?.otherAssets) return null;
+    const muni = s.otherAssets.muni || 0;
+    const cash = Math.max((s.otherAssets.cash || 0) - OP_RESERVE, 0);
+    return muni + cash;
+  }
+
+  function closestSnapshot(targetDate) {
+    const td = new Date(targetDate);
+    const past = quarters.filter(s => new Date(s.date) <= new Date());
+    if (!past.length) return null;
+    return past.reduce((best, s) => {
+      return Math.abs(new Date(s.date) - td) < Math.abs(new Date(best.date) - td) ? s : best;
+    });
+  }
+
+  // ── Progress bar ──
+  const latest = quarters[quarters.length - 1];
+  const progressEl = $('lump-sum-progress');
+  if (progressEl) {
+    if (latest) {
+      const muni = latest.otherAssets?.muni || 0;
+      const cashEarmarked = Math.max((latest.otherAssets?.cash || 0) - OP_RESERVE, 0);
+      const total = muni + cashEarmarked;
+      const pct = Math.min(total / TARGET * 100, 100).toFixed(1);
+      const muniPct = Math.min(muni / TARGET * 100, 100).toFixed(1);
+      const cashPct = Math.min(cashEarmarked / TARGET * 100, 100 - parseFloat(muniPct)).toFixed(1);
+      progressEl.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
+          <span style="font-size:0.8rem;color:#ddd8ce;font-weight:600;">${fmt$(total)} saved toward ${fmt$(TARGET)}</span>
+          <span style="font-size:0.8rem;color:#4caf7d;font-weight:700;">${pct}%</span>
+        </div>
+        <div style="height:10px;border-radius:5px;background:rgba(255,255,255,0.08);overflow:hidden;">
+          <div style="display:flex;height:100%;">
+            <div style="width:${muniPct}%;background:#2d6b4a;"></div>
+            <div style="width:${cashPct}%;background:#4caf7d;"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;margin-top:7px;font-size:0.67rem;color:var(--text-muted);">
+          <span><span style="display:inline-block;width:8px;height:8px;background:#2d6b4a;border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Muni bonds ${fmt$(muni)}</span>
+          <span><span style="display:inline-block;width:8px;height:8px;background:#4caf7d;border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Cash ${fmt$(cashEarmarked)}</span>
+          <span style="margin-left:auto;">${fmt$(TARGET - total)} remaining</span>
+        </div>`;
+    } else {
+      progressEl.innerHTML = `<div style="font-size:0.75rem;color:var(--text-muted);">No snapshot data yet.</div>`;
+    }
+  }
+
+  // ── Milestone table ──
+  const milestones = [
+    { label: 'Q1 2026', date: '2026-03-31', projected: 131001 },
+    { label: 'Q2 2026', date: '2026-06-30', projected: 131001, note: 'Flat — CF to Bradcliff' },
+    { label: 'Q3 2026', date: '2026-09-30', projected: 131001, note: 'Flat — CF to Bradcliff' },
+    { label: 'Q4 2026', date: '2026-12-31', projected: 141489, note: 'Bradcliff paid off' },
+    { label: 'Q1 2027', date: '2027-03-31', projected: 173616 },
+    { label: 'Q2 2027', date: '2027-06-30', projected: 205743 },
+    { label: 'Q3 2027', date: '2027-09-30', projected: 237870, note: '≥ Target' },
+    { label: 'Q4 2027', date: '2027-12-31', projected: 269997 },
+  ];
+
+  const tbody = $('lump-sum-milestones');
+  if (!tbody) return;
+  const today = new Date();
+  tbody.innerHTML = milestones.map(m => {
+    const isPast = new Date(m.date) <= today;
+    const snap = isPast ? closestSnapshot(m.date) : null;
+    const act = snap ? actual(snap) : null;
+    const diff = act !== null ? act - m.projected : null;
+    const isTarget = m.projected >= TARGET;
+
+    let statusHtml = `<span style="color:var(--text-muted);">Pending</span>`;
+    if (act !== null) {
+      if (diff >= 0) statusHtml = `<span style="color:#4caf7d;font-weight:600;">+${fmt$(diff)} ahead</span>`;
+      else statusHtml = `<span style="color:#e57373;font-weight:600;">${fmt$(diff)} behind</span>`;
+    }
+
+    const rowStyle = isTarget ? 'background:rgba(76,175,125,0.05);' : '';
+    const labelStyle = isTarget ? 'color:#4caf7d;font-weight:600;' : 'color:#ddd8ce;';
+
+    return `<tr style="border-bottom:1px solid rgba(255,255,255,0.04);${rowStyle}">
+      <td style="padding:6px 8px;${labelStyle}">${m.label}${m.note ? `<span style="font-size:0.65rem;color:var(--text-muted);font-weight:400;margin-left:6px;">${m.note}</span>` : ''}</td>
+      <td style="padding:6px 8px;text-align:right;color:var(--text-muted);">${fmt$(m.projected)}</td>
+      <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">${act !== null ? fmt$(act) : '—'}</td>
+      <td style="padding:6px 8px;text-align:right;">${statusHtml}</td>
+    </tr>`;
+  }).join('');
 }
 
 // ── BLENDED VALUATION ──────────────────────────────────────────────────────
@@ -2148,13 +2377,12 @@ function runReview() {
   };
   otherSavings.total = otherSavings.ibonds + otherSavings.extraPrincipal + otherSavings.other;
 
-  // W-2 savings rate — account contributions + other savings vs. total quarterly income
-  const w2Base     = v('w2_base');
-  const w2Rsu      = v('w2_rsu');
-  const w2Spiff    = v('w2_spiff');
-  const w2Quarterly = w2Base + w2Rsu + w2Spiff;
-  const totalSaved = contrib.total + otherSavings.total;
-  const savingsRate = w2Quarterly > 0 ? totalSaved / w2Quarterly : 0;
+  // W-2 — entered as YTD; quarterly delta computed after quarterLabel is known
+  const w2BaseYTD  = v('w2_base');
+  const w2RsuYTD   = v('w2_rsu');
+  const w2SpiffYTD = v('w2_spiff');
+  const w2TaxesYTD = v('w2_taxes');
+  const taxRefund  = v('w2_tax_refund');
 
   // Principal paydown vs prior quarter
   const quarterLabel = getQuarter(dateStr);
@@ -2162,6 +2390,21 @@ function runReview() {
     .filter(q => q.quarter !== quarterLabel)
     .sort((a,b) => new Date(a.date) - new Date(b.date));
   const priorQ = sortedPrior.length > 0 ? sortedPrior[sortedPrior.length - 1] : null;
+
+  // W-2 quarterly delta: YTD minus prior same-year quarter's YTD
+  const priorSameYear = data.quarters
+    .filter(q => new Date(q.date).getFullYear() === currentYear && q.quarter !== quarterLabel)
+    .sort((a,b) => new Date(a.date) - new Date(b.date))
+    .pop();
+  const w2Base  = w2BaseYTD  - (priorSameYear?.w2BaseYTD  || 0);
+  const w2Rsu   = w2RsuYTD   - (priorSameYear?.w2RsuYTD   || 0);
+  const w2Spiff = w2SpiffYTD - (priorSameYear?.w2SpiffYTD || 0);
+  const w2Taxes = w2TaxesYTD - (priorSameYear?.w2TaxesYTD || 0);
+  const w2Quarterly = w2Base + w2Rsu + w2Spiff;
+  const w2NetTakeHome = w2Taxes > 0 ? w2Quarterly - w2Taxes : null;
+  const totalSaved = contrib.total + otherSavings.total;
+  const savingsRate = w2Quarterly > 0 ? totalSaved / w2Quarterly : 0;
+
   const principalPaydown = priorQ ? Math.max(0,
     ((priorQ.properties?.bradcliff?.mortgage||0) - (props.bradcliff.mortgage||0)) +
     ((priorQ.properties?.holladay?.mortgage||0) - (props.holladay.mortgage||0)) +
@@ -2189,7 +2432,9 @@ function runReview() {
     annualCFPerProp,
     quarterlyCashFlow: propKeys.reduce((s, key) => s + (props[key]?.netCF || 0), 0),
     quarterlyCFPerProp: Object.fromEntries(propKeys.map(key => [key, props[key]?.netCF || 0])),
-    w2Quarterly, w2Base, w2Rsu, w2Spiff, savingsRate, principalPaydown,
+    w2Quarterly, w2Base, w2Rsu, w2Spiff, w2Taxes, w2NetTakeHome,
+    w2BaseYTD, w2RsuYTD, w2SpiffYTD, w2TaxesYTD,
+    taxRefund, savingsRate, principalPaydown,
     otherSavings, totalSaved,
     contributionsNext: contribNext,
     rawInputs,
@@ -2709,13 +2954,13 @@ function renderReviewResults(s) {
   const w2Q = s.w2Quarterly || 0;
   // Trending annual W-2: sum YTD quarterly income, scale to full year
   const w2Year = new Date(s.date).getFullYear();
-  const w2YtdQ = quarters.filter(q => new Date(q.date).getFullYear() === w2Year && new Date(q.date) <= new Date(s.date));
+  const w2YtdQ = allQ.filter(q => new Date(q.date).getFullYear() === w2Year && new Date(q.date) <= new Date(s.date));
   const w2YtdSum = w2YtdQ.reduce((a, q) => a + (q.w2Quarterly || 0), 0);
   const w2QNum = w2YtdQ.length;
   const w2Trending = w2QNum > 0 ? w2YtdSum * (4 / w2QNum) : 0;
   const prevW2Trending = prev ? (() => {
     const pYear = new Date(prev.date).getFullYear();
-    const pQ = quarters.filter(q => new Date(q.date).getFullYear() === pYear && new Date(q.date) <= new Date(prev.date));
+    const pQ = allQ.filter(q => new Date(q.date).getFullYear() === pYear && new Date(q.date) <= new Date(prev.date));
     const pSum = pQ.reduce((a, q) => a + (q.w2Quarterly || 0), 0);
     return pQ.length > 0 ? pSum * (4 / pQ.length) : 0;
   })() : null;
@@ -3086,6 +3331,7 @@ function renderDashboard() {
 
   const chartDefaults = {
     responsive: true, maintainAspectRatio: false,
+    interaction: { mode: 'nearest', intersect: false },
     plugins: { legend: { labels: { color:'#7a7060', font:{size:11}, boxWidth:12 } } },
     scales: {
       x: { grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#7a7060',font:{size:10},maxTicksLimit:8} },
@@ -3268,17 +3514,17 @@ function renderDashboard() {
         data: quarters.map(q => {
           const prop = q.properties?.[p.key];
           if (!prop) return null;
-          const val = prop.blendedValue || 0;
+          const val = prop.value || 0;
           const debt = p.key === 'brokenBow'
             ? (prop.mortgage1 || 0) + (prop.mortgage2 || 0)
             : (prop.mortgage || 0);
-          return val > 0 ? Math.max(0, val - debt) : null;
+          return val > 0 ? val - debt : null;
         }),
         borderColor: p.color, backgroundColor: 'transparent', tension: 0.3, pointRadius: 3, borderWidth: 2,
         spanGaps: true,
       })),
     },
-    options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, legend: { labels: { color: '#a09880', font: { size: 10 }, boxWidth: 10 } }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmt$(ctx.raw)}` } } } },
+    options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, legend: { labels: { color: '#a09880', font: { size: 10 }, boxWidth: 10 } }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw < 0 ? '-' : ''}${fmt$(ctx.raw)}` } } }, scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, ticks: { ...chartDefaults.scales.y.ticks, callback: v => (v < 0 ? '-' : '') + fmt$(v) } } } },
   });
 }
 
@@ -3332,6 +3578,11 @@ function setFormReadOnly(readOnly) {
       el.style.cursor = '';
     }
   });
+  const toggle = $('tax_refund_toggle');
+  if (toggle) {
+    toggle.disabled = readOnly;
+    toggle.style.cursor = readOnly ? 'default' : 'pointer';
+  }
   const analyzeBtn = document.querySelector('button[onclick="runReview()"]');
   const demoBtn = document.querySelector('button[onclick="prefillDemo()"]');
   if (analyzeBtn) analyzeBtn.style.display = readOnly ? 'none' : '';
@@ -3392,9 +3643,11 @@ function loadQuarterIntoForm(quarterLabel) {
     setMoney('a_ibonds', oa.ibonds); setMoney('a_muni', oa.muni);
     setMoney('a_cash',   oa.cash);   setMoney('a_other', oa.other);
     setMoney('d_other',  q.otherDebts || 0);
-    if (q.w2Base)      setMoney('w2_base',  q.w2Base);
-    if (q.w2Rsu)       setMoney('w2_rsu',   q.w2Rsu);
-    if (q.w2Spiff)     setMoney('w2_spiff', q.w2Spiff);
+    if (q.w2BaseYTD  || q.w2Base)  setMoney('w2_base',  q.w2BaseYTD  ?? q.w2Base);
+    if (q.w2RsuYTD   || q.w2Rsu)   setMoney('w2_rsu',   q.w2RsuYTD   ?? q.w2Rsu);
+    if (q.w2SpiffYTD || q.w2Spiff) setMoney('w2_spiff', q.w2SpiffYTD ?? q.w2Spiff);
+    if (q.w2TaxesYTD || q.w2Taxes) setMoney('w2_taxes', q.w2TaxesYTD ?? q.w2Taxes);
+    if (q.taxRefund)   { setMoney('w2_tax_refund', q.taxRefund); $('tax_refund_toggle').checked = true; toggleTaxRefund(true); }
     // Legacy fallback
     else if (q.w2Quarterly && !q.w2Base) setMoney('w2_base', q.w2Quarterly);
     else if (q.w2Annual && !q.w2Base)    setMoney('w2_base', q.w2Annual / 4);
@@ -3425,114 +3678,6 @@ function clearAllData() {
 }
 
 // ── PREFILL DEMO Q1 (prior quarter for trend arrow preview) ────────────────
-function prefillDemoQ1() {
-  const existingSticky = loadSticky();
-  const origSetMoney = setMoney;
-  const setMoneyDemo = (id, num) => {
-    if (STICKY_IDS.includes(id) && existingSticky[id]) return;
-    origSetMoney(id, num);
-  };
-  const setMoney = setMoneyDemo;
-
-  $('r_date').value = '2026-03-31';
-
-  // Portfolio — slightly lower than Q2
-  setMoney('h_fxaix_401k',  141200.00);
-  setMoney('h_fxaix_r401k', 880.00);
-  setMoney('h_fssnx_hsa',   9540.00);
-  setMoney('h_bitb_hsa',    4950.00);
-  setMoney('h_etha_hsa',    1880.00);
-  setMoney('h_iblc_hsa',    6300.00);
-  setMoney('h_swssx_ira',   34100.00);
-  setMoney('h_swisx_ira',   36200.00);
-  setMoney('h_vwo_ira',     13100.00);
-
-  // Contributions
-  setMoney('c_401k',  5775); setMoney('c_r401k', 0);
-  setMoney('c_hsa',   1000); setMoney('c_ira',   0);
-  setMoney('cn_401k', 5775); setMoney('cn_r401k', 0);
-  setMoney('cn_hsa',  1000); setMoney('cn_ira',  1500);
-
-  // Bradcliff
-  setMoney('brad_mortgage',  112500);
-  setMoney('brad_pi',        774);
-  setMoney('brad_cash_invested', 30000);
-  setMoney('brad_purchase_price', 0);
-  setMoney('brad_rent',      4350);
-  $('brad_months_occupied').value = '3';
-  setMoney('brad_pm',        348);
-  setMoney('brad_tax',       1500);
-  setMoney('brad_insurance', 900);
-
-  // Neely
-  setMoney('neely_cash_invested',  35000);
-  setMoney('neely_purchase_price', 0);
-  setMoney('neely_rent',   4275);
-  $('neely_months_occupied').value = '3';
-  setMoney('neely_pm',     342);
-  setMoney('neely_tax',    1300);
-  setMoney('neely_insurance', 800);
-
-  // Greenmount
-  setMoney('green_cash_invested',  30000);
-  setMoney('green_purchase_price', 0);
-  setMoney('green_rent',   3795);
-  $('green_months_occupied').value = '3';
-  setMoney('green_pm',     304);
-  setMoney('green_tax',    1140);
-  setMoney('green_insurance', 700);
-
-  // Holladay — slightly lower occupancy
-  setMoney('holl_mortgage',  395500);
-  setMoney('holl_pi',        1819);
-  setMoney('holl_cash_invested', 100000);
-  setMoney('holl_purchase_price', 0);
-  setMoney('holl_rent',      9000);  // slightly lower
-  $('holl_nights_avail').value = '90';
-  $('holl_nights_booked').value = '68';
-  setMoney('holl_tax',       5684);
-  setMoney('holl_insurance', 3600);
-  setMoney('holl_util',      1350);
-
-  // Broken Bow — weaker revenue quarter
-  setMoney('bb_mortgage1',  513500);
-  setMoney('bb_pi1',        4064);
-  setMoney('bb_mortgage2',  175200);
-  setMoney('bb_pi2',        781);
-  setMoney('bb_cash_invested', 50000);
-  setMoney('bb_purchase_price', 685000);
-  setMoney('bb_revenue',    14500);  // lower revenue
-  $('bb_nights_avail').value = '90';
-  $('bb_nights_booked').value = '42';
-  setMoney('bb_platform',   2400);
-  setMoney('bb_tax',        5687);
-  setMoney('bb_insurance',  3600);
-  setMoney('bb_rm',         2800);
-  setMoney('bb_util',       1600);
-  setMoney('bb_supplies',   900);
-  setMoney('bb_subs',       441);
-  setMoney('bb_lodging_tax', 540);
-
-  setMoney('w2_base', 75000);
-  setMoney('w2_rsu',  10000);
-  setMoney('w2_spiff', 2500);
-  setMoney('a_ibonds',  48000);
-  setMoney('a_muni',    127000);
-  setMoney('a_cash',    12000);
-
-  setMoney('s_ibonds', 0);
-  setMoney('s_extra_principal', 2500);
-  setMoney('s_other',  0);
-
-  recalcAllBlended();
-  document.querySelectorAll('.acc-header').forEach(h => {
-    h.classList.add('open');
-    h.nextElementSibling.classList.add('open');
-  });
-
-  alert('Q1 2026 demo loaded. Click "Analyze & Save Quarter" to save it, then load the Q2 2026 demo to see trend arrows.');
-}
-
 // ── PREFILL DEMO ───────────────────────────────────────────────────────────
 function prefillDemo() {
   // Sticky fields are never overwritten by demo — only set if not already saved
@@ -3665,7 +3810,9 @@ document.addEventListener('DOMContentLoaded', () => {
   restoreDraft();
   initValuationMode();
   $('r_date').addEventListener('change', initValuationMode);
-  renderDashboard();
+  const savedTab = localStorage.getItem('activeTab') || 'dashboard';
+  switchTab(savedTab);
+  if (savedTab === 'goals') renderLumpSumProjection();
 });
 </script>
 </body>
