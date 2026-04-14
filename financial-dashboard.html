@@ -2131,23 +2131,53 @@ function renderLumpSumProjection() {
   }
 
   // ── Milestone table ──
+  // projMuni/projCash = expected balances; propCFs = planned quarterly CF per property (mo × 3)
+  // taxRefundProj = expected refund that quarter; bradPayoffProj = expected lump-sum payoff event
   const milestones = [
-    { label: 'Q1 2026', date: '2026-03-31', projected: 131001 },
-    { label: 'Q2 2026', date: '2026-06-30', projected: 131001, note: 'Flat — CF to Bradcliff' },
-    { label: 'Q3 2026', date: '2026-09-30', projected: 131001, note: 'Flat — CF to Bradcliff' },
-    { label: 'Q4 2026', date: '2026-12-31', projected: 141489, note: 'Bradcliff paid off' },
-    { label: 'Q1 2027', date: '2027-03-31', projected: 173616 },
-    { label: 'Q2 2027', date: '2027-06-30', projected: 205743 },
-    { label: 'Q3 2027', date: '2027-09-30', projected: 237870, note: '≥ Target' },
-    { label: 'Q4 2027', date: '2027-12-31', projected: 269997 },
+    { label: 'Q1 2026', date: '2026-03-31', projected: 131001, projMuni: 127501, projCash:   3500,
+      propCFs: { bradcliff: 552, neely: 1758, greenmount: 2757, holladay: 1125, brokenBow: -12024 },
+      taxRefundProj: 0, bradPayoffProj: 0 },
+    { label: 'Q2 2026', date: '2026-06-30', projected: 131001, projMuni: 127501, projCash:   3500, note: 'Flat — CF to Bradcliff',
+      propCFs: { bradcliff: 552, neely: 1758, greenmount: 2757, holladay: 1125, brokenBow: -12024 },
+      taxRefundProj: 39200, bradPayoffProj: 0 },
+    { label: 'Q3 2026', date: '2026-09-30', projected: 131001, projMuni: 127501, projCash:   3500, note: 'Flat — CF to Bradcliff',
+      propCFs: { bradcliff: 552, neely: 1758, greenmount: 2757, holladay: 1125, brokenBow: -7242 },
+      taxRefundProj: 0, bradPayoffProj: 0 },
+    { label: 'Q4 2026', date: '2026-12-31', projected: 141489, projMuni: 127501, projCash:  13988, note: 'Bradcliff paid off',
+      propCFs: { bradcliff: 552, neely: 1758, greenmount: 2757, holladay: 1125, brokenBow: -7242 },
+      taxRefundProj: 0, bradPayoffProj: 110080 },
+    { label: 'Q1 2027', date: '2027-03-31', projected: 173616, projMuni: 127501, projCash:  46115,
+      propCFs: { bradcliff: 2814, neely: 1758, greenmount: 2757, holladay: 1125, brokenBow: -7242 },
+      taxRefundProj: 0, bradPayoffProj: 0 },
+    { label: 'Q2 2027', date: '2027-06-30', projected: 205743, projMuni: 127501, projCash:  78242,
+      propCFs: { bradcliff: 2814, neely: 1758, greenmount: 2757, holladay: 1125, brokenBow: -7242 },
+      taxRefundProj: 0, bradPayoffProj: 0 },
+    { label: 'Q3 2027', date: '2027-09-30', projected: 237870, projMuni: 127501, projCash: 110369, note: '≥ Target',
+      propCFs: { bradcliff: 2814, neely: 1758, greenmount: 2757, holladay: 1125, brokenBow: -7242 },
+      taxRefundProj: 0, bradPayoffProj: 0 },
+    { label: 'Q4 2027', date: '2027-12-31', projected: 269997, projMuni: 127501, projCash: 142496,
+      propCFs: { bradcliff: 2814, neely: 1758, greenmount: 2757, holladay: 1125, brokenBow: -7242 },
+      taxRefundProj: 0, bradPayoffProj: 0 },
   ];
+
+  const PROP_LABELS = { bradcliff: 'Bradcliff', neely: 'Neely', greenmount: 'Greenmount', holladay: 'Holladay', brokenBow: 'Broken Bow' };
+  const VARIANCE_THRESHOLD = 500;
 
   const tbody = $('lump-sum-milestones');
   if (!tbody) return;
   const today = new Date();
+
   tbody.innerHTML = milestones.map(m => {
     const isPast = new Date(m.date) <= today;
-    const snap = isPast ? closestSnapshot(m.date) : null;
+    const snapIdx = isPast ? (() => {
+      const td = new Date(m.date);
+      const pastIdxs = quarters.map((s,i) => ({ i, d: new Date(s.date) })).filter(x => x.d <= today);
+      if (!pastIdxs.length) return -1;
+      return pastIdxs.reduce((best, x) => Math.abs(x.d - td) < Math.abs(new Date(quarters[best].date) - td) ? x.i : best, pastIdxs[0].i);
+    })() : -1;
+    const snap = snapIdx >= 0 ? quarters[snapIdx] : null;
+    const prevSnap = snapIdx > 0 ? quarters[snapIdx - 1] : null;
+
     const act = snap ? actual(snap) : null;
     const diff = act !== null ? act - m.projected : null;
     const isTarget = m.projected >= TARGET;
@@ -2155,18 +2185,111 @@ function renderLumpSumProjection() {
     let statusHtml = `<span style="color:var(--text-muted);">Pending</span>`;
     if (act !== null) {
       if (diff >= 0) statusHtml = `<span style="color:#4caf7d;font-weight:600;">+${fmt$(diff)} ahead</span>`;
-      else statusHtml = `<span style="color:#e57373;font-weight:600;">${fmt$(diff)} behind</span>`;
+      else           statusHtml = `<span style="color:#e57373;font-weight:600;">${fmt$(diff)} behind</span>`;
     }
 
-    const rowStyle = isTarget ? 'background:rgba(76,175,125,0.05);' : '';
+    const rowStyle   = isTarget ? 'background:rgba(76,175,125,0.05);' : '';
     const labelStyle = isTarget ? 'color:#4caf7d;font-weight:600;' : 'color:#ddd8ce;';
+
+    // ── Variance breakdown ──
+    let breakdownRow = '';
+    if (act !== null && snap) {
+
+      const varCell = (val, invert) => {
+        if (Math.abs(val) < 100) return `<span style="color:var(--text-muted);">—</span>`;
+        const good  = invert ? val <= 0 : val >= 0;
+        const color = good ? '#4caf7d' : '#e57373';
+        const sign  = val >= 0 ? '+' : '';
+        return `<span style="color:${color};font-weight:600;">${sign}${fmt$(val)}</span>`;
+      };
+
+      // ── 1. Property CF rows ──
+      const propRows = Object.entries(m.propCFs).map(([key, projQ]) => {
+        const actQ = snap.properties?.[key]?.netCF ?? null;
+        const v    = actQ !== null ? actQ - projQ : null;
+        return `
+          <span style="color:var(--text-muted);padding-left:8px;">↳ ${PROP_LABELS[key]}</span>
+          <span style="text-align:right;color:var(--text-muted);">${fmt$(projQ)}</span>
+          <span style="text-align:right;color:#ddd8ce;">${actQ !== null ? fmt$(actQ) : '—'}</span>
+          <span>${v !== null ? varCell(v, false) : '<span style="color:var(--text-muted);">—</span>'}</span>`;
+      }).join('');
+
+      // ── 2. Tax refund ──
+      const taxAct  = snap.taxRefund || 0;
+      const taxDiff = taxAct - m.taxRefundProj;
+      const taxRow  = (m.taxRefundProj > 0 || taxAct > 0) ? `
+          <span style="color:var(--text-muted);padding-left:8px;">↳ Tax refund</span>
+          <span style="text-align:right;color:var(--text-muted);">${fmt$(m.taxRefundProj)}</span>
+          <span style="text-align:right;color:#ddd8ce;">${fmt$(taxAct)}</span>
+          <span>${varCell(taxDiff, false)}</span>` : '';
+
+      // ── 3. Bradcliff paydown (derived from balance change) ──
+      const bradBalNow  = snap.properties?.bradcliff?.mortgage || 0;
+      const bradBalPrev = prevSnap?.properties?.bradcliff?.mortgage ?? null;
+      const bradReduction = bradBalPrev !== null ? Math.max(0, bradBalPrev - bradBalNow) : null;
+      const bradDiff = bradReduction !== null ? bradReduction - m.bradPayoffProj : null;
+      const bradRow = `
+          <span style="color:var(--text-muted);padding-left:8px;">↳ Bradcliff paydown</span>
+          <span style="text-align:right;color:var(--text-muted);">${m.bradPayoffProj > 0 ? fmt$(m.bradPayoffProj) : '—'}</span>
+          <span style="text-align:right;color:#ddd8ce;">${bradReduction !== null ? fmt$(bradReduction) : '—'}</span>
+          <span>${bradDiff !== null ? varCell(-bradDiff, false) : '<span style="color:var(--text-muted);">—</span>'}</span>`;
+
+      // ── 4. W-2 discretionary (residual) ──
+      // W2 = Δlump_sum - prop_CFs - tax_refund + brad_paydown
+      let w2Row = '';
+      if (prevSnap) {
+        const prevAct   = actual(prevSnap) ?? 0;
+        const deltaLS   = act - prevAct;
+        const totalPropCF = Object.keys(m.propCFs).reduce((s,k) => s + (snap.properties?.[k]?.netCF || 0), 0);
+        const brad      = bradReduction || 0;
+        const w2Implied = deltaLS - totalPropCF - taxAct + brad;
+        const w2Proj    = 10305 * 3; // $10,305/mo × 3
+        const w2Diff    = w2Implied - w2Proj;
+        w2Row = `
+          <span style="color:var(--text-muted);padding-left:8px;">↳ W-2 discretionary</span>
+          <span style="text-align:right;color:var(--text-muted);">${fmt$(w2Proj)}</span>
+          <span style="text-align:right;color:#ddd8ce;">${fmt$(w2Implied)}</span>
+          <span>${varCell(w2Diff, false)}</span>`;
+      }
+
+      // ── 5. Balance components ──
+      const actMuni = snap.otherAssets?.muni || 0;
+      const actCash = Math.max((snap.otherAssets?.cash || 0) - OP_RESERVE, 0);
+
+      breakdownRow = `
+        <tr style="background:rgba(255,255,255,0.02);">
+          <td colspan="4" style="padding:8px 16px 14px 16px;">
+
+            <div style="font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin:4px 0 8px;">This Quarter vs Plan</div>
+            <div style="display:grid;grid-template-columns:160px 90px 90px 1fr;gap:3px 8px;font-size:0.72rem;align-items:center;margin-bottom:12px;">
+              <span style="color:var(--text-muted);font-size:0.65rem;">Source</span>
+              <span style="color:var(--text-muted);font-size:0.65rem;text-align:right;">Plan</span>
+              <span style="color:var(--text-muted);font-size:0.65rem;text-align:right;">Actual</span>
+              <span style="color:var(--text-muted);font-size:0.65rem;">Variance</span>
+              ${propRows}${taxRow}${bradRow}${w2Row}
+            </div>
+
+            <div style="font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Balance Components</div>
+            <div style="display:grid;grid-template-columns:160px 90px 90px 1fr;gap:3px 8px;font-size:0.72rem;align-items:center;">
+              <span style="color:var(--text-muted);padding-left:8px;">↳ Muni bonds</span>
+              <span style="text-align:right;color:var(--text-muted);">${fmt$(m.projMuni)}</span>
+              <span style="text-align:right;color:#ddd8ce;">${fmt$(actMuni)}</span>
+              <span>${varCell(actMuni - m.projMuni, false)}</span>
+              <span style="color:var(--text-muted);padding-left:8px;">↳ Cash earmarked</span>
+              <span style="text-align:right;color:var(--text-muted);">${fmt$(m.projCash)}</span>
+              <span style="text-align:right;color:#ddd8ce;">${fmt$(actCash)}</span>
+              <span>${varCell(actCash - m.projCash, false)}</span>
+            </div>
+          </td>
+        </tr>`;
+    }
 
     return `<tr style="border-bottom:1px solid rgba(255,255,255,0.04);${rowStyle}">
       <td style="padding:6px 8px;${labelStyle}">${m.label}${m.note ? `<span style="font-size:0.65rem;color:var(--text-muted);font-weight:400;margin-left:6px;">${m.note}</span>` : ''}</td>
       <td style="padding:6px 8px;text-align:right;color:var(--text-muted);">${fmt$(m.projected)}</td>
       <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">${act !== null ? fmt$(act) : '—'}</td>
       <td style="padding:6px 8px;text-align:right;">${statusHtml}</td>
-    </tr>`;
+    </tr>${breakdownRow}`;
   }).join('');
 }
 
