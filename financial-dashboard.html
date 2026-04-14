@@ -507,101 +507,119 @@
           </marker>
         </defs>
 
-        <!-- ── MAIN SPINE (center y=240) ── -->
+        <!-- ── MAIN SPINE ── -->
+        <!-- Start → Build Cash Reserve -->
+        <line x1="36" y1="240" x2="101" y2="240" stroke="#cfac67" stroke-width="2" marker-end="url(#arrow-gold)"/>
+        <!-- Build Cash Reserve → Revenue? -->
+        <line x1="129" y1="240" x2="201" y2="240" stroke="#cfac67" stroke-width="2" marker-end="url(#arrow-gold)"/>
 
-        <!-- Start → Pay off Bradcliff -->
-        <line x1="30" y1="240" x2="118" y2="240" stroke="#cfac67" stroke-width="2" stroke-dasharray="0" marker-end="url(#arrow-gold)"/>
-        <!-- Bradcliff → Revenue Decision -->
-        <line x1="150" y1="240" x2="228" y2="240" stroke="#5b9bd5" stroke-width="2" marker-end="url(#arrow-blue)"/>
+        <!-- ── FORK from Revenue? ── -->
+        <!-- Upper (Yes → Hold) -->
+        <path d="M 229,240 Q 255,230 265,185 L 296,185" stroke="#cfac67" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-gold)"/>
+        <!-- Lower (No → Sell) -->
+        <path d="M 229,240 Q 255,250 265,305 L 296,305" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
 
-        <!-- Revenue Decision FORK -->
-        <!-- Upper fork (Yes → Hold): → Refi lump sum → Holladay Decision → Refi BB -->
-        <path d="M 264,240 Q 290,220 310,200 L 490,200" stroke="#cfac67" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-gold)"/>
-        <!-- Lower fork (No → Sell): → Redeploy -->
-        <path d="M 264,240 Q 290,260 310,300 L 490,300" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
+        <!-- ── UPPER PATH (Hold) ── -->
+        <!-- Bradcliff → Refi Lump Sum -->
+        <line x1="324" y1="185" x2="401" y2="185" stroke="#cfac67" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gold)"/>
+        <!-- Refi Lump Sum → Holladay -->
+        <line x1="429" y1="185" x2="506" y2="185" stroke="#5b9bd5" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-blue)"/>
+        <!-- Holladay → Refi Broken Bow -->
+        <line x1="534" y1="185" x2="616" y2="185" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
+        <!-- Refi Broken Bow → Secondary Paydown -->
+        <line x1="644" y1="185" x2="726" y2="185" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
+        <!-- Secondary Paydown → FI (curve down) -->
+        <path d="M 754,185 C 800,185 820,215 831,240" stroke="#4caf7d" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-green)"/>
 
-        <!-- Upper path continues: Refi lump sum → Holladay Decision -->
-        <line x1="530" y1="200" x2="598" y2="200" stroke="#5b9bd5" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-blue)"/>
-        <!-- Holladay Decision → Refi BB -->
-        <line x1="630" y1="200" x2="708" y2="200" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
-        <!-- Refi BB → Secondary Paydown (reconverge at y=240) -->
-        <path d="M 740,200 Q 760,200 770,240 L 780,240" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none" stroke-dasharray="5,3"/>
-
-        <!-- Lower path: Redeploy → Holladay Decision (lower) -->
-        <line x1="530" y1="300" x2="601" y2="300" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
-        <!-- Lower Holladay Decision → FI Target (bypasses BB refi/secondary) -->
-        <path d="M 629,300 Q 740,300 760,240 L 831,240" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
-
-        <!-- Secondary Paydown → FI Target -->
-        <line x1="800" y1="240" x2="828" y2="240" stroke="#4caf7d" stroke-width="2" marker-end="url(#arrow-green)"/>
+        <!-- ── LOWER PATH (Sell) ── -->
+        <!-- 1031 Exchange → Pay off Bradcliff -->
+        <line x1="324" y1="305" x2="401" y2="305" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
+        <!-- Pay off Bradcliff → Holladay -->
+        <line x1="429" y1="305" x2="506" y2="305" stroke="#5b9bd5" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-blue)"/>
+        <!-- Holladay → FI (curve up) -->
+        <path d="M 534,305 C 680,305 800,260 831,240" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
 
         <!-- ── NODES ── -->
 
-        <!-- START: Q1 2026 -->
+        <!-- START -->
         <circle cx="30" cy="240" r="6" fill="#cfac67"/>
         <text x="30" y="225" text-anchor="middle" fill="#cfac67" font-size="9" font-family="Montserrat,sans-serif" font-weight="700" letter-spacing="0.5">NOW</text>
-        <text x="30" y="262" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Q1 2026</text>
+        <text x="30" y="262" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Apr 2026</text>
 
-        <!-- NODE 1: Pay off Bradcliff -->
-        <circle cx="140" cy="240" r="14" fill="#0d1824" stroke="#cfac67" stroke-width="2"/>
-        <text x="140" y="244" text-anchor="middle" fill="#cfac67" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">$</text>
-        <text x="140" y="222" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Pay off</text>
-        <text x="140" y="212" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Bradcliff</text>
-        <text x="140" y="264" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Dec 2026</text>
+        <!-- Build Cash Reserve -->
+        <circle cx="115" cy="240" r="14" fill="#0d1824" stroke="#cfac67" stroke-width="2"/>
+        <text x="115" y="244" text-anchor="middle" fill="#cfac67" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">$</text>
+        <text x="115" y="220" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Build cash</text>
+        <text x="115" y="210" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">reserve</text>
+        <text x="115" y="265" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Apr–Oct 2026</text>
 
-        <!-- NODE 2: Revenue ≥$90K? (decision + fork) -->
-        <circle cx="250" cy="240" r="14" fill="#0d1824" stroke="#5b9bd5" stroke-width="2"/>
-        <text x="250" y="244" text-anchor="middle" fill="#5b9bd5" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">?</text>
-        <text x="250" y="222" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Revenue</text>
-        <text x="250" y="212" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">≥$90K?</text>
-        <text x="250" y="264" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Oct 2026</text>
+        <!-- Revenue ≥$90K? (decision fork) -->
+        <circle cx="215" cy="240" r="14" fill="#0d1824" stroke="#5b9bd5" stroke-width="2"/>
+        <text x="215" y="244" text-anchor="middle" fill="#5b9bd5" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">?</text>
+        <text x="215" y="220" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Revenue</text>
+        <text x="215" y="210" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">≥$90K?</text>
+        <text x="215" y="265" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Oct 2026</text>
 
         <!-- Fork labels -->
-        <text x="360" y="186" text-anchor="middle" fill="#cfac67" font-size="8" font-family="Inter,sans-serif" font-style="italic">Yes → Hold</text>
-        <text x="360" y="316" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif" font-style="italic">No → Sell</text>
+        <text x="258" y="170" text-anchor="middle" fill="#cfac67" font-size="8" font-family="Inter,sans-serif" font-style="italic">Yes → Hold</text>
+        <text x="258" y="320" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif" font-style="italic">No → Sell</text>
 
-        <!-- NODE 4a: Refi lump sum (upper) -->
-        <circle cx="510" cy="200" r="14" fill="#0d1824" stroke="#cfac67" stroke-width="1.5"/>
-        <text x="510" y="204" text-anchor="middle" fill="#cfac67" font-size="9" font-family="Montserrat,sans-serif" font-weight="700">💰</text>
-        <text x="510" y="178" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Build Refi</text>
-        <text x="510" y="168" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Lump Sum</text>
-        <text x="510" y="224" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">2027</text>
+        <!-- UPPER: Pay off Bradcliff -->
+        <circle cx="310" cy="185" r="14" fill="#0d1824" stroke="#cfac67" stroke-width="1.5"/>
+        <text x="310" y="189" text-anchor="middle" fill="#cfac67" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">$</text>
+        <text x="310" y="164" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Pay off</text>
+        <text x="310" y="153" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Bradcliff</text>
+        <text x="310" y="210" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Dec 2026</text>
 
-        <!-- NODE 4b: Sell + Redeploy (lower) -->
-        <circle cx="510" cy="300" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
-        <text x="510" y="304" text-anchor="middle" fill="#a09880" font-size="9" font-family="Montserrat,sans-serif" font-weight="700">→</text>
-        <text x="510" y="318" text-anchor="middle" fill="#a09880" font-size="9" font-family="Inter,sans-serif" font-weight="600">1031 Exchange</text>
-        <text x="510" y="328" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">into ≥$649.9K</text>
-        <text x="510" y="338" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Real Estate</text>
+        <!-- UPPER: Build Refi Lump Sum -->
+        <circle cx="415" cy="185" r="14" fill="#0d1824" stroke="#cfac67" stroke-width="1.5"/>
+        <text x="415" y="189" text-anchor="middle" fill="#cfac67" font-size="9" font-family="Montserrat,sans-serif" font-weight="700">💰</text>
+        <text x="415" y="164" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Build refi</text>
+        <text x="415" y="153" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">lump sum</text>
+        <text x="415" y="210" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">2027</text>
 
-        <!-- NODE 5a: Holladay Decision (upper / Hold BB path) -->
-        <circle cx="615" cy="200" r="14" fill="#0d1824" stroke="#5b9bd5" stroke-width="1.5"/>
-        <text x="615" y="204" text-anchor="middle" fill="#5b9bd5" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">?</text>
-        <text x="615" y="168" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Holladay:</text>
-        <text x="615" y="178" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Sell or Hold?</text>
-        <text x="615" y="224" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Aug 2027</text>
+        <!-- UPPER: Holladay Decision -->
+        <circle cx="520" cy="185" r="14" fill="#0d1824" stroke="#5b9bd5" stroke-width="1.5"/>
+        <text x="520" y="189" text-anchor="middle" fill="#5b9bd5" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">?</text>
+        <text x="520" y="164" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Holladay:</text>
+        <text x="520" y="153" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Sell or Hold?</text>
+        <text x="520" y="210" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Aug 2027</text>
 
-        <!-- NODE 5b: Holladay Decision (lower / Sell BB path) -->
-        <circle cx="615" cy="300" r="14" fill="#0d1824" stroke="#5b9bd5" stroke-width="1.5"/>
-        <text x="615" y="304" text-anchor="middle" fill="#5b9bd5" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">?</text>
-        <text x="615" y="322" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Holladay:</text>
-        <text x="615" y="332" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Sell or Hold?</text>
-        <text x="615" y="346" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Aug 2027</text>
+        <!-- UPPER: Refinance Broken Bow -->
+        <circle cx="630" cy="185" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <text x="630" y="189" text-anchor="middle" fill="#a09880" font-size="9" font-family="Montserrat,sans-serif" font-weight="700">%</text>
+        <text x="630" y="164" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Refinance</text>
+        <text x="630" y="153" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Broken Bow</text>
+        <text x="630" y="210" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Dec 2027</text>
 
-        <!-- NODE 6: Refi BB -->
-        <circle cx="725" cy="200" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
-        <text x="725" y="204" text-anchor="middle" fill="#a09880" font-size="9" font-family="Montserrat,sans-serif" font-weight="700">%</text>
-        <text x="725" y="178" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Refinance Broken Bow</text>
-        <text x="725" y="224" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Dec 2027</text>
+        <!-- UPPER: Secondary Paydown -->
+        <circle cx="740" cy="185" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <text x="740" y="189" text-anchor="middle" fill="#a09880" font-size="8" font-family="Montserrat,sans-serif" font-weight="700">20%</text>
+        <text x="740" y="164" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Broken Bow</text>
+        <text x="740" y="153" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">secondary paydown</text>
+        <text x="740" y="210" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Dec 2028</text>
 
-        <!-- NODE 7: Secondary Paydown (reconverge) -->
-        <circle cx="790" cy="240" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
-        <text x="790" y="244" text-anchor="middle" fill="#a09880" font-size="9" font-family="Montserrat,sans-serif" font-weight="700">20%</text>
-        <text x="790" y="264" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Broken Bow</text>
-        <text x="790" y="274" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Secondary Paydown</text>
-        <text x="790" y="288" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Dec 2028</text>
+        <!-- LOWER: 1031 Exchange -->
+        <circle cx="310" cy="305" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <text x="310" y="309" text-anchor="middle" fill="#a09880" font-size="9" font-family="Montserrat,sans-serif" font-weight="700">→</text>
+        <text x="310" y="328" text-anchor="middle" fill="#a09880" font-size="9" font-family="Inter,sans-serif" font-weight="600">1031 exchange</text>
+        <text x="310" y="340" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">into $491,000</text>
 
-        <!-- NODE 8: FI Target -->
+        <!-- LOWER: Pay off Bradcliff -->
+        <circle cx="415" cy="305" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <text x="415" y="309" text-anchor="middle" fill="#a09880" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">$</text>
+        <text x="415" y="328" text-anchor="middle" fill="#a09880" font-size="9" font-family="Inter,sans-serif" font-weight="600">Pay off</text>
+        <text x="415" y="340" text-anchor="middle" fill="#a09880" font-size="9" font-family="Inter,sans-serif" font-weight="600">Bradcliff</text>
+        <text x="415" y="352" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">~May 2027</text>
+
+        <!-- LOWER: Holladay Decision -->
+        <circle cx="520" cy="305" r="14" fill="#0d1824" stroke="#5b9bd5" stroke-width="1.5"/>
+        <text x="520" y="309" text-anchor="middle" fill="#5b9bd5" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">?</text>
+        <text x="520" y="328" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Holladay:</text>
+        <text x="520" y="340" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Sell or Hold?</text>
+        <text x="520" y="352" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif">Aug 2027</text>
+
+        <!-- FI Target -->
         <circle cx="845" cy="240" r="14" fill="#0d1824" stroke="#4caf7d" stroke-width="2.5"/>
         <text x="845" y="244" text-anchor="middle" fill="#4caf7d" font-size="10" font-family="Montserrat,sans-serif" font-weight="700">FI</text>
         <text x="845" y="222" text-anchor="middle" fill="#4caf7d" font-size="9" font-family="Inter,sans-serif" font-weight="600">$115K</text>
