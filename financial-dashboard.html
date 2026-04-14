@@ -1890,7 +1890,7 @@ function toggleAcc(header) {
 // ── TABS ───────────────────────────────────────────────────────────────────
 function switchTab(name) {
   document.querySelectorAll('.tab-btn').forEach((b,i) => {
-    const names = ['dashboard','review','history','goals'];
+    const names = ['dashboard','review','goals','history'];
     b.classList.toggle('active', names[i] === name);
   });
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
