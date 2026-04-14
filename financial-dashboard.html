@@ -656,109 +656,6 @@
       </svg>
     </div>
 
-    <!-- BROKEN BOW DECISION BRIEF -->
-    <div class="card" style="margin-bottom:32px;cursor:pointer;position:relative;" onclick="toggleCardDetail('bb-brief')">
-      <div class="card-expand-icon" id="bb-brief-icon">+</div>
-      <div class="chart-title" style="margin-bottom:2px;">Broken Bow: Oct 2026 Decision Brief</div>
-      <div class="chart-sub">Strategic review — October 2026</div>
-      <div class="card-detail" id="bb-brief-detail" style="font-size:0.82rem;line-height:1.7;color:var(--text-muted);">
-
-        <!-- Decision criteria -->
-        <div style="background:rgba(207,172,103,0.07);border:1px solid rgba(207,172,103,0.2);border-radius:var(--radius);padding:16px 18px;margin-bottom:24px;">
-          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">Decision criteria — annualized revenue</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
-            <div style="text-align:center;padding:10px;background:rgba(76,175,125,0.1);border:1px solid rgba(76,175,125,0.3);border-radius:6px;">
-              <div style="font-size:0.78rem;font-weight:700;color:#4caf7d;">≥ $90,000</div>
-              <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;">Hold</div>
-            </div>
-            <div style="text-align:center;padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:6px;">
-              <div style="font-size:0.78rem;font-weight:700;color:#ddd8ce;">$80,000–$90,000</div>
-              <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;">Borderline — hold only if further upside is credible</div>
-            </div>
-            <div style="text-align:center;padding:10px;background:rgba(229,57,53,0.1);border:1px solid rgba(229,57,53,0.3);border-radius:6px;">
-              <div style="font-size:0.78rem;font-weight:700;color:#e57373;">< $80,000</div>
-              <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;">Sell</div>
-            </div>
-          </div>
-          <div style="font-size:0.78rem;">Annualized revenue is calculated from peak season data available by October 2026. The decision should reflect a full-year projection, not a single quarter in isolation.</div>
-        </div>
-
-        <!-- Hold path -->
-        <div style="margin-bottom:24px;">
-          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4caf7d;margin-bottom:10px;">Hold path</div>
-          <div style="font-size:0.82rem;">If revenue meets or exceeds $90,000 annualized, continue holding and redirect all available cash to build a refinance lump sum. Muni bonds (IBMP) should be purchased through year-end 2026 for tax efficiency, then switched to T-bills in 2027.</div>
-          <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;font-size:0.82rem;">
-            <div><span style="color:#ddd8ce;font-weight:600;">December 2027:</span> Prepayment penalty expires and muni bonds mature (~$127,500). Refinance the primary mortgage at 6%, 30-year term, applying a ~$222,000–$249,000 lump sum to reduce the outstanding balance. New principal and interest drops from $4,137 to ~$1,523–$1,683 per month.</div>
-            <div><span style="color:#ddd8ce;font-weight:600;">December 2028:</span> Pay 20% of the secondary balance (~$32,000–$35,000) to extend the balloon payment five years. Rate converts to 6%; new principal and interest ~$784 per month. Remaining balloon due December 2033.</div>
-          </div>
-        </div>
-
-        <!-- Sell path -->
-        <div style="margin-bottom:24px;">
-          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#e57373;margin-bottom:10px;">Sell path — recommended exit strategy</div>
-          <div style="font-size:0.82rem;">If revenue falls below $80,000 annualized, sell as soon as possible and execute a 1031 exchange into replacement real estate valued at $491,000 or more. The $491,000 threshold — not the original purchase price of $649,900 — is the amount required to fully defer depreciation recapture under a 1031 exchange.</div>
-
-          <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;font-size:0.82rem;">
-            <div><span style="color:#ddd8ce;font-weight:600;">Why sell before December 2027 despite the prepayment penalty:</span> The prepayment penalty is $25,580. At approximately $4,000 per month in negative cash flow, the penalty is recovered in under seven months. Waiting 14 or more months to avoid the penalty results in over $56,000 in additional losses — more than double the penalty itself.</div>
-            <div><span style="color:#ddd8ce;font-weight:600;">Why execute a 1031 exchange:</span> Selling without a 1031 exchange triggers approximately $79,415 in depreciation recapture tax. A 1031 exchange into a property valued at $491,000 or more fully defers this liability. At 25% down, the required investment is $132,570 — of which $122,750 is equity acquired in the replacement property. The true incremental cost of the 1031 versus walking away is $9,820 in closing costs, not the full $132,570.</div>
-            <div><span style="color:#ddd8ce;font-weight:600;">Additional benefit of the 1031 path:</span> A cost segregation study on the replacement property may generate $50,000–$60,000 in new bonus depreciation under the current 100% rate, partially offsetting the deferred recapture liability over time.</div>
-            <div><span style="color:#ddd8ce;font-weight:600;">Replacement property profile:</span> At 25% down on a $491,000 property: $368,250 mortgage at 6.25%, principal and interest ~$2,268 per month.</div>
-            <div><span style="color:#ddd8ce;font-weight:600;">1031 exchange timeline:</span> Replacement property must be identified within 45 days of closing on Broken Bow and acquired within 180 days. Begin identifying candidates before the October 2026 decision, not after.</div>
-          </div>
-        </div>
-
-        <!-- Scenario Cost Table -->
-        <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Scenario cost comparison</div>
-        <div style="overflow-x:auto;">
-          <table style="width:100%;border-collapse:collapse;font-size:0.76rem;">
-            <thead>
-              <tr style="color:var(--text-muted);font-size:0.68rem;">
-                <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Scenario</th>
-                <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Cash to close‡</th>
-                <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Recapture tax</th>
-                <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Hold cost§</th>
-                <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Replacement real estate</th>
-                <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Total†</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                <td style="padding:7px 8px;color:#ddd8ce;">Sell now, no 1031 exchange</td>
-                <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$46,498</td>
-                <td style="padding:7px 8px;text-align:right;color:#e57373;">$79,415</td>
-                <td style="padding:7px 8px;text-align:right;color:var(--text-muted);">—</td>
-                <td style="padding:7px 8px;text-align:right;color:var(--text-muted);">—</td>
-                <td style="padding:7px 8px;text-align:right;font-weight:700;color:#ddd8ce;">$125,913</td>
-              </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                <td style="padding:7px 8px;color:#ddd8ce;">Sell December 2027, no 1031 exchange</td>
-                <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$13,349</td>
-                <td style="padding:7px 8px;text-align:right;color:#e57373;">$102,975</td>
-                <td style="padding:7px 8px;text-align:right;color:#e57373;">$80,000</td>
-                <td style="padding:7px 8px;text-align:right;color:var(--text-muted);">—</td>
-                <td style="padding:7px 8px;text-align:right;font-weight:700;color:#ddd8ce;">$196,324</td>
-              </tr>
-              <tr style="background:rgba(207,172,103,0.05);">
-                <td style="padding:7px 8px;color:var(--gold);font-weight:600;">Sell now, 1031 exchange into $491,000 (recommended)</td>
-                <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$46,498</td>
-                <td style="padding:7px 8px;text-align:right;color:#4caf7d;">$0 deferred</td>
-                <td style="padding:7px 8px;text-align:right;color:var(--text-muted);">—</td>
-                <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$132,570*</td>
-                <td style="padding:7px 8px;text-align:right;font-weight:700;color:var(--gold);">$179,068*</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div style="font-size:0.68rem;color:var(--text-muted);margin-top:10px;display:flex;flex-direction:column;gap:5px;">
-          <div>† Total excludes the secondary note, which represents a ~$190,514 obligation through December 2028 (monthly payments plus balloon) that is consistent across all scenarios.</div>
-          <div>* Replacement real estate cash of $132,570 acquires $122,750 in equity at 25% down on a $491,000 property. The net incremental cost versus walking away is $9,820 in closing costs — not the full $132,570.</div>
-          <div>‡ Cash to close includes the $25,580 prepayment penalty on the primary mortgage.</div>
-          <div>§ Hold cost represents the cumulative negative cash flow incurred during the hold period prior to sale (~$4,000 per month). Hold cost is $0 for sell-now scenarios and $80,000 for the December 2027 scenario (20 months at ~$4,000 per month).</div>
-        </div>
-
-      </div>
-    </div>
-
     <!-- 2026 -->
     <div class="goal-year">
       <div class="goal-year-label">2026</div>
@@ -864,6 +761,109 @@
           </div>
           <div class="goal-date">Dec 31, 2028</div>
         </div>
+      </div>
+    </div>
+
+    <!-- BROKEN BOW DECISION BRIEF -->
+    <div class="card" style="margin-bottom:32px;cursor:pointer;position:relative;" onclick="toggleCardDetail('bb-brief')">
+      <div class="card-expand-icon" id="bb-brief-icon">+</div>
+      <div class="chart-title" style="margin-bottom:2px;">Broken Bow: Oct 2026 Decision Brief</div>
+      <div class="chart-sub">Strategic review — October 2026</div>
+      <div class="card-detail" id="bb-brief-detail" style="font-size:0.82rem;line-height:1.7;color:var(--text-muted);">
+
+        <!-- Decision criteria -->
+        <div style="background:rgba(207,172,103,0.07);border:1px solid rgba(207,172,103,0.2);border-radius:var(--radius);padding:16px 18px;margin-bottom:24px;">
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">Decision criteria — annualized revenue</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div style="text-align:center;padding:10px;background:rgba(76,175,125,0.1);border:1px solid rgba(76,175,125,0.3);border-radius:6px;">
+              <div style="font-size:0.78rem;font-weight:700;color:#4caf7d;">≥ $90,000</div>
+              <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;">Hold</div>
+            </div>
+            <div style="text-align:center;padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:6px;">
+              <div style="font-size:0.78rem;font-weight:700;color:#ddd8ce;">$80,000–$90,000</div>
+              <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;">Borderline — hold only if further upside is credible</div>
+            </div>
+            <div style="text-align:center;padding:10px;background:rgba(229,57,53,0.1);border:1px solid rgba(229,57,53,0.3);border-radius:6px;">
+              <div style="font-size:0.78rem;font-weight:700;color:#e57373;">< $80,000</div>
+              <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;">Sell</div>
+            </div>
+          </div>
+          <div style="font-size:0.78rem;">Annualized revenue is calculated from peak season data available by October 2026. The decision should reflect a full-year projection, not a single quarter in isolation.</div>
+        </div>
+
+        <!-- Hold path -->
+        <div style="margin-bottom:24px;">
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4caf7d;margin-bottom:10px;">Hold path</div>
+          <div style="font-size:0.82rem;">If revenue meets or exceeds $90,000 annualized, continue holding and redirect all available cash to build a refinance lump sum. Muni bonds (IBMP) should be purchased through year-end 2026 for tax efficiency, then switched to T-bills in 2027.</div>
+          <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;font-size:0.82rem;">
+            <div><span style="color:#ddd8ce;font-weight:600;">December 2027:</span> Prepayment penalty expires and muni bonds mature (~$127,500). Refinance the primary mortgage at 6%, 30-year term, applying a ~$222,000–$249,000 lump sum to reduce the outstanding balance. New principal and interest drops from $4,137 to ~$1,523–$1,683 per month.</div>
+            <div><span style="color:#ddd8ce;font-weight:600;">December 2028:</span> Pay 20% of the secondary balance (~$32,000–$35,000) to extend the balloon payment five years. Rate converts to 6%; new principal and interest ~$784 per month. Remaining balloon due December 2033.</div>
+          </div>
+        </div>
+
+        <!-- Sell path -->
+        <div style="margin-bottom:24px;">
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#e57373;margin-bottom:10px;">Sell path — recommended exit strategy</div>
+          <div style="font-size:0.82rem;">If revenue falls below $80,000 annualized, sell as soon as possible and execute a 1031 exchange into replacement real estate valued at $491,000 or more. The $491,000 threshold — not the original purchase price of $649,900 — is the amount required to fully defer depreciation recapture under a 1031 exchange.</div>
+
+          <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;font-size:0.82rem;">
+            <div><span style="color:#ddd8ce;font-weight:600;">Why sell before December 2027 despite the prepayment penalty:</span> The prepayment penalty is $25,580. At approximately $4,000 per month in negative cash flow, the penalty is recovered in under seven months. Waiting 14 or more months to avoid the penalty results in over $56,000 in additional losses — more than double the penalty itself.</div>
+            <div><span style="color:#ddd8ce;font-weight:600;">Why execute a 1031 exchange:</span> Selling without a 1031 exchange triggers approximately $79,415 in depreciation recapture tax. A 1031 exchange into a property valued at $491,000 or more fully defers this liability. At 25% down, the required investment is $132,570 — of which $122,750 is equity acquired in the replacement property. The true incremental cost of the 1031 versus walking away is $9,820 in closing costs, not the full $132,570.</div>
+            <div><span style="color:#ddd8ce;font-weight:600;">Additional benefit of the 1031 path:</span> A cost segregation study on the replacement property may generate $50,000–$60,000 in new bonus depreciation under the current 100% rate, partially offsetting the deferred recapture liability over time.</div>
+            <div><span style="color:#ddd8ce;font-weight:600;">Replacement property profile:</span> At 25% down on a $491,000 property: $368,250 mortgage at 6.25%, principal and interest ~$2,268 per month.</div>
+            <div><span style="color:#ddd8ce;font-weight:600;">1031 exchange timeline:</span> Replacement property must be identified within 45 days of closing on Broken Bow and acquired within 180 days. Begin identifying candidates before the October 2026 decision, not after.</div>
+          </div>
+        </div>
+
+        <!-- Scenario Cost Table -->
+        <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Scenario cost comparison</div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.76rem;">
+            <thead>
+              <tr style="color:var(--text-muted);font-size:0.68rem;">
+                <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Scenario</th>
+                <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Cash to close‡</th>
+                <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Recapture tax</th>
+                <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Hold cost§</th>
+                <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Replacement real estate</th>
+                <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);font-weight:500;">Total†</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:7px 8px;color:#ddd8ce;">Sell now, no 1031 exchange</td>
+                <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$46,498</td>
+                <td style="padding:7px 8px;text-align:right;color:#e57373;">$79,415</td>
+                <td style="padding:7px 8px;text-align:right;color:var(--text-muted);">—</td>
+                <td style="padding:7px 8px;text-align:right;color:var(--text-muted);">—</td>
+                <td style="padding:7px 8px;text-align:right;font-weight:700;color:#ddd8ce;">$125,913</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:7px 8px;color:#ddd8ce;">Sell December 2027, no 1031 exchange</td>
+                <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$13,349</td>
+                <td style="padding:7px 8px;text-align:right;color:#e57373;">$102,975</td>
+                <td style="padding:7px 8px;text-align:right;color:#e57373;">$80,000</td>
+                <td style="padding:7px 8px;text-align:right;color:var(--text-muted);">—</td>
+                <td style="padding:7px 8px;text-align:right;font-weight:700;color:#ddd8ce;">$196,324</td>
+              </tr>
+              <tr style="background:rgba(207,172,103,0.05);">
+                <td style="padding:7px 8px;color:var(--gold);font-weight:600;">Sell now, 1031 exchange into $491,000 (recommended)</td>
+                <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$46,498</td>
+                <td style="padding:7px 8px;text-align:right;color:#4caf7d;">$0 deferred</td>
+                <td style="padding:7px 8px;text-align:right;color:var(--text-muted);">—</td>
+                <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$132,570*</td>
+                <td style="padding:7px 8px;text-align:right;font-weight:700;color:var(--gold);">$179,068*</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="font-size:0.68rem;color:var(--text-muted);margin-top:10px;display:flex;flex-direction:column;gap:5px;">
+          <div>† Total excludes the secondary note, which represents a ~$190,514 obligation through December 2028 (monthly payments plus balloon) that is consistent across all scenarios.</div>
+          <div>* Replacement real estate cash of $132,570 acquires $122,750 in equity at 25% down on a $491,000 property. The net incremental cost versus walking away is $9,820 in closing costs — not the full $132,570.</div>
+          <div>‡ Cash to close includes the $25,580 prepayment penalty on the primary mortgage.</div>
+          <div>§ Hold cost represents the cumulative negative cash flow incurred during the hold period prior to sale (~$4,000 per month). Hold cost is $0 for sell-now scenarios and $80,000 for the December 2027 scenario (20 months at ~$4,000 per month).</div>
+        </div>
+
       </div>
     </div>
 
