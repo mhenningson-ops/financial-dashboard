@@ -2406,10 +2406,14 @@ function renderReviewResults(s) {
         rdTotalIncome, 'qs-income'
       )}
       ${(() => {
-        const cf = s.quarterlyCashFlow ?? (s.annualRentalCashFlow / 4);
-        const cfPrev = prev ? (prev.quarterlyCashFlow ?? (prev.annualRentalCashFlow / 4)) : null;
+        const propKeys = ['bradcliff','neely','greenmount','holladay','brokenBow'];
+        const cfFromProps = p => p?.properties ? propKeys.reduce((sum, k) => sum + (p.properties[k]?.netCF || 0), 0) : null;
+        const cf = s.quarterlyCashFlow ?? cfFromProps(s) ?? (s.annualRentalCashFlow / 4);
+        const cfPrev = prev ? (prev.quarterlyCashFlow ?? cfFromProps(prev) ?? (prev.annualRentalCashFlow / 4)) : null;
         const cfPropNm = { bradcliff:'Bradcliff', neely:'Neely', greenmount:'Greenmount', holladay:'Holladay', brokenBow:'Broken Bow' };
-        const perProp = s.quarterlyCFPerProp || Object.fromEntries(Object.entries(s.annualCFPerProp || {}).map(([k,v]) => [k, v/4]));
+        const perProp = s.quarterlyCFPerProp ||
+          (s.properties ? Object.fromEntries(propKeys.map(k => [k, s.properties[k]?.netCF || 0])) :
+           Object.fromEntries(Object.entries(s.annualCFPerProp || {}).map(([k,v]) => [k, v/4])));
         const rdCF = [
           ...Object.entries(perProp).map(([key, val]) =>
             rdr(cfPropNm[key]||key, `${val<0?'-':''}${fmt$(val)}`, val>=0?'pos':'neg')
