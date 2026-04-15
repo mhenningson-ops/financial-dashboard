@@ -94,6 +94,8 @@
     .acc-badge { font-family: 'Montserrat', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; background: var(--gold-faint); color: var(--gold); }
     .acc-arrow { color: var(--text-muted); font-size: 0.8rem; transition: transform 0.2s; }
     .acc-header.open .acc-arrow { transform: rotate(180deg); }
+    .sub-toggle-icon { display:inline-block; transition:transform 0.2s; margin-right:5px; font-size:0.55rem; vertical-align:middle; }
+    .sub-toggle-icon.open { transform:rotate(90deg); }
     .acc-body { background: var(--dark-3); padding: 24px 22px; display: none; }
     .acc-body.open { display: block; }
 
@@ -471,12 +473,15 @@
     </div>
 
     <!-- SVG TIMELINE -->
-    <div class="card" style="margin-bottom:32px;overflow-x:auto;cursor:pointer;position:relative;" onclick="toggleCardDetail('roadmap')">
-      <div class="card-expand-icon" id="roadmap-icon">+</div>
-      <div class="chart-title" style="margin-bottom:4px;">Strategic Roadmap</div>
-      <div class="chart-sub" style="margin-bottom:20px;">Decision forks and key milestones through Dec 2028</div>
-
-      <div class="card-detail" id="roadmap-detail">
+    <div class="card" style="margin-bottom:32px;padding:0;overflow:hidden;">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div>
+          <div class="chart-title" style="margin-bottom:4px;">Strategic Roadmap</div>
+          <div class="chart-sub">Decision forks and key milestones through Dec 2028</div>
+        </div>
+        <div class="acc-arrow">▼</div>
+      </div>
+      <div class="acc-body" style="overflow-x:auto;">
 
       <!-- Legend -->
       <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
@@ -703,17 +708,22 @@
         </div>
 
       </div>
-      </div><!-- end card-detail roadmap -->
+      </div>
     </div>
 
     <!-- REFI LUMP SUM PROJECTION -->
-    <div class="card" style="margin-bottom:32px;cursor:pointer;position:relative;" onclick="toggleCardDetail('refi-projection')">
-      <div class="card-expand-icon" id="refi-projection-icon">+</div>
-      <div class="chart-title" style="margin-bottom:2px;">Broken Bow Refi Lump Sum Projection</div>
-      <div class="chart-sub">Hold scenario · Dec 2027 target · BB revenue ≥$90K</div>
+    <div class="card" style="margin-bottom:32px;padding:0;overflow:hidden;">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div>
+          <div class="chart-title" style="margin-bottom:2px;">Broken Bow Refi Lump Sum Projection</div>
+          <div class="chart-sub">Hold scenario · Dec 2027 target · BB revenue ≥$90K</div>
+        </div>
+        <div class="acc-arrow">▼</div>
+      </div>
+      <div class="acc-body" style="font-size:0.82rem;line-height:1.7;color:var(--text-muted);">
 
       <!-- Progress bar -->
-      <div id="lump-sum-progress" style="margin-top:16px;"></div>
+      <div id="lump-sum-progress" style="margin-bottom:16px;"></div>
 
       <!-- Summary bar -->
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);border-radius:var(--radius);overflow:hidden;margin-top:16px;">
@@ -731,11 +741,11 @@
         </div>
       </div>
 
-      <div class="card-detail" id="refi-projection-detail" style="font-size:0.82rem;line-height:1.7;color:var(--text-muted);">
 
         <!-- Projected vs Actual milestones -->
-        <div style="margin-bottom:24px;">
-          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Projected vs Actual</div>
+        <div style="margin-top:24px;margin-bottom:24px;">
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;cursor:pointer;user-select:none;" onclick="event.stopPropagation();toggleSubsection('refi-projvsact')"><span id="refi-projvsact-icon" class="sub-toggle-icon open">▶</span>Projected vs Actual</div>
+          <div id="refi-projvsact-body">
           <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:10px;">Actual = muni bonds + (cash − $15,000 operational reserve)</div>
           <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
             <thead>
@@ -748,11 +758,13 @@
             </thead>
             <tbody id="lump-sum-milestones"></tbody>
           </table>
+          </div>
         </div>
 
         <!-- Phase 1 -->
         <div style="margin-bottom:24px;">
-          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Phase 1 — Bradcliff Payoff (Apr–Dec 2026)</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;cursor:pointer;user-select:none;" onclick="event.stopPropagation();toggleSubsection('refi-phase1')"><span id="refi-phase1-icon" class="sub-toggle-icon open">▶</span>Phase 1 — Bradcliff Payoff (Apr–Dec 2026)</div>
+          <div id="refi-phase1-body">
           <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
             <thead>
               <tr style="color:var(--text-muted);font-size:0.68rem;">
@@ -819,11 +831,13 @@
               </tr>
             </tbody>
           </table>
+          </div>
         </div>
 
         <!-- Phase 2 -->
         <div style="margin-bottom:24px;">
-          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Phase 2 — Lump Sum Accumulation (Jan–Dec 2027)</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;cursor:pointer;user-select:none;" onclick="event.stopPropagation();toggleSubsection('refi-phase2')"><span id="refi-phase2-icon" class="sub-toggle-icon open">▶</span>Phase 2 — Lump Sum Accumulation (Jan–Dec 2027)</div>
+          <div id="refi-phase2-body">
           <div style="font-size:0.78rem;margin-bottom:10px;">Post-Bradcliff payoff · BB at $90K ADR-driven revenue · 68.9% occupancy · self-managed · 15% platform fee</div>
           <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
             <thead>
@@ -871,11 +885,13 @@
               </tr>
             </tbody>
           </table>
+          </div>
         </div>
 
         <!-- Full lump sum -->
         <div>
-          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Full Lump Sum (Dec 2027)</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;cursor:pointer;user-select:none;" onclick="event.stopPropagation();toggleSubsection('refi-fulllump')"><span id="refi-fulllump-icon" class="sub-toggle-icon open">▶</span>Full Lump Sum (Dec 2027)</div>
+          <div id="refi-fulllump-body">
           <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
             <tbody>
               <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
@@ -904,21 +920,27 @@
               </tr>
             </tbody>
           </table>
+          </div>
         </div>
 
       </div>
     </div>
 
     <!-- BROKEN BOW DECISION BRIEF -->
-    <div class="card" style="margin-bottom:32px;cursor:pointer;position:relative;" onclick="toggleCardDetail('bb-brief')">
-      <div class="card-expand-icon" id="bb-brief-icon">+</div>
-      <div class="chart-title" style="margin-bottom:2px;">Broken Bow: Oct 2026 Decision Brief</div>
-      <div class="chart-sub">Strategic review — October 2026</div>
-      <div class="card-detail" id="bb-brief-detail" style="font-size:0.82rem;line-height:1.7;color:var(--text-muted);">
+    <div class="card" style="margin-bottom:32px;padding:0;overflow:hidden;">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div>
+          <div class="chart-title" style="margin-bottom:2px;">Broken Bow: Oct 2026 Decision Brief</div>
+          <div class="chart-sub">Strategic review — October 2026</div>
+        </div>
+        <div class="acc-arrow">▼</div>
+      </div>
+      <div class="acc-body" style="font-size:0.82rem;line-height:1.7;color:var(--text-muted);">
 
         <!-- Decision criteria -->
         <div style="background:rgba(207,172,103,0.07);border:1px solid rgba(207,172,103,0.2);border-radius:var(--radius);padding:16px 18px;margin-bottom:24px;">
-          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">Decision criteria — annualized revenue</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;cursor:pointer;user-select:none;" onclick="event.stopPropagation();toggleSubsection('bb-criteria')"><span id="bb-criteria-icon" class="sub-toggle-icon open">▶</span>Decision criteria — annualized revenue</div>
+          <div id="bb-criteria-body">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
             <div style="text-align:center;padding:10px;background:rgba(76,175,125,0.1);border:1px solid rgba(76,175,125,0.3);border-radius:6px;">
               <div style="font-size:0.78rem;font-weight:700;color:#4caf7d;">≥ $90,000</div>
@@ -934,21 +956,25 @@
             </div>
           </div>
           <div style="font-size:0.78rem;">Annualized revenue is calculated from peak season data available by October 2026. The decision should reflect a full-year projection, not a single quarter in isolation.</div>
+          </div>
         </div>
 
         <!-- Hold path -->
         <div style="margin-bottom:24px;">
-          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4caf7d;margin-bottom:10px;">Hold path</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4caf7d;margin-bottom:10px;cursor:pointer;user-select:none;" onclick="event.stopPropagation();toggleSubsection('bb-hold')"><span id="bb-hold-icon" class="sub-toggle-icon open">▶</span>Hold path</div>
+          <div id="bb-hold-body">
           <div style="font-size:0.82rem;">If revenue meets or exceeds $90,000 annualized, continue holding and redirect all available cash to build a refinance lump sum. Muni bonds (IBMP) should be purchased through year-end 2026 for tax efficiency, then switched to T-bills in 2027.</div>
           <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;font-size:0.82rem;">
             <div><span style="color:#ddd8ce;font-weight:600;">December 2027:</span> Prepayment penalty expires and muni bonds mature (~$127,500). Refinance the primary mortgage at 6%, 30-year term, applying a ~$225,000 lump sum to reduce the outstanding balance. New principal and interest drops from $4,137 to ~$1,523–$1,683 per month.</div>
             <div><span style="color:#ddd8ce;font-weight:600;">December 2028:</span> Pay 20% of the secondary balance (~$32,000–$35,000) to extend the balloon payment five years. Rate converts to 6%; new principal and interest ~$784 per month. Remaining balloon due December 2033.</div>
           </div>
+          </div>
         </div>
 
         <!-- Sell path -->
         <div style="margin-bottom:24px;">
-          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#e57373;margin-bottom:10px;">Sell path — recommended exit strategy</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#e57373;margin-bottom:10px;cursor:pointer;user-select:none;" onclick="event.stopPropagation();toggleSubsection('bb-sell')"><span id="bb-sell-icon" class="sub-toggle-icon open">▶</span>Sell path — recommended exit strategy</div>
+          <div id="bb-sell-body">
           <div style="font-size:0.82rem;">If revenue falls below $80,000 annualized, sell as soon as possible and execute a 1031 exchange into replacement real estate valued at $491,000 or more. The $491,000 threshold — not the original purchase price of $649,900 — is the amount required to fully defer depreciation recapture under a 1031 exchange.</div>
 
           <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;font-size:0.82rem;">
@@ -958,10 +984,12 @@
             <div><span style="color:#ddd8ce;font-weight:600;">Replacement property profile:</span> At 25% down on a $491,000 property: $368,250 mortgage at 6.25%, principal and interest ~$2,268 per month.</div>
             <div><span style="color:#ddd8ce;font-weight:600;">1031 exchange timeline:</span> Replacement property must be identified within 45 days of closing on Broken Bow and acquired within 180 days. Begin identifying candidates before the October 2026 decision, not after.</div>
           </div>
+          </div>
         </div>
 
         <!-- Scenario Cost Table -->
-        <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Scenario cost comparison</div>
+        <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;cursor:pointer;user-select:none;" onclick="event.stopPropagation();toggleSubsection('bb-scenarios')"><span id="bb-scenarios-icon" class="sub-toggle-icon open">▶</span>Scenario cost comparison</div>
+        <div id="bb-scenarios-body">
         <div style="overflow-x:auto;">
           <table style="width:100%;border-collapse:collapse;font-size:0.76rem;">
             <thead>
@@ -1016,6 +1044,7 @@
           <div>‡ Cash to close includes the $25,580 prepayment penalty on the primary mortgage.</div>
           <div>§ Hold cost represents the cumulative negative cash flow incurred during the hold period prior to sale (~$4,000 per month). Hold cost is $0 for sell-now scenarios and $80,000 for the December 2027 scenario (20 months at ~$4,000 per month). Hold cost assumption is based on $67,500 annualized revenue — re-model in October 2026 using actual revenue data.</div>
           <div>** Deferred recapture increases to ~$102,975 by December 2027 (vs. ~$79,415 if selling now) due to two additional years of depreciation. Scenario 4 defers ~$24K more than Scenario 3 but costs ~$56K more in hold losses — not recommended unless meaningful appreciation is expected.</div>
+        </div>
         </div>
 
       </div>
@@ -2260,7 +2289,9 @@ function renderLumpSumProjection() {
         <tr style="background:rgba(255,255,255,0.02);">
           <td colspan="4" style="padding:8px 16px 14px 16px;">
 
-            <div style="font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin:4px 0 8px;">This Quarter vs Plan</div>
+            ${!prevSnap
+              ? `<div style="font-size:0.72rem;color:var(--text-muted);font-style:italic;">Baseline quarter — no variance available</div>`
+              : `<div style="font-family:'Montserrat',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin:4px 0 8px;">This Quarter vs Plan</div>
             <div style="display:grid;grid-template-columns:160px 90px 90px 1fr;gap:3px 8px;font-size:0.72rem;align-items:center;margin-bottom:12px;">
               <span style="color:var(--text-muted);font-size:0.65rem;">Source</span>
               <span style="color:var(--text-muted);font-size:0.65rem;text-align:right;">Plan</span>
@@ -2279,17 +2310,26 @@ function renderLumpSumProjection() {
               <span style="text-align:right;color:var(--text-muted);">${fmt$(m.projCash)}</span>
               <span style="text-align:right;color:#ddd8ce;">${fmt$(actCash)}</span>
               <span>${varCell(actCash - m.projCash, false)}</span>
-            </div>
+            </div>`}
           </td>
         </tr>`;
     }
 
+    const milestoneId = `lsm-${m.label.replace(/\s+/g, '-').toLowerCase()}`;
+    const hasBreakdown = breakdownRow !== '';
+    const toggleBtn = hasBreakdown
+      ? `<span id="${milestoneId}-icon" onclick="event.stopPropagation();toggleMilestone('${milestoneId}')" class="sub-toggle-icon" style="cursor:pointer;color:var(--text-muted);">▶</span>`
+      : '';
+    const breakdownHtml = hasBreakdown
+      ? breakdownRow.replace('<tr ', `<tr id="${milestoneId}" style="display:none;" `)
+      : '';
+
     return `<tr style="border-bottom:1px solid rgba(255,255,255,0.04);${rowStyle}">
-      <td style="padding:6px 8px;${labelStyle}">${m.label}${m.note ? `<span style="font-size:0.65rem;color:var(--text-muted);font-weight:400;margin-left:6px;">${m.note}</span>` : ''}</td>
+      <td style="padding:6px 8px;${labelStyle}">${toggleBtn}${m.label}${m.note ? `<span style="font-size:0.65rem;color:var(--text-muted);font-weight:400;margin-left:6px;">${m.note}</span>` : ''}</td>
       <td style="padding:6px 8px;text-align:right;color:var(--text-muted);">${fmt$(m.projected)}</td>
       <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">${act !== null ? fmt$(act) : '—'}</td>
       <td style="padding:6px 8px;text-align:right;">${statusHtml}</td>
-    </tr>${breakdownRow}`;
+    </tr>${breakdownHtml}`;
   }).join('');
 }
 
@@ -3132,6 +3172,24 @@ function renderReviewResults(s) {
 }
 
 // ── CARD DRILL-DOWN ────────────────────────────────────────────────────────
+function toggleSubsection(id) {
+  const body = document.getElementById(id + '-body');
+  const icon = document.getElementById(id + '-icon');
+  if (!body) return;
+  const open = body.style.display === 'none';
+  body.style.display = open ? '' : 'none';
+  if (icon) icon.classList.toggle('open', open);
+}
+
+function toggleMilestone(id) {
+  const row  = document.getElementById(id);
+  const icon = document.getElementById(id + '-icon');
+  if (!row) return;
+  const open = row.style.display === 'none';
+  row.style.display = open ? '' : 'none';
+  if (icon) icon.classList.toggle('open', open);
+}
+
 function toggleCardDetail(id) {
   const detail = document.getElementById(id + '-detail');
   const icon   = document.getElementById(id + '-icon');
