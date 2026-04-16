@@ -394,7 +394,7 @@
           <div class="milestone-bar">
             <div class="ms"><div class="ms-dot" style="background:var(--gold);"></div>Historical</div>
             <div class="ms"><div class="ms-dot" style="background:rgba(207,172,103,0.4);border:1px dashed var(--gold);"></div>Projected (10%/yr)</div>
-            <div class="ms"><div class="ms-dot" style="background:var(--green);"></div>FI Milestone (2029)</div>
+            <div class="ms"><div class="ms-dot" style="background:var(--green);"></div>FI Milestone (2028) — incl. 401k + HSA contributions</div>
             <div class="ms"><div class="ms-dot" style="background:var(--blue);"></div>Portfolio Drawdown (2048)</div>
           </div>
           <div class="chart-canvas-wrap tall"><canvas id="chart-portfolio"></canvas></div>
@@ -1744,6 +1744,8 @@ const DRAWDOWN_AGE   = 59.5;
 const DRAWDOWN_YEAR  = BIRTH_YEAR + DRAWDOWN_AGE;
 const DRAWDOWN_INCOME = 250000;
 const PORTFOLIO_RETURN = 0.10;
+const ANNUAL_MAX_CONTRIB = 27800; // 401k $23,500 + HSA $4,300 (2026 single limits)
+const CONTRIB_THRU_YEAR = 2028;  // stop adding contributions after FI
 const SAFE_WITHDRAWAL = 0.04;
 const STORAGE_KEY = 'cordoba_fin_v1';
 const DRAFT_KEY   = 'cordoba_draft_v1';
@@ -3464,16 +3466,22 @@ function renderDashboard() {
     return q.totalPortfolio - initPort - contribSinceStart;
   });
 
-  function buildProjection(lastVal, annualRate, yearsForward) {
-    const qRate = Math.pow(1+annualRate, 1/4)-1;
+  function buildProjection(lastVal, annualRate, yearsForward, startYear) {
+    const qRate   = Math.pow(1+annualRate, 1/4)-1;
+    const qContrib = ANNUAL_MAX_CONTRIB / 4;
+    const contribThruYear = CONTRIB_THRU_YEAR;
     const pts = [lastVal];
-    for (let i=1; i<=yearsForward*4; i++) pts.push(pts[pts.length-1]*(1+qRate));
+    for (let i=1; i<=yearsForward*4; i++) {
+      const yr = (startYear || 0) + Math.floor(i/4);
+      const contrib = (startYear && yr <= contribThruYear) ? qContrib : 0;
+      pts.push(pts[pts.length-1]*(1+qRate) + contrib);
+    }
     return pts;
   }
 
   const curYear = new Date(last.date).getFullYear();
   const portYearsLeft = DRAWDOWN_YEAR - curYear;
-  const portProj = buildProjection(last.totalPortfolio, PORTFOLIO_RETURN, portYearsLeft);
+  const portProj = buildProjection(last.totalPortfolio, PORTFOLIO_RETURN, portYearsLeft, curYear);
   const portProjLabels = [];
   for (let i=0; i<=portYearsLeft*4; i++) {
     const yr = curYear + Math.floor(i/4);
@@ -3530,7 +3538,7 @@ function renderDashboard() {
       datasets: [
         { label:'Portfolio Value', data:[...portData,...Array(portProjLabels.length-1).fill(null)], borderColor:C.gold, backgroundColor:'rgba(207,172,103,0.1)', fill:true, tension:0.3, pointRadius:4, pointBackgroundColor:C.gold },
         { label:'Projected (10%/yr)', data:[...Array(labels.length-1).fill(null), portData[portData.length-1], ...portProj.slice(1)], borderColor:'rgba(207,172,103,0.5)', borderDash:[6,4], backgroundColor:'transparent', tension:0.3, pointRadius:0 },
-        { label:`FI Milestone (${FI_TARGET_YEAR})`, data:[...labels,...portProjLabels.slice(1)].map(l=>l.includes(String(FI_TARGET_YEAR))?portProj[Math.round((FI_TARGET_YEAR-curYear)*4)]:null), borderColor:C.green, borderDash:[3,3], pointRadius:6, pointBackgroundColor:C.green, pointStyle:'triangle', showLine:false },
+        { label:`FI Milestone (${FI_TARGET_YEAR})`, data:[...labels,...portProjLabels.slice(1)].map(l=>l===`Q4 ${FI_TARGET_YEAR}`?portProj[Math.round((FI_TARGET_YEAR-curYear)*4)]:null), borderColor:C.green, borderDash:[3,3], pointRadius:8, pointBackgroundColor:C.green, pointStyle:'triangle', showLine:false },
       ],
     },
     options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, tooltip:{ callbacks:{ label: ctx => ' '+fmt$(ctx.raw) } } } },
@@ -3543,7 +3551,7 @@ function renderDashboard() {
       datasets: [
         { label:'Net Worth', data:[...nwData,...Array(nwProjYears*4).fill(null)], borderColor:C.gold, backgroundColor:'rgba(207,172,103,0.08)', fill:true, tension:0.3, pointRadius:3, pointBackgroundColor:C.gold },
         { label:'Projected', data:[...Array(labels.length-1).fill(null),nwData[nwData.length-1],...nwProj.slice(1)], borderColor:'rgba(207,172,103,0.45)', borderDash:[6,4], backgroundColor:'transparent', tension:0.3, pointRadius:0 },
-        { label:'Debt-Free 2030', data:[...Array(labels.length + nwProjYears*4)].map((_,i)=>{ const yr=i<labels.length?new Date(quarters[i]?.date).getFullYear():curYear+Math.floor((i-labels.length+1)/4); return yr===DEBT_FREE_YEAR?nwProj[Math.min(nwProj.length-1,(DEBT_FREE_YEAR-curYear)*4)]:null; }), borderColor:C.green, pointRadius:8, pointBackgroundColor:C.green, pointStyle:'star', showLine:false },
+        { label:'Debt-Free 2030', data:[...labels, ...Array(nwProjYears*4).fill(null).map((_,i)=>{ const yr=curYear+Math.floor((i+1)/4); const q=((i+1)%4)+1; return (yr===DEBT_FREE_YEAR&&q===4)?nwProj[Math.min(nwProj.length-1,(DEBT_FREE_YEAR-curYear)*4)]:null; })], borderColor:C.green, pointRadius:8, pointBackgroundColor:C.green, pointStyle:'triangle', showLine:false },
       ],
     },
     options: { ...chartDefaults },
