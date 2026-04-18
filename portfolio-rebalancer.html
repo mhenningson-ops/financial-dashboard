@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio Rebalancer — Cordoba Capital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    :root {
+      --dark-1: #080e16;
+      --dark-2: #0d1824;
+      --dark-3: #122030;
+      --dark-4: #1a2c3f;
+      --gold:        #cfac67;
+      --gold-light:  #e0c47a;
+      --gold-dark:   #ba995d;
+      --gold-faint:  rgba(207,172,103,0.12);
+      --cream:       #f7f3ec;
+      --text-light:  #ddd8ce;
+      --text-muted:  #7a7060;
+      --green:       #4caf7d;
+      --green-faint: rgba(76,175,125,0.12);
+      --red:         #e05c5c;
+      --red-faint:   rgba(224,92,92,0.12);
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--dark-1);
+      color: var(--text-light);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    h1, h2, h3 { font-family: 'Playfair Display', serif; line-height: 1.15; }
+
+    /* ─── HEADER ─── */
+    header {
+      background: var(--dark-2);
+      border-bottom: 1px solid rgba(207,172,103,0.15);
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    header img { height: 36px; width: auto; }
+    .header-text {}
+    .header-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .header-sub {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .header-divider {
+      width: 1px;
+      height: 32px;
+      background: rgba(207,172,103,0.25);
+      margin: 0 6px;
+    }
+    .header-tool {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ─── LAYOUT ─── */
+    .page { max-width: 860px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    .page-title {
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .page-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+    }
+    .page-subtitle span { color: var(--gold); }
+
+    /* ─── SECTIONS ─── */
+    .form-section {
+      background: var(--dark-2);
+      border: 1px solid rgba(207,172,103,0.1);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      margin-bottom: 24px;
+    }
+    .section-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+    .section-title {
+      font-size: 1.1rem;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    /* ─── TABLE INPUTS ─── */
+    .input-table { width: 100%; border-collapse: collapse; }
+    .input-table thead th {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-align: left;
+      padding: 0 12px 10px;
+      border-bottom: 1px solid rgba(207,172,103,0.1);
+    }
+    .input-table thead th:last-child { text-align: right; }
+    .input-table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .input-table tbody tr:last-child { border-bottom: none; }
+    .input-table tbody td {
+      padding: 10px 12px;
+      font-size: 0.85rem;
+    }
+    .input-table tbody td:first-child { color: var(--text-muted); font-size: 0.78rem; }
+    .input-table tbody td:nth-child(2) { color: var(--text-light); font-weight: 500; }
+    .input-table tbody td:last-child { text-align: right; }
+
+    .acct-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 3px;
+      background: var(--gold-faint);
+      color: var(--gold);
+      margin-bottom: 2px;
+    }
+
+    input[type="number"] {
+      background: var(--dark-3);
+      border: 1px solid rgba(207,172,103,0.2);
+      border-radius: var(--radius-sm);
+      color: var(--cream);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 7px 10px;
+      width: 140px;
+      text-align: right;
+      transition: border-color 0.2s;
+      -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: var(--dark-4);
+    }
+
+    /* ─── DATE ROW ─── */
+    .meta-row {
+      display: flex;
+      gap: 24px;
+      align-items: flex-end;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .meta-field { display: flex; flex-direction: column; gap: 6px; }
+    .meta-field label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    input[type="date"] {
+      background: var(--dark-3);
+      border: 1px solid rgba(207,172,103,0.2);
+      border-radius: var(--radius-sm);
+      color: var(--cream);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.88rem;
+      padding: 7px 12px;
+      transition: border-color 0.2s;
+      color-scheme: dark;
+    }
+    input[type="date"]:focus { outline: none; border-color: var(--gold); }
+
+    /* ─── THRESHOLD ─── */
+    .threshold-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 4px;
+    }
+    .threshold-row label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .threshold-row input {
+      width: 70px;
+      text-align: center;
+    }
+
+    /* ─── BUTTON ─── */
+    .btn-analyze {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: var(--gold);
+      color: var(--dark-1);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 8px;
+    }
+    .btn-analyze:hover { background: var(--gold-light); }
+    .btn-analyze:active { transform: scale(0.99); }
+
+    .btn-reset {
+      display: block;
+      width: 100%;
+      padding: 11px;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      margin-top: 10px;
+    }
+    .btn-reset:hover { color: var(--text-light); border-color: rgba(255,255,255,0.2); }
+
+    /* ─── RESULTS ─── */
+    #results { display: none; margin-top: 32px; }
+
+    .result-section {
+      background: var(--dark-2);
+      border: 1px solid rgba(207,172,103,0.1);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      margin-bottom: 20px;
+    }
+    .result-section-title {
+      font-size: 1rem;
+      color: #fff;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .result-section-title .step-badge {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--dark-1);
+      background: var(--gold);
+      padding: 3px 8px;
+      border-radius: 3px;
+    }
+
+    .result-table { width: 100%; border-collapse: collapse; }
+    .result-table thead th {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-align: left;
+      padding: 0 12px 10px;
+      border-bottom: 1px solid rgba(207,172,103,0.1);
+    }
+    .result-table thead th:not(:first-child):not(:nth-child(2)) { text-align: right; }
+    .result-table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .result-table tbody tr:last-child { border-bottom: none; }
+    .result-table tbody td {
+      padding: 10px 12px;
+      font-size: 0.85rem;
+    }
+    .result-table tbody td:not(:first-child):not(:nth-child(2)) { text-align: right; }
+
+    .status-ok {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 3px;
+      background: var(--green-faint);
+      color: var(--green);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .status-flag {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 3px;
+      background: var(--red-faint);
+      color: var(--red);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .tag-buy {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 3px;
+      background: var(--green-faint);
+      color: var(--green);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .tag-sell {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 3px;
+      background: var(--red-faint);
+      color: var(--red);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .tag-none {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    .pos { color: var(--green); }
+    .neg { color: var(--red); }
+    .muted { color: var(--text-muted); }
+
+    .acct-header {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      padding: 14px 12px 6px;
+      border-top: 1px solid rgba(207,172,103,0.12);
+      margin-top: 4px;
+    }
+    .acct-header:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+
+    .status-msg {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.03);
+      border-radius: var(--radius-sm);
+      margin-top: 6px;
+    }
+    .status-msg.executable { color: var(--green); background: var(--green-faint); font-style: normal; font-weight: 500; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .summary-card {
+      background: var(--dark-3);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+    }
+    .summary-card .sc-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .summary-card .sc-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .summary-card .sc-value.gold { color: var(--gold); }
+
+    .divider {
+      height: 1px;
+      background: rgba(207,172,103,0.1);
+      margin: 20px 0;
+    }
+
+    .note {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-top: 12px;
+    }
+
+    /* ─── PRINT ─── */
+    .btn-print {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      background: transparent;
+      color: var(--gold);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border: 1px solid rgba(207,172,103,0.3);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 24px;
+    }
+    .btn-print:hover { background: var(--gold-faint); }
+
+    @media print {
+      header, .form-section, .btn-print, .btn-reset { display: none !important; }
+      #results { display: block !important; }
+      body { background: white; color: black; }
+    }
+
+    @media (max-width: 600px) {
+      .form-section, .result-section { padding: 20px 18px; }
+      input[type="number"] { width: 110px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <img src="../cordoba-capital-site/cordoba_capital_arch_1.png" alt="Cordoba Capital" />
+  <div class="header-divider"></div>
+  <div class="header-text">
+    <div class="header-name">Cordoba Capital</div>
+    <div class="header-sub">Private Client Tools</div>
+  </div>
+  <div class="header-divider"></div>
+  <div class="header-tool">Portfolio Rebalancer</div>
+</header>
+
+<!-- PAGE -->
+<div class="page">
+  <h1 class="page-title">Quarterly Rebalancer</h1>
+  <p class="page-subtitle">Enter your current balances and contributions. Results update instantly. <span>Drift threshold: ±5%</span></p>
+
+  <!-- META -->
+  <div class="form-section">
+    <div class="meta-row">
+      <div class="meta-field">
+        <label>As of Date</label>
+        <input type="date" id="asof" />
+      </div>
+      <div class="meta-field">
+        <label>Drift Threshold</label>
+        <div class="threshold-row">
+          <input type="number" id="threshold" value="5" min="1" max="20" style="width:70px;text-align:center;" />
+          <label style="font-size:0.85rem;">%</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 1: CURRENT VALUES -->
+  <div class="form-section">
+    <div class="section-label">Step 1</div>
+    <div class="section-title">Current Holdings</div>
+    <table class="input-table">
+      <thead>
+        <tr>
+          <th>Account</th>
+          <th>Fund</th>
+          <th>Current Value ($)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="acct-badge">401(k)</span></td>
+          <td>FXAIX — Large Cap</td>
+          <td><input type="number" id="h_fxaix_401k" placeholder="0.00" step="0.01" min="0" /></td>
+        </tr>
+        <tr>
+          <td><span class="acct-badge">Roth 401(k)</span></td>
+          <td>FXAIX — Large Cap</td>
+          <td><input type="number" id="h_fxaix_r401k" placeholder="0.00" step="0.01" min="0" /></td>
+        </tr>
+        <tr>
+          <td><span class="acct-badge">HSA</span></td>
+          <td>FSSNX — Small Cap</td>
+          <td><input type="number" id="h_fssnx_hsa" placeholder="0.00" step="0.01" min="0" /></td>
+        </tr>
+        <tr>
+          <td><span class="acct-badge">HSA</span></td>
+          <td>BITB — Crypto BTC</td>
+          <td><input type="number" id="h_bitb_hsa" placeholder="0.00" step="0.01" min="0" /></td>
+        </tr>
+        <tr>
+          <td><span class="acct-badge">HSA</span></td>
+          <td>ETHA — Crypto ETH</td>
+          <td><input type="number" id="h_etha_hsa" placeholder="0.00" step="0.01" min="0" /></td>
+        </tr>
+        <tr>
+          <td><span class="acct-badge">HSA</span></td>
+          <td>IBLC — Crypto Infra</td>
+          <td><input type="number" id="h_iblc_hsa" placeholder="0.00" step="0.01" min="0" /></td>
+        </tr>
+        <tr>
+          <td><span class="acct-badge">Roth IRA</span></td>
+          <td>SWSSX — Small Cap</td>
+          <td><input type="number" id="h_swssx_ira" placeholder="0.00" step="0.01" min="0" /></td>
+        </tr>
+        <tr>
+          <td><span class="acct-badge">Roth IRA</span></td>
+          <td>SWISX — Intl Developed</td>
+          <td><input type="number" id="h_swisx_ira" placeholder="0.00" step="0.01" min="0" /></td>
+        </tr>
+        <tr>
+          <td><span class="acct-badge">Roth IRA</span></td>
+          <td>VWO — Emerging Markets</td>
+          <td><input type="number" id="h_vwo_ira" placeholder="0.00" step="0.01" min="0" /></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- STEP 2: CONTRIBUTIONS -->
+  <div class="form-section">
+    <div class="section-label">Step 2</div>
+    <div class="section-title">Quarterly Contributions</div>
+    <table class="input-table">
+      <thead>
+        <tr>
+          <th>Account</th>
+          <th></th>
+          <th>Amount ($)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="acct-badge">401(k)</span></td>
+          <td>Traditional 401(k)</td>
+          <td><input type="number" id="c_401k" placeholder="0.00" step="0.01" min="0" /></td>
+        </tr>
+        <tr>
+          <td><span class="acct-badge">Roth 401(k)</span></td>
+          <td>Roth 401(k)</td>
+          <td><input type="number" id="c_r401k" placeholder="0.00" step="0.01" min="0" /></td>
+        </tr>
+        <tr>
+          <td><span class="acct-badge">HSA</span></td>
+          <td>Health Savings Account</td>
+          <td><input type="number" id="c_hsa" placeholder="0.00" step="0.01" min="0" /></td>
+        </tr>
+        <tr>
+          <td><span class="acct-badge">Roth IRA</span></td>
+          <td>Roth IRA (Backdoor)</td>
+          <td><input type="number" id="c_ira" placeholder="0.00" step="0.01" min="0" /></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <button class="btn-analyze" onclick="analyze()">Analyze Portfolio</button>
+  <button class="btn-reset" onclick="resetForm()">Clear All Fields</button>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <button class="btn-print" onclick="window.print()">&#x1F5A8; Save / Print</button>
+
+    <!-- SUMMARY -->
+    <div class="result-section">
+      <div class="result-section-title">
+        <span class="step-badge">Summary</span>
+        Portfolio Snapshot
+      </div>
+      <div class="summary-grid" id="summary-grid"></div>
+    </div>
+
+    <!-- DRIFT CHECK -->
+    <div class="result-section">
+      <div class="result-section-title">
+        <span class="step-badge">Step 1</span>
+        Drift Check
+      </div>
+      <table class="result-table">
+        <thead>
+          <tr>
+            <th>Asset Class</th>
+            <th>Fund(s)</th>
+            <th>Target</th>
+            <th>Actual</th>
+            <th>Deviation</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="drift-body"></tbody>
+      </table>
+    </div>
+
+    <!-- CONTRIBUTION ALLOCATION -->
+    <div class="result-section">
+      <div class="result-section-title">
+        <span class="step-badge">Step 2</span>
+        Contribution Allocation
+      </div>
+      <div id="contrib-body"></div>
+    </div>
+
+    <!-- TRADE INSTRUCTIONS -->
+    <div class="result-section">
+      <div class="result-section-title">
+        <span class="step-badge">Step 3</span>
+        Trade Instructions
+      </div>
+      <div id="trades-body"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── TARGETS ───────────────────────────────────────────────
+const TARGETS = {
+  'Large Cap':        0.57,
+  'Small Cap':        0.17,
+  'Intl Developed':   0.15,
+  'Emerging Markets': 0.07,
+  'Crypto – BTC':     0.0175,
+  'Crypto – ETH':     0.0075,
+  'Crypto – Infra':   0.015,
+};
+
+const AC_FUNDS = {
+  'Large Cap':        'FXAIX',
+  'Small Cap':        'SWSSX / FSSNX',
+  'Intl Developed':   'SWISX',
+  'Emerging Markets': 'VWO',
+  'Crypto – BTC':     'BITB',
+  'Crypto – ETH':     'ETHA',
+  'Crypto – Infra':   'IBLC',
+};
+
+// ─── HELPERS ───────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const v = id => parseFloat($(id).value) || 0;
+const fmt$ = n => '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+const fmtPct = n => (n >= 0 ? '+' : '') + (n*100).toFixed(2) + '%';
+const fmtPctAbs = n => (n*100).toFixed(2) + '%';
+
+function analyze() {
+  const threshold = (parseFloat($('threshold').value) || 5) / 100;
+
+  // Current holdings
+  const holdings = {
+    fxaix_401k:  v('h_fxaix_401k'),
+    fxaix_r401k: v('h_fxaix_r401k'),
+    fssnx_hsa:   v('h_fssnx_hsa'),
+    bitb_hsa:    v('h_bitb_hsa'),
+    etha_hsa:    v('h_etha_hsa'),
+    iblc_hsa:    v('h_iblc_hsa'),
+    swssx_ira:   v('h_swssx_ira'),
+    swisx_ira:   v('h_swisx_ira'),
+    vwo_ira:     v('h_vwo_ira'),
+  };
+
+  // Contributions
+  const contribs = {
+    c401k:  v('c_401k'),
+    r401k:  v('c_r401k'),
+    hsa:    v('c_hsa'),
+    ira:    v('c_ira'),
+  };
+
+  const totalContrib = contribs.c401k + contribs.r401k + contribs.hsa + contribs.ira;
+  const currentTotal = Object.values(holdings).reduce((a,b) => a+b, 0);
+  const projTotal = currentTotal + totalContrib;
+
+  // Asset class current values
+  const acValues = {
+    'Large Cap':        holdings.fxaix_401k + holdings.fxaix_r401k,
+    'Small Cap':        holdings.fssnx_hsa + holdings.swssx_ira,
+    'Intl Developed':   holdings.swisx_ira,
+    'Emerging Markets': holdings.vwo_ira,
+    'Crypto – BTC':     holdings.bitb_hsa,
+    'Crypto – ETH':     holdings.etha_hsa,
+    'Crypto – Infra':   holdings.iblc_hsa,
+  };
+
+  // ── SUMMARY ──
+  const flagCount = Object.entries(TARGETS).filter(([ac, tgt]) => {
+    const actual = currentTotal > 0 ? acValues[ac] / currentTotal : 0;
+    return Math.abs(actual - tgt) > threshold;
+  }).length;
+
+  $('summary-grid').innerHTML = `
+    <div class="summary-card">
+      <div class="sc-label">Portfolio Value</div>
+      <div class="sc-value gold">${fmt$(currentTotal)}</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">Q Contributions</div>
+      <div class="sc-value">${fmt$(totalContrib)}</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">Projected Total</div>
+      <div class="sc-value">${fmt$(projTotal)}</div>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">Flags</div>
+      <div class="sc-value" style="color:${flagCount > 0 ? 'var(--red)' : 'var(--green)'}">${flagCount} asset class${flagCount !== 1 ? 'es' : ''}</div>
+    </div>
+  `;
+
+  // ── DRIFT CHECK ──
+  let driftRows = '';
+  for (const [ac, tgt] of Object.entries(TARGETS)) {
+    const actual = currentTotal > 0 ? acValues[ac] / currentTotal : 0;
+    const dev = actual - tgt;
+    const flagged = Math.abs(dev) > threshold;
+    const devClass = dev > threshold ? 'neg' : (dev < -threshold ? 'pos' : 'muted');
+    driftRows += `
+      <tr>
+        <td>${ac}</td>
+        <td class="muted">${AC_FUNDS[ac]}</td>
+        <td>${fmtPctAbs(tgt)}</td>
+        <td>${fmtPctAbs(actual)}</td>
+        <td class="${devClass}">${fmtPct(dev)}</td>
+        <td>${flagged ? '<span class="status-flag">⚠ Rebalance</span>' : '<span class="status-ok">✓ OK</span>'}</td>
+      </tr>`;
+  }
+  $('drift-body').innerHTML = driftRows;
+
+  // ── CONTRIBUTION ALLOCATION ──
+  // Per-account fund gap analysis
+  // Gaps = target$ (projected) - current$
+  const lcTotal = holdings.fxaix_401k + holdings.fxaix_r401k;
+  const scTotal = holdings.fssnx_hsa + holdings.swssx_ira;
+
+  const gaps = {
+    fxaix_401k:  TARGETS['Large Cap'] * projTotal * (lcTotal > 0 ? holdings.fxaix_401k / lcTotal : 0.5) - holdings.fxaix_401k,
+    fxaix_r401k: TARGETS['Large Cap'] * projTotal * (lcTotal > 0 ? holdings.fxaix_r401k / lcTotal : 0.5) - holdings.fxaix_r401k,
+    fssnx_hsa:   TARGETS['Small Cap'] * projTotal * (scTotal > 0 ? holdings.fssnx_hsa / scTotal : 0.5) - holdings.fssnx_hsa,
+    bitb_hsa:    TARGETS['Crypto – BTC'] * projTotal - holdings.bitb_hsa,
+    etha_hsa:    TARGETS['Crypto – ETH'] * projTotal - holdings.etha_hsa,
+    iblc_hsa:    TARGETS['Crypto – Infra'] * projTotal - holdings.iblc_hsa,
+    swssx_ira:   TARGETS['Small Cap'] * projTotal * (scTotal > 0 ? holdings.swssx_ira / scTotal : 0.5) - holdings.swssx_ira,
+    swisx_ira:   TARGETS['Intl Developed'] * projTotal - holdings.swisx_ira,
+    vwo_ira:     TARGETS['Emerging Markets'] * projTotal - holdings.vwo_ira,
+  };
+
+  // Account groups for allocation
+  const acctGroups = {
+    '401(k)':      [['fxaix_401k',  'FXAIX', 'Large Cap',        contribs.c401k]],
+    'Roth 401(k)': [['fxaix_r401k', 'FXAIX', 'Large Cap',        contribs.r401k]],
+    'HSA':         [['fssnx_hsa',   'FSSNX', 'Small Cap',        contribs.hsa],
+                    ['bitb_hsa',    'BITB',  'Crypto – BTC',     contribs.hsa],
+                    ['etha_hsa',    'ETHA',  'Crypto – ETH',     contribs.hsa],
+                    ['iblc_hsa',    'IBLC',  'Crypto – Infra',   contribs.hsa]],
+    'Roth IRA':    [['swssx_ira',   'SWSSX', 'Small Cap',        contribs.ira],
+                    ['swisx_ira',   'SWISX', 'Intl Developed',   contribs.ira],
+                    ['vwo_ira',     'VWO',   'Emerging Markets', contribs.ira]],
+  };
+
+  function getAllocPct(keys, key) {
+    const posGapSum = keys.reduce((s, k) => s + Math.max(0, gaps[k]), 0);
+    if (posGapSum > 0) {
+      return Math.max(0, gaps[key]) / posGapSum;
+    }
+    // Inverse proportional fallback
+    const invSum = keys.reduce((s, k) => s + 1 / Math.max(Math.abs(gaps[k]), 0.01), 0);
+    return (1 / Math.max(Math.abs(gaps[key]), 0.01)) / invSum;
+  }
+
+  let contribHTML = '';
+  for (const [acct, funds] of Object.entries(acctGroups)) {
+    const acctContrib = funds[0][3];
+    const keys = funds.map(f => f[0]);
+    contribHTML += `
+      <div class="acct-header">${acct} — Contribution: ${fmt$(acctContrib)}</div>
+      <table class="result-table" style="margin-bottom:8px;">
+        <thead><tr>
+          <th>Asset Class</th><th>Fund</th><th>Alloc %</th><th>$ Amount</th>
+        </tr></thead>
+        <tbody>`;
+    for (const [key, fund, ac] of funds) {
+      const pct = getAllocPct(keys, key);
+      const amt = acctContrib * pct;
+      contribHTML += `<tr>
+        <td>${ac}</td>
+        <td class="muted">${fund}</td>
+        <td>${(pct*100).toFixed(0)}%</td>
+        <td class="pos">${fmt$(amt)}</td>
+      </tr>`;
+    }
+    contribHTML += `</tbody></table>`;
+  }
+  $('contrib-body').innerHTML = contribHTML;
+
+  // ── TRADE INSTRUCTIONS ──
+  const tradeAccts = [
+    { name: '401(k)', funds: [
+      { key: 'fxaix_401k', label: 'FXAIX', ac: 'Large Cap',
+        target: TARGETS['Large Cap'] * projTotal * (lcTotal > 0 ? holdings.fxaix_401k / lcTotal : 0.5),
+        projected: holdings.fxaix_401k + contribs.c401k * getAllocPct(['fxaix_401k'], 'fxaix_401k'),
+        flagged: Math.abs((holdings.fxaix_401k + holdings.fxaix_r401k > 0 ? (holdings.fxaix_401k + holdings.fxaix_r401k) / currentTotal : 0) - TARGETS['Large Cap']) > threshold,
+      }
+    ]},
+    { name: 'Roth 401(k)', funds: [
+      { key: 'fxaix_r401k', label: 'FXAIX', ac: 'Large Cap',
+        target: TARGETS['Large Cap'] * projTotal * (lcTotal > 0 ? holdings.fxaix_r401k / lcTotal : 0.5),
+        projected: holdings.fxaix_r401k + contribs.r401k,
+        flagged: Math.abs((holdings.fxaix_401k + holdings.fxaix_r401k > 0 ? (holdings.fxaix_401k + holdings.fxaix_r401k) / currentTotal : 0) - TARGETS['Large Cap']) > threshold,
+      }
+    ]},
+    { name: 'HSA', funds: [
+      { key: 'fssnx_hsa', label: 'FSSNX', ac: 'Small Cap',
+        target: TARGETS['Small Cap'] * projTotal * (scTotal > 0 ? holdings.fssnx_hsa / scTotal : 0.5),
+        projected: holdings.fssnx_hsa + contribs.hsa * getAllocPct(['fssnx_hsa','bitb_hsa','etha_hsa','iblc_hsa'], 'fssnx_hsa'),
+        flagged: Math.abs((acValues['Small Cap'] > 0 ? acValues['Small Cap'] / currentTotal : 0) - TARGETS['Small Cap']) > threshold,
+      },
+      { key: 'bitb_hsa', label: 'BITB', ac: 'Crypto – BTC',
+        target: TARGETS['Crypto – BTC'] * projTotal,
+        projected: holdings.bitb_hsa + contribs.hsa * getAllocPct(['fssnx_hsa','bitb_hsa','etha_hsa','iblc_hsa'], 'bitb_hsa'),
+        flagged: Math.abs((holdings.bitb_hsa > 0 ? holdings.bitb_hsa / currentTotal : 0) - TARGETS['Crypto – BTC']) > threshold,
+      },
+      { key: 'etha_hsa', label: 'ETHA', ac: 'Crypto – ETH',
+        target: TARGETS['Crypto – ETH'] * projTotal,
+        projected: holdings.etha_hsa + contribs.hsa * getAllocPct(['fssnx_hsa','bitb_hsa','etha_hsa','iblc_hsa'], 'etha_hsa'),
+        flagged: Math.abs((holdings.etha_hsa > 0 ? holdings.etha_hsa / currentTotal : 0) - TARGETS['Crypto – ETH']) > threshold,
+      },
+      { key: 'iblc_hsa', label: 'IBLC', ac: 'Crypto – Infra',
+        target: TARGETS['Crypto – Infra'] * projTotal,
+        projected: holdings.iblc_hsa + contribs.hsa * getAllocPct(['fssnx_hsa','bitb_hsa','etha_hsa','iblc_hsa'], 'iblc_hsa'),
+        flagged: Math.abs((holdings.iblc_hsa > 0 ? holdings.iblc_hsa / currentTotal : 0) - TARGETS['Crypto – Infra']) > threshold,
+      },
+    ]},
+    { name: 'Roth IRA', funds: [
+      { key: 'swssx_ira', label: 'SWSSX', ac: 'Small Cap',
+        target: TARGETS['Small Cap'] * projTotal * (scTotal > 0 ? holdings.swssx_ira / scTotal : 0.5),
+        projected: holdings.swssx_ira + contribs.ira * getAllocPct(['swssx_ira','swisx_ira','vwo_ira'], 'swssx_ira'),
+        flagged: Math.abs((acValues['Small Cap'] > 0 ? acValues['Small Cap'] / currentTotal : 0) - TARGETS['Small Cap']) > threshold,
+      },
+      { key: 'swisx_ira', label: 'SWISX', ac: 'Intl Developed',
+        target: TARGETS['Intl Developed'] * projTotal,
+        projected: holdings.swisx_ira + contribs.ira * getAllocPct(['swssx_ira','swisx_ira','vwo_ira'], 'swisx_ira'),
+        flagged: Math.abs((holdings.swisx_ira > 0 ? holdings.swisx_ira / currentTotal : 0) - TARGETS['Intl Developed']) > threshold,
+      },
+      { key: 'vwo_ira', label: 'VWO', ac: 'Emerging Markets',
+        target: TARGETS['Emerging Markets'] * projTotal,
+        projected: holdings.vwo_ira + contribs.ira * getAllocPct(['swssx_ira','swisx_ira','vwo_ira'], 'vwo_ira'),
+        flagged: Math.abs((holdings.vwo_ira > 0 ? holdings.vwo_ira / currentTotal : 0) - TARGETS['Emerging Markets']) > threshold,
+      },
+    ]},
+  ];
+
+  let tradesHTML = '';
+  for (const acct of tradeAccts) {
+    const trades = acct.funds.map(f => {
+      const raw = f.flagged ? f.target - f.projected : 0;
+      return { ...f, raw };
+    });
+
+    const totalSell = trades.reduce((s, t) => s + Math.min(0, t.raw), 0);
+    const totalBuy  = trades.reduce((s, t) => s + Math.max(0, t.raw), 0);
+    const hasSell = totalSell < -0.01;
+    const hasBuy  = totalBuy  >  0.01;
+    const scale   = hasBuy && hasSell ? Math.min(1, Math.abs(totalSell) / totalBuy) : 1;
+    const executable = hasSell && hasBuy;
+
+    tradesHTML += `<div class="acct-header">${acct.name}</div>
+      <table class="result-table" style="margin-bottom:6px;">
+        <thead><tr>
+          <th>Asset Class</th><th>Fund</th><th>Target $</th><th>Projected $</th><th>Trade Amount</th><th>Action</th>
+        </tr></thead>
+        <tbody>`;
+
+    for (const t of trades) {
+      let execAmt = 0;
+      if (executable) {
+        execAmt = t.raw < 0 ? t.raw : t.raw * scale;
+      }
+      const action = execAmt < -0.01 ? '<span class="tag-sell">SELL</span>'
+                   : execAmt >  0.01 ? '<span class="tag-buy">BUY</span>'
+                   : '<span class="tag-none">—</span>';
+      const amtStr = Math.abs(execAmt) > 0.01
+        ? `<span class="${execAmt > 0 ? 'pos' : 'neg'}">${execAmt > 0 ? '+' : ''}${fmt$(execAmt)}</span>`
+        : '<span class="muted">—</span>';
+      tradesHTML += `<tr>
+        <td>${t.ac}</td>
+        <td class="muted">${t.label}</td>
+        <td>${fmt$(t.target)}</td>
+        <td>${fmt$(t.projected)}</td>
+        <td>${amtStr}</td>
+        <td>${action}</td>
+      </tr>`;
+    }
+
+    tradesHTML += `</tbody></table>`;
+
+    const msgClass = executable ? 'executable' : '';
+    const msg = executable
+      ? 'Trades executable. Execute SELLs first — proceeds fund BUYs within this account.'
+      : !hasSell && !hasBuy
+        ? 'No flagged asset classes — no action needed.'
+        : !hasSell
+          ? 'Nothing to SELL — all flagged funds are underweight. Address via contributions.'
+          : 'No BUY targets — SELL proceeds have nowhere to go. Address via contributions.';
+
+    tradesHTML += `<div class="status-msg ${msgClass}">${msg}</div>`;
+  }
+
+  $('trades-body').innerHTML = tradesHTML;
+
+  // Show results
+  $('results').style.display = 'block';
+  $('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetForm() {
+  ['h_fxaix_401k','h_fxaix_r401k','h_fssnx_hsa','h_bitb_hsa','h_etha_hsa',
+   'h_iblc_hsa','h_swssx_ira','h_swisx_ira','h_vwo_ira',
+   'c_401k','c_r401k','c_hsa','c_ira'].forEach(id => $(id).value = '');
+  $('results').style.display = 'none';
+  // Set today's date
+  const today = new Date().toISOString().split('T')[0];
+  $('asof').value = today;
+}
+
+// Set today's date on load
+window.addEventListener('DOMContentLoaded', () => {
+  const today = new Date().toISOString().split('T')[0];
+  $('asof').value = today;
+});
+</script>
+</body>
+</html>
