@@ -6,42 +6,43 @@
   <title>Financial Dashboard — Cordoba Capital</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
 
     :root {
-      --dark-1: #080e16; --dark-2: #0d1824; --dark-3: #122030; --dark-4: #1a2c3f;
-      --gold: #cfac67; --gold-light: #e0c47a; --gold-dark: #ba995d;
-      --gold-faint: rgba(207,172,103,0.12); --gold-faint2: rgba(207,172,103,0.06);
-      --text-light: #ddd8ce; --text-muted: #a09880; --text-dark: #0f1a24;
-      --green: #4caf7d; --green-faint: rgba(76,175,125,0.14);
-      --red: #e05c5c; --red-faint: rgba(224,92,92,0.14);
-      --blue: #5b9bd5; --orange: #e67e22; --purple: #9b59b6;
-      --btc: #f7931a; --eth: #627eea; --infra: #9b59b6;
-      --border: rgba(207,172,103,0.12);
-      --radius: 10px; --radius-sm: 6px; --radius-lg: 14px;
+      --dark-1: #F6F4F2; --dark-2: #FFFFFF; --dark-3: #F0EDE9; --dark-4: #E8E3DF;
+      --card: #FFFFFF;
+      --gold: #3A7BC8; --gold-light: #5B9BD5; --gold-dark: #2A6AAD;
+      --gold-faint: rgba(58,123,200,0.1); --gold-faint2: rgba(58,123,200,0.05);
+      --text-light: #1A1614; --text-muted: #9B948D; --text-dark: #1A1614;
+      --green: #2E8B5A; --green-faint: rgba(46,139,90,0.1);
+      --red: #C0392B; --red-faint: rgba(192,57,43,0.1);
+      --blue: #6CA2E3; --orange: #E67E22; --purple: #9B59B6;
+      --btc: #F7931A; --eth: #6CA2E3; --infra: #9B59B6;
+      --border: #E0D8D2;
+      --radius: 8px; --radius-sm: 5px; --radius-lg: 10px;
     }
 
     body { font-family: 'Inter', sans-serif; background: var(--dark-1); color: var(--text-light); line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh; }
-    h1,h2,h3,h4 { font-family: 'Playfair Display', serif; line-height: 1.15; }
+    h1,h2,h3,h4 { font-family: 'Playfair Display', serif; line-height: 1.15; letter-spacing: -0.02em; }
     input, select, textarea { font-family: 'Inter', sans-serif; }
 
     /* ── HEADER ── */
-    .site-header { background: var(--dark-2); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
-    .site-header img { height: 32px; }
-    .hd { width: 1px; height: 28px; background: var(--border); margin: 0 4px; }
-    .h-name { font-family: 'Montserrat', sans-serif; font-size: 0.95rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; }
-    .h-sub { font-family: 'Montserrat', sans-serif; font-size: 0.58rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
-    .h-tool { font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+    .site-header { background: #1A1614; border-bottom: none; padding: 14px 28px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
+    .site-header img { height: 32px; filter: brightness(0) invert(1); }
+    .hd { width: 1px; height: 28px; background: rgba(255,255,255,0.15); margin: 0 4px; }
+    .h-name { font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #F6F4F2; }
+    .h-sub { font-family: 'Inter', sans-serif; font-size: 0.58rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); }
+    .h-tool { font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
 
     /* ── TABS ── */
-    .tab-bar { background: var(--dark-2); border-bottom: 1px solid var(--border); display: flex; padding: 0 28px; gap: 4px; }
-    .tab-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 14px 20px; font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); cursor: pointer; transition: color 0.2s, border-color 0.2s; white-space: nowrap; }
-    .tab-btn:hover { color: var(--text-light); }
-    .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+    .tab-bar { background: #252120; border-bottom: none; display: flex; padding: 0 28px; gap: 4px; box-shadow: 0 1px 0 rgba(255,255,255,0.06); }
+    .tab-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 13px 20px; font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.4); cursor: pointer; transition: color 0.2s, border-color 0.2s; white-space: nowrap; }
+    .tab-btn:hover { color: rgba(255,255,255,0.75); }
+    .tab-btn.active { color: #F6F4F2; border-bottom-color: var(--gold); }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
@@ -50,20 +51,20 @@
     .page-sm { max-width: 860px; margin: 0 auto; padding: 36px 24px 80px; }
 
     /* ── CARDS ── */
-    .card { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px 28px; }
+    .card { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
     .card + .card { margin-top: 20px; }
-    .card-title { font-size: 1rem; color: #fff; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-    .step-pill { font-family: 'Montserrat', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; background: var(--gold); color: var(--dark-1); padding: 3px 9px; border-radius: 3px; }
-    .section-label { font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+    .card-title { font-size: 1rem; color: var(--text-light); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    .step-pill { font-family: 'Inter', sans-serif; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; background: var(--gold-faint); color: var(--gold); padding: 3px 10px; border-radius: 20px; border: 1px solid rgba(108,162,227,0.2); }
+    .section-label { font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
 
     /* ── SUMMARY GRID ── */
     .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
     .kpi-section { margin-bottom: 28px; }
     .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 12px; }
     .kpi-row-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
-    .sum-card { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; }
-    .sum-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
-    .sum-value { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; font-weight: 700; color: #fff; }
+    .sum-card { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .sum-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+    .sum-value { font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 600; color: var(--text-light); letter-spacing: -0.02em; line-height: 1.1; }
     .sum-value.gold { color: var(--gold); }
     .sum-value.green { color: var(--green); }
     .sum-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
@@ -74,9 +75,9 @@
     /* ── CHART GRID ── */
     .chart-grid { display: grid; gap: 20px; }
     .chart-grid-2 { grid-template-columns: 1fr 1fr; }
-    .chart-wrap { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px 28px; }
+    .chart-wrap { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
     .chart-wrap.full { grid-column: 1 / -1; }
-    .chart-title { font-size: 0.92rem; font-weight: 600; color: #fff; margin-bottom: 4px; }
+    .chart-title { font-size: 0.92rem; font-weight: 600; color: var(--text-light); margin-bottom: 4px; }
     .chart-sub { font-size: 0.76rem; color: var(--text-muted); margin-bottom: 18px; }
     .chart-canvas-wrap { position: relative; height: 240px; }
     .chart-canvas-wrap.tall { height: 300px; }
@@ -90,8 +91,8 @@
     .acc-header { background: var(--dark-2); padding: 16px 22px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; user-select: none; transition: background 0.2s; }
     .acc-header:hover { background: var(--dark-3); }
     .acc-header.open { border-bottom: 1px solid var(--border); }
-    .acc-title { font-size: 0.88rem; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 10px; }
-    .acc-badge { font-family: 'Montserrat', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; background: var(--gold-faint); color: var(--gold); }
+    .acc-title { font-size: 0.88rem; font-weight: 600; color: var(--text-light); display: flex; align-items: center; gap: 10px; }
+    .acc-badge { font-family: 'Inter', sans-serif; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 8px; border-radius: 20px; background: var(--gold-faint); color: var(--gold); border: 1px solid rgba(108,162,227,0.2); }
     .acc-arrow { color: var(--text-muted); font-size: 0.8rem; transition: transform 0.2s; }
     .acc-header.open .acc-arrow { transform: rotate(180deg); }
     .sub-toggle-icon { display:inline-block; transition:transform 0.2s; margin-right:5px; font-size:0.55rem; vertical-align:middle; }
@@ -103,22 +104,22 @@
     .input-table { width: 100%; border-collapse: collapse; }
     .input-table thead th { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); text-align: left; padding: 0 10px 10px; border-bottom: 1px solid var(--border); }
     .input-table thead th.right { text-align: right; }
-    .input-table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .input-table tbody tr { border-bottom: 1px solid rgba(0,0,0,0.05); }
     .input-table tbody tr:last-child { border-bottom: none; }
     .input-table tbody td { padding: 9px 10px; font-size: 0.88rem; vertical-align: middle; }
     .input-table tbody td.muted { color: var(--text-muted); font-size: 0.8rem; }
     .input-table tbody td.right { text-align: right; }
-    .acct-tag { display: inline-block; font-size: 0.67rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; background: var(--gold-faint); color: var(--gold); }
+    .acct-tag { display: inline-block; font-size: 0.67rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 7px; border-radius: 20px; background: var(--gold-faint); color: var(--gold); border: 1px solid rgba(108,162,227,0.2); }
 
     input[type="number"], input[type="text"], input[type="date"], select {
-      background: var(--dark-4); border: 1px solid rgba(207,172,103,0.2); border-radius: var(--radius-sm);
-      color: #ddd8ce; font-size: 0.85rem; padding: 7px 10px;
+      background: var(--dark-4); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      color: var(--text-light); font-size: 0.85rem; padding: 7px 10px;
       transition: border-color 0.2s; width: 100%;
     }
     input[type="number"] { text-align: right; -moz-appearance: textfield; width: 140px; }
     input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
-    input[type="number"]:focus, input[type="text"]:focus, input[type="date"]:focus, select:focus { outline: none; border-color: var(--gold); background: #1f3048; }
-    input[type="date"] { color-scheme: dark; width: 160px; }
+    input[type="number"]:focus, input[type="text"]:focus, input[type="date"]:focus, select:focus { outline: none; border-color: var(--gold); background: #FFFFFF; }
+    input[type="date"] { width: 160px; }
 
     /* Money inputs */
     .money-input { text-align: right; width: 140px; }
@@ -135,33 +136,33 @@
     .field-group { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; align-items: stretch; }
     .field-group-3 { grid-template-columns: 1fr 1fr 1fr; }
     .field { display: flex; flex-direction: column; justify-content: space-between; gap: 5px; }
-    .field label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .field label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
 
     .sub-section { margin-bottom: 20px; }
     .sub-section-title { font-size: 0.76rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
 
-    .blended-display { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; margin-top: 14px; display: flex; align-items: center; justify-content: space-between; }
+    .blended-display { background: var(--dark-3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; margin-top: 14px; display: flex; align-items: center; justify-content: space-between; }
     .blended-label { font-size: 0.74rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
-    .blended-value { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--gold); }
+    .blended-value { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--gold); }
 
     .comp-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
     .comp-row label { font-size: 0.65rem; color: var(--text-muted); display: block; margin-bottom: 3px; }
 
     /* ── BUTTONS ── */
-    .btn-primary { display: block; width: 100%; padding: 15px; background: var(--gold); color: var(--dark-1); font-family: 'Montserrat', sans-serif; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; border: none; border-radius: var(--radius); cursor: pointer; transition: background 0.2s; }
-    .btn-primary:hover { background: var(--gold-light); }
+    .btn-primary { display: block; width: 100%; padding: 15px; background: #1A1614; color: #F6F4F2; font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border: none; border-radius: 9999px; cursor: pointer; transition: background 0.2s; }
+    .btn-primary:hover { background: #2d2926; }
     .btn-secondary { display: inline-block; padding: 9px 18px; background: transparent; color: var(--text-muted); font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: color 0.2s, border-color 0.2s; }
-    .btn-secondary:hover { color: var(--text-light); border-color: rgba(207,172,103,0.3); }
-    .btn-gold-outline { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: transparent; color: var(--gold); font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 600; border: 1px solid rgba(207,172,103,0.3); border-radius: var(--radius-sm); cursor: pointer; transition: background 0.2s; }
+    .btn-secondary:hover { color: var(--text-light); border-color: rgba(108,162,227,0.4); }
+    .btn-gold-outline { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: transparent; color: var(--gold); font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 600; border: 1px solid rgba(108,162,227,0.3); border-radius: var(--radius-sm); cursor: pointer; transition: background 0.2s; }
     .btn-gold-outline:hover { background: var(--gold-faint); }
-    .btn-danger { display: inline-block; padding: 7px 14px; background: var(--red-faint); color: var(--red); font-size: 0.72rem; font-weight: 600; border: 1px solid rgba(224,92,92,0.2); border-radius: var(--radius-sm); cursor: pointer; transition: background 0.2s; }
-    .btn-danger:hover { background: rgba(224,92,92,0.25); }
+    .btn-danger { display: inline-block; padding: 7px 14px; background: var(--red-faint); color: var(--red); font-size: 0.72rem; font-weight: 600; border: 1px solid rgba(192,57,43,0.2); border-radius: var(--radius-sm); cursor: pointer; transition: background 0.2s; }
+    .btn-danger:hover { background: rgba(192,57,43,0.18); }
 
     /* ── STATUS ── */
-    .badge-ok { display: inline-block; padding: 2px 9px; border-radius: 3px; background: var(--green-faint); color: var(--green); font-size: 0.72rem; font-weight: 600; }
-    .badge-flag { display: inline-block; padding: 2px 9px; border-radius: 3px; background: var(--red-faint); color: var(--red); font-size: 0.72rem; font-weight: 600; }
-    .badge-buy { display: inline-block; padding: 2px 9px; border-radius: 3px; background: var(--green-faint); color: var(--green); font-size: 0.72rem; font-weight: 600; }
-    .badge-sell { display: inline-block; padding: 2px 9px; border-radius: 3px; background: var(--red-faint); color: var(--red); font-size: 0.72rem; font-weight: 600; }
+    .badge-ok { display: inline-block; padding: 2px 9px; border-radius: 20px; background: var(--green-faint); color: var(--green); font-size: 0.72rem; font-weight: 600; }
+    .badge-flag { display: inline-block; padding: 2px 9px; border-radius: 20px; background: var(--red-faint); color: var(--red); font-size: 0.72rem; font-weight: 600; }
+    .badge-buy { display: inline-block; padding: 2px 9px; border-radius: 20px; background: var(--green-faint); color: var(--green); font-size: 0.72rem; font-weight: 600; }
+    .badge-sell { display: inline-block; padding: 2px 9px; border-radius: 20px; background: var(--red-faint); color: var(--red); font-size: 0.72rem; font-weight: 600; }
     .pos { color: var(--green); } .neg { color: var(--red); } .muted { color: var(--text-muted); }
     .gold { color: var(--gold); } .green { color: var(--green); }
 
@@ -169,17 +170,17 @@
     .history-grid { display: grid; gap: 16px; }
     .hist-card { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; }
     .hist-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-    .hist-q { font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+    .hist-q { font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); }
     .hist-date { font-size: 0.72rem; color: var(--text-muted); }
     .hist-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
     .hist-m { }
     .hist-m-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; }
-    .hist-m-val { font-family: 'Montserrat', sans-serif; font-size: 1.02rem; font-weight: 700; color: #fff; }
+    .hist-m-val { font-family: 'Inter', sans-serif; font-size: 1.02rem; font-weight: 700; color: var(--text-light); }
 
     /* ── EMPTY STATE ── */
     .empty-state { text-align: center; padding: 60px 24px; }
     .empty-icon { font-size: 3rem; margin-bottom: 16px; }
-    .empty-title { font-size: 1.3rem; color: #fff; margin-bottom: 8px; }
+    .empty-title { font-size: 1.3rem; color: var(--text-light); margin-bottom: 8px; }
     .empty-sub { font-size: 0.85rem; color: var(--text-muted); max-width: 400px; margin: 0 auto 24px; }
 
     /* ── FI PROGRESS ── */
@@ -195,81 +196,81 @@
     .note { font-size: 0.72rem; color: var(--text-muted); font-style: italic; margin-top: 10px; }
 
     /* ── METRIC TOOLTIP ── */
-    .metric-tip { position: relative; display: inline-block; cursor: help; border-bottom: 1px dashed rgba(207,172,103,0.4); }
+    .metric-tip { position: relative; display: inline-block; cursor: help; border-bottom: 1px dashed rgba(108,162,227,0.4); }
     .metric-tip .tip-box {
       visibility: hidden; opacity: 0;
       position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
-      background: var(--dark-4); border: 1px solid rgba(207,172,103,0.25);
+      background: var(--dark-2); border: 1px solid var(--border);
       border-radius: var(--radius-sm); padding: 10px 13px;
       width: 260px; font-size: 0.72rem; font-weight: 400; letter-spacing: 0;
       text-transform: none; color: var(--text-light); line-height: 1.55;
       text-align: left;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.5); z-index: 200;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1); z-index: 200;
       pointer-events: none; transition: opacity 0.15s;
     }
     .metric-tip .tip-box::after {
       content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-      border: 5px solid transparent; border-top-color: rgba(207,172,103,0.25);
+      border: 5px solid transparent; border-top-color: var(--border);
     }
     .metric-tip:hover .tip-box { visibility: visible; opacity: 1; }
-    .tip-label { font-family: 'Montserrat', sans-serif; font-size: 0.62rem; font-weight: 700;
+    .tip-label { font-family: 'Inter', sans-serif; font-size: 0.62rem; font-weight: 700;
       letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 5px; }
     .tip-formula { color: var(--text-muted); margin-bottom: 5px; font-style: italic; }
     .tip-why { color: var(--text-light); }
-    .info-box { background: var(--gold-faint2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 20px; }
+    .info-box { background: var(--gold-faint2); border: 1px solid rgba(108,162,227,0.15); border-radius: var(--radius-sm); padding: 12px 16px; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 20px; }
     .info-box strong { color: var(--gold); font-weight: 600; }
 
     /* ── RESULT SECTION ── */
     #review-results { display: none; margin-top: 32px; }
     .result-card { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px 28px; margin-bottom: 20px; }
-    .result-title { font-size: 0.95rem; color: #fff; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+    .result-title { font-size: 0.95rem; color: var(--text-light); margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
     .result-table { width: 100%; border-collapse: collapse; }
     .result-table thead th { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); text-align: left; padding: 0 10px 10px; border-bottom: 1px solid var(--border); }
     .result-table thead th.right { text-align: right; }
-    .result-table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .result-table tbody tr { border-bottom: 1px solid rgba(0,0,0,0.05); }
     .result-table tbody tr:last-child { border-bottom: none; }
     .result-table tbody td { padding: 9px 10px; font-size: 0.83rem; vertical-align: middle; }
     .result-table tbody td.right { text-align: right; }
-    .acct-divider-row td { padding: 12px 10px 6px; font-family: 'Montserrat', sans-serif; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); border-top: 1px solid var(--border); }
-    .status-msg { font-size: 0.75rem; color: var(--text-muted); font-style: italic; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); margin-top: 8px; }
+    .acct-divider-row td { padding: 12px 10px 6px; font-family: 'Inter', sans-serif; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); border-top: 1px solid var(--border); }
+    .status-msg { font-size: 0.75rem; color: var(--text-muted); font-style: italic; padding: 8px 12px; background: rgba(0,0,0,0.03); border-radius: var(--radius-sm); margin-top: 8px; }
     .status-msg.exec { color: var(--green); background: var(--green-faint); font-style: normal; font-weight: 500; }
 
     /* ── EXPANDABLE KPI TILES ── */
     .sum-card { position: relative; }
     .sum-card.has-detail { cursor: pointer; transition: border-color 0.2s; }
-    .sum-card.has-detail:hover { border-color: rgba(207,172,103,0.28); }
+    .sum-card.has-detail:hover { border-color: rgba(108,162,227,0.4); }
     .card-expand-icon { position: absolute; top: 12px; right: 14px; font-size: 0.78rem; color: var(--text-muted); line-height: 1; transition: color 0.2s, transform 0.2s; user-select: none; }
     .sum-card.has-detail:hover .card-expand-icon { color: var(--gold); }
     .card-detail { display: none; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
     .card-detail.open { display: block; }
-    .card-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .card-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
     .card-detail-row:last-child { border-bottom: none; }
     .card-detail-row.sm { padding: 4px 0; }
     .card-detail-label { font-size: 0.76rem; color: var(--text-muted); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 8px; }
-    .card-detail-val { font-size: 0.79rem; font-weight: 600; color: #fff; font-family: 'Montserrat', sans-serif; text-align: right; flex-shrink: 0; white-space: nowrap; }
+    .card-detail-val { font-size: 0.79rem; font-weight: 600; color: var(--text-light); font-family: 'Inter', sans-serif; text-align: right; flex-shrink: 0; white-space: nowrap; }
     .card-detail-val.pos { color: var(--green); }
     .card-detail-val.neg { color: var(--red); }
     .card-detail-val.gold { color: var(--gold); }
-    .card-detail-total { display: flex; justify-content: space-between; align-items: center; padding-top: 8px; margin-top: 4px; border-top: 1px solid rgba(207,172,103,0.2); }
+    .card-detail-total { display: flex; justify-content: space-between; align-items: center; padding-top: 8px; margin-top: 4px; border-top: 1px solid rgba(108,162,227,0.2); }
     .card-detail-total-label { font-size: 0.75rem; font-weight: 700; color: var(--gold); }
-    .card-detail-total-val { font-size: 0.82rem; font-weight: 700; color: var(--gold); font-family: 'Montserrat', sans-serif; }
-    .card-detail-section { font-family: 'Montserrat', sans-serif; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); padding: 20px 0 4px; }
+    .card-detail-total-val { font-size: 0.82rem; font-weight: 700; color: var(--gold); font-family: 'Inter', sans-serif; }
+    .card-detail-section { font-family: 'Inter', sans-serif; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); padding: 20px 0 4px; }
 
     /* ── GOAL TRACKER ── */
     .goal-year { margin-bottom: 28px; }
-    .goal-year-label { font-family: 'Montserrat', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+    .goal-year-label { font-family: 'Inter', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
     .goal-list { display: flex; flex-direction: column; gap: 10px; }
     .goal-item { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; align-items: flex-start; gap: 14px; transition: border-color 0.2s; }
-    .goal-item:hover { border-color: rgba(207,172,103,0.28); }
+    .goal-item:hover { border-color: rgba(108,162,227,0.4); }
     .goal-status { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; margin-top: 1px; }
     .goal-status.complete { background: var(--green); border-color: var(--green); color: #fff; }
     .goal-status.active { background: var(--gold-faint); border-color: var(--gold); color: var(--gold); }
-    .goal-status.pending { background: transparent; border-color: rgba(255,255,255,0.15); color: transparent; }
-    .goal-status.decision { background: rgba(91,155,213,0.15); border-color: #5b9bd5; color: #5b9bd5; }
+    .goal-status.pending { background: transparent; border-color: rgba(0,0,0,0.15); color: transparent; }
+    .goal-status.decision { background: rgba(108,162,227,0.1); border-color: #6CA2E3; color: #6CA2E3; }
     .goal-body { flex: 1; min-width: 0; }
-    .goal-title { font-size: 0.88rem; font-weight: 600; color: #fff; margin-bottom: 3px; }
+    .goal-title { font-size: 0.88rem; font-weight: 600; color: var(--text-light); margin-bottom: 3px; }
     .goal-meta { font-size: 0.74rem; color: var(--text-muted); }
-    .goal-date { font-family: 'Montserrat', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; color: var(--text-muted); flex-shrink: 0; margin-top: 3px; }
+    .goal-date { font-family: 'Inter', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; color: var(--text-muted); flex-shrink: 0; margin-top: 3px; }
     .goal-item.complete-item { opacity: 0.6; }
     .goal-item.complete-item .goal-title { text-decoration: line-through; color: var(--text-muted); }
 
@@ -352,9 +353,9 @@
   <div style="flex:1;"></div>
   <div style="position:relative;display:flex;align-items:center;" id="data-menu-wrap">
     <button class="tab-btn" onclick="toggleDataMenu(event)" style="color:var(--gold);border-bottom:none;">Import/Export Data ▾</button>
-    <div id="data-menu" style="display:none;position:absolute;top:100%;right:0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);min-width:140px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
-      <div onclick="exportData();closeDataMenu()" style="padding:10px 16px;font-size:0.8rem;color:var(--text-light);cursor:pointer;border-bottom:1px solid var(--border);" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background=''">⬇ Export Data</div>
-      <div onclick="document.getElementById('import-file').click();closeDataMenu()" style="padding:10px 16px;font-size:0.8rem;color:var(--text-light);cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background=''">⬆ Import Data</div>
+    <div id="data-menu" style="display:none;position:absolute;top:100%;right:0;background:#2a2522;border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-sm);min-width:140px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,0.3);">
+      <div onclick="exportData();closeDataMenu()" style="padding:10px 16px;font-size:0.8rem;color:rgba(255,255,255,0.8);cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.08);" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background=''">⬇ Export Data</div>
+      <div onclick="document.getElementById('import-file').click();closeDataMenu()" style="padding:10px 16px;font-size:0.8rem;color:rgba(255,255,255,0.8);cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background=''">⬆ Import Data</div>
     </div>
     <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)">
   </div>
@@ -495,7 +496,7 @@
           <div style="width:8px;height:8px;border-radius:50%;background:#5b9bd5;flex-shrink:0;"></div> Decision
         </div>
         <div style="display:flex;align-items:center;gap:5px;font-size:0.68rem;color:var(--text-muted);">
-          <div style="width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15);flex-shrink:0;"></div> Pending
+          <div style="width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,0.12);flex-shrink:0;"></div> Pending
         </div>
       </div>
 
@@ -508,7 +509,7 @@
             <path d="M0,0 L0,6 L8,3 z" fill="#5b9bd5" opacity="0.6"/>
           </marker>
           <marker id="arrow-gray" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L8,3 z" fill="rgba(255,255,255,0.2)"/>
+            <path d="M0,0 L0,6 L8,3 z" fill="rgba(0,0,0,0.15)"/>
           </marker>
           <marker id="arrow-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
             <path d="M0,0 L0,6 L8,3 z" fill="#4caf7d" opacity="0.7"/>
@@ -519,7 +520,7 @@
         <!-- Start → Build Cash Reserve -->
         <line x1="36" y1="240" x2="101" y2="240" stroke="#cfac67" stroke-width="2" marker-end="url(#arrow-gold)"/>
         <!-- Build Cash Reserve → Revenue? -->
-        <line x1="129" y1="240" x2="201" y2="240" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
+        <line x1="129" y1="240" x2="201" y2="240" stroke="rgba(0,0,0,0.2)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
 
         <!-- ── FORK from Revenue? ── -->
         <!-- Upper (Yes → Hold) -->
@@ -529,24 +530,24 @@
 
         <!-- ── UPPER PATH (Hold) ── -->
         <!-- Bradcliff → Refi Lump Sum -->
-        <line x1="324" y1="185" x2="401" y2="185" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
+        <line x1="324" y1="185" x2="401" y2="185" stroke="rgba(0,0,0,0.2)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
         <!-- Refi Lump Sum → Holladay -->
-        <line x1="429" y1="185" x2="506" y2="185" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
+        <line x1="429" y1="185" x2="506" y2="185" stroke="rgba(0,0,0,0.2)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
         <!-- Holladay → Refi Broken Bow -->
-        <line x1="534" y1="185" x2="616" y2="185" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
+        <line x1="534" y1="185" x2="616" y2="185" stroke="rgba(0,0,0,0.2)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
         <!-- Refi Broken Bow → Secondary Paydown (curve down to spine) -->
         <path d="M 644,185 Q 687,185 726,240" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
 
         <!-- ── LOWER PATH (Sell) ── -->
         <!-- 1031 Exchange → Pay off Bradcliff -->
-        <line x1="324" y1="305" x2="401" y2="305" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
+        <line x1="324" y1="305" x2="401" y2="305" stroke="rgba(0,0,0,0.2)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
         <!-- Pay off Bradcliff → Holladay -->
-        <line x1="429" y1="305" x2="506" y2="305" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
+        <line x1="429" y1="305" x2="506" y2="305" stroke="rgba(0,0,0,0.2)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
         <!-- Holladay → Secondary Paydown (curve up to spine) -->
         <path d="M 534,305 C 620,305 690,240 726,240" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
 
         <!-- Secondary Paydown → FI -->
-        <line x1="754" y1="240" x2="821" y2="240" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
+        <line x1="754" y1="240" x2="821" y2="240" stroke="rgba(0,0,0,0.2)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
 
         <!-- ── NODES ── -->
 
@@ -563,7 +564,7 @@
         <text x="115" y="265" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif" font-weight="600">Apr–Oct 2026</text>
 
         <!-- Revenue ≥$90K? (decision fork) -->
-        <circle cx="215" cy="240" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+        <circle cx="215" cy="240" r="14" fill="#FFFFFF" stroke="rgba(0,0,0,0.2)" stroke-width="2"/>
         <text x="215" y="244" text-anchor="middle" fill="#a09880" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">?</text>
         <text x="215" y="210" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Broken Bow</text>
         <text x="215" y="220" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Revenue ≥$90K?</text>
@@ -574,55 +575,55 @@
         <text x="258" y="320" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif" font-weight="600" font-style="italic" font-weight="700">No → Sell</text>
 
         <!-- UPPER: Pay off Bradcliff -->
-        <circle cx="310" cy="185" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <circle cx="310" cy="185" r="14" fill="#FFFFFF" stroke="rgba(0,0,0,0.2)" stroke-width="1.5"/>
         <text x="310" y="189" text-anchor="middle" fill="#a09880" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">$</text>
         <text x="310" y="153" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Pay Off</text>
         <text x="310" y="164" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Bradcliff</text>
         <text x="310" y="210" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif" font-weight="600">Dec 2026</text>
 
         <!-- UPPER: Build Refi Lump Sum -->
-        <circle cx="415" cy="185" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <circle cx="415" cy="185" r="14" fill="#FFFFFF" stroke="rgba(0,0,0,0.2)" stroke-width="1.5"/>
         <text x="415" y="189" text-anchor="middle" fill="#a09880" font-size="9" font-family="Montserrat,sans-serif" font-weight="700">💰</text>
         <text x="415" y="153" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Build Lump Sum</text>
         <text x="415" y="164" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Broken Bow Refi</text>
         <text x="415" y="210" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif" font-weight="600">2027</text>
 
         <!-- UPPER: Holladay Decision -->
-        <circle cx="520" cy="185" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <circle cx="520" cy="185" r="14" fill="#FFFFFF" stroke="rgba(0,0,0,0.2)" stroke-width="1.5"/>
         <text x="520" y="189" text-anchor="middle" fill="#a09880" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">?</text>
         <text x="520" y="153" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Holladay:</text>
         <text x="520" y="164" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Sell or Hold?</text>
         <text x="520" y="210" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif" font-weight="600">Aug 2027</text>
 
         <!-- UPPER: Refinance Broken Bow -->
-        <circle cx="630" cy="185" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <circle cx="630" cy="185" r="14" fill="#FFFFFF" stroke="rgba(0,0,0,0.2)" stroke-width="1.5"/>
         <text x="630" y="189" text-anchor="middle" fill="#a09880" font-size="9" font-family="Montserrat,sans-serif" font-weight="700">%</text>
         <text x="630" y="153" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Refinance</text>
         <text x="630" y="164" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Broken Bow</text>
         <text x="630" y="210" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif" font-weight="600">Dec 2027</text>
 
         <!-- Secondary Paydown (convergence node on spine) -->
-        <circle cx="740" cy="240" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <circle cx="740" cy="240" r="14" fill="#FFFFFF" stroke="rgba(0,0,0,0.2)" stroke-width="1.5"/>
         <text x="740" y="244" text-anchor="middle" fill="#a09880" font-size="8" font-family="Montserrat,sans-serif" font-weight="700">20%</text>
         <text x="740" y="208" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Broken Bow</text>
         <text x="740" y="220" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Secondary Paydown</text>
         <text x="740" y="265" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif" font-weight="600">Dec 2028</text>
 
         <!-- LOWER: 1031 Exchange -->
-        <circle cx="310" cy="305" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <circle cx="310" cy="305" r="14" fill="#FFFFFF" stroke="rgba(0,0,0,0.2)" stroke-width="1.5"/>
         <text x="310" y="309" text-anchor="middle" fill="#a09880" font-size="9" font-family="Montserrat,sans-serif" font-weight="700">→</text>
         <text x="310" y="269" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">1031 Exchange</text>
         <text x="310" y="281" text-anchor="middle" fill="#ddd8ce" font-size="8" font-family="Inter,sans-serif">Into $491,000</text>
 
         <!-- LOWER: Pay off Bradcliff -->
-        <circle cx="415" cy="305" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <circle cx="415" cy="305" r="14" fill="#FFFFFF" stroke="rgba(0,0,0,0.2)" stroke-width="1.5"/>
         <text x="415" y="309" text-anchor="middle" fill="#a09880" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">$</text>
         <text x="415" y="269" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Pay Off</text>
         <text x="415" y="281" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Bradcliff</text>
         <text x="415" y="333" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif" font-weight="600">~May 2027</text>
 
         <!-- LOWER: Holladay Decision -->
-        <circle cx="520" cy="305" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <circle cx="520" cy="305" r="14" fill="#FFFFFF" stroke="rgba(0,0,0,0.2)" stroke-width="1.5"/>
         <text x="520" y="309" text-anchor="middle" fill="#a09880" font-size="11" font-family="Montserrat,sans-serif" font-weight="700">?</text>
         <text x="520" y="269" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Holladay:</text>
         <text x="520" y="281" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Sell or Hold?</text>
@@ -634,7 +635,7 @@
 
         <!-- UPPER: Holladay sell fork → 1031 Exchange → Refinance Broken Bow -->
         <path d="M 524,172 Q 555,135 578,116" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
-        <circle cx="590" cy="108" r="12" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <circle cx="590" cy="108" r="12" fill="#FFFFFF" stroke="rgba(0,0,0,0.2)" stroke-width="1.5"/>
         <text x="590" y="112" text-anchor="middle" fill="#a09880" font-size="9" font-family="Montserrat,sans-serif" font-weight="700">→</text>
         <text x="590" y="76" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">1031 Exchange</text>
         <text x="590" y="88" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif" font-weight="600">If Holladay Sold</text>
@@ -647,7 +648,7 @@
 
         <!-- LOWER: Holladay sell fork → 1031 Exchange → Secondary Paydown -->
         <path d="M 524,318 Q 555,345 578,364" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
-        <circle cx="590" cy="376" r="12" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <circle cx="590" cy="376" r="12" fill="#FFFFFF" stroke="rgba(0,0,0,0.2)" stroke-width="1.5"/>
         <text x="590" y="380" text-anchor="middle" fill="#a09880" font-size="9" font-family="Montserrat,sans-serif" font-weight="700">→</text>
         <text x="590" y="347" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">1031 Exchange</text>
         <text x="590" y="359" text-anchor="middle" fill="#a09880" font-size="8" font-family="Inter,sans-serif" font-weight="600">If Holladay Sold</text>
@@ -655,7 +656,7 @@
         <path d="M 602,376 C 690,376 720,275 726,254" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-gray)"/>
 
         <!-- FI Target -->
-        <circle cx="835" cy="240" r="14" fill="#0d1824" stroke="rgba(255,255,255,0.25)" stroke-width="2.5"/>
+        <circle cx="835" cy="240" r="14" fill="#FFFFFF" stroke="rgba(0,0,0,0.2)" stroke-width="2.5"/>
         <text x="835" y="244" text-anchor="middle" fill="#a09880" font-size="10" font-family="Montserrat,sans-serif" font-weight="700">FI</text>
         <text x="835" y="212" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">$115K</text>
         <text x="835" y="222" text-anchor="middle" fill="#ddd8ce" font-size="9" font-family="Inter,sans-serif" font-weight="600">Target</text>
@@ -774,52 +775,52 @@
               </tr>
             </thead>
             <tbody>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:6px 8px;color:var(--text-muted);">W-2 discretionary</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$10,305</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$92,745</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:6px 8px;color:var(--text-muted);">Bradcliff Cash Flow (pre-payoff)</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$184</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$1,656</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:6px 8px;color:var(--text-muted);">Neely Cash Flow</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$586</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$5,274</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:6px 8px;color:var(--text-muted);">Greenmount Cash Flow</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$919</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$8,271</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:6px 8px;color:var(--text-muted);">Holladay Cash Flow</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$375</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$3,375</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:6px 8px;color:var(--text-muted);">Broken Bow Cash Flow — Apr–Jun ($67.5K revenue)</td>
                 <td style="padding:6px 8px;text-align:right;color:#e57373;">−$4,008</td>
                 <td style="padding:6px 8px;text-align:right;color:#e57373;">−$12,024</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.08);">
                 <td style="padding:6px 8px;color:var(--text-muted);">Broken Bow Cash Flow — Jul–Dec ($90K revenue)</td>
                 <td style="padding:6px 8px;text-align:right;color:#e57373;">−$2,414</td>
                 <td style="padding:6px 8px;text-align:right;color:#e57373;">−$14,484</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);background:rgba(0,0,0,0.02);">
                 <td style="padding:6px 8px;font-weight:600;color:#ddd8ce;">Cash Flow subtotal (9 months)</td>
                 <td style="padding:6px 8px;text-align:right;color:var(--text-muted);">—</td>
                 <td style="padding:6px 8px;text-align:right;font-weight:600;color:#ddd8ce;">$84,813</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:6px 8px;color:var(--text-muted);">2025 Tax Refund</td>
                 <td style="padding:6px 8px;text-align:right;color:var(--text-muted);">—</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">~$39,200</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.08);">
                 <td style="padding:6px 8px;color:var(--text-muted);">Bradcliff payoff</td>
                 <td style="padding:6px 8px;text-align:right;color:var(--text-muted);">—</td>
                 <td style="padding:6px 8px;text-align:right;color:#e57373;">−$110,080</td>
@@ -848,32 +849,32 @@
               </tr>
             </thead>
             <tbody>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:6px 8px;color:var(--text-muted);">W-2 discretionary</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$10,305</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$123,660</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:6px 8px;color:var(--text-muted);">Bradcliff Cash Flow (post-payoff)</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$938</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$11,256</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:6px 8px;color:var(--text-muted);">Neely Cash Flow</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$586</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$7,032</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:6px 8px;color:var(--text-muted);">Greenmount Cash Flow</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$919</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$11,028</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:6px 8px;color:var(--text-muted);">Holladay Cash Flow</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$375</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$4,500</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.08);">
                 <td style="padding:6px 8px;color:var(--text-muted);">Broken Bow Cash Flow ($90K revenue)</td>
                 <td style="padding:6px 8px;text-align:right;color:#e57373;">−$2,414</td>
                 <td style="padding:6px 8px;text-align:right;color:#e57373;">−$28,968</td>
@@ -894,15 +895,15 @@
           <div id="refi-fulllump-body">
           <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
             <tbody>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:6px 8px;color:var(--text-muted);">Muni bonds (mature Dec 2027)</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$127,556</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:6px 8px;color:var(--text-muted);">2026 savings</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$13,933</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.08);">
                 <td style="padding:6px 8px;color:var(--text-muted);">2027 savings</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$128,508</td>
               </tr>
@@ -910,7 +911,7 @@
                 <td style="padding:6px 8px;font-weight:600;color:#ddd8ce;">Total available</td>
                 <td style="padding:6px 8px;text-align:right;font-weight:700;color:#4caf7d;">$270,997</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:6px 8px;color:var(--text-muted);">Target</td>
                 <td style="padding:6px 8px;text-align:right;color:#ddd8ce;">$225K</td>
               </tr>
@@ -1003,7 +1004,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:7px 8px;color:#ddd8ce;">Sell now, no 1031 exchange</td>
                 <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$46,498</td>
                 <td style="padding:7px 8px;text-align:right;color:#e57373;">$79,415</td>
@@ -1011,7 +1012,7 @@
                 <td style="padding:7px 8px;text-align:right;color:var(--text-muted);">—</td>
                 <td style="padding:7px 8px;text-align:right;font-weight:700;color:#ddd8ce;">$125,913</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:7px 8px;color:#ddd8ce;">Sell December 2027, no 1031 exchange</td>
                 <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$13,349</td>
                 <td style="padding:7px 8px;text-align:right;color:#e57373;">$102,975</td>
@@ -1027,7 +1028,7 @@
                 <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$132,570*</td>
                 <td style="padding:7px 8px;text-align:right;font-weight:700;color:var(--gold);">$179,068*</td>
               </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
                 <td style="padding:7px 8px;color:#ddd8ce;">Sell December 2027, 1031 exchange into $491,000</td>
                 <td style="padding:7px 8px;text-align:right;color:#ddd8ce;">$13,349</td>
                 <td style="padding:7px 8px;text-align:right;color:#4caf7d;">$0 deferred**</td>
@@ -1761,10 +1762,10 @@ const AC_FUNDS = {
 const DRIFT_THRESHOLD = 0.05;
 
 const C = {
-  gold:'#cfac67', green:'#4caf7d', red:'#e05c5c', blue:'#5b9bd5',
+  gold:'#3A7BC8', green:'#2E8B5A', red:'#C0392B', blue:'#3A7BC8',
   orange:'#e67e22', purple:'#9b59b6', teal:'#1abc9c',
-  largecap:'#c9a84c', smallcap:'#2a5f8f', intl:'#2d6b4a',
-  em:'#c4622a', btc:'#5c4b8a', eth:'#7a8fa6', infra:'#2a7f7f',
+  largecap:'#5B8FCC', smallcap:'#3A7BC8', intl:'#4A9B7A',
+  em:'#E07B3A', btc:'#9B59B6', eth:'#6CA2E3', infra:'#3A9E8A',
 };
 
 // ── UTILITIES ──────────────────────────────────────────────────────────────
@@ -3521,10 +3522,10 @@ function renderDashboard() {
   const chartDefaults = {
     responsive: true, maintainAspectRatio: false,
     interaction: { mode: 'nearest', intersect: false },
-    plugins: { legend: { labels: { color:'#7a7060', font:{size:11}, boxWidth:12 } } },
+    plugins: { legend: { labels: { color:'#9B948D', font:{size:11}, boxWidth:12 } } },
     scales: {
-      x: { grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#7a7060',font:{size:10},maxTicksLimit:8} },
-      y: { grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#7a7060',font:{size:10},callback:v=>fmt$(v)} },
+      x: { grid:{color:'rgba(0,0,0,0.06)'}, ticks:{color:'#9B948D',font:{size:10},maxTicksLimit:8} },
+      y: { grid:{color:'rgba(0,0,0,0.06)'}, ticks:{color:'#9B948D',font:{size:10},callback:v=>fmt$(v)} },
     },
   };
 
@@ -3536,8 +3537,8 @@ function renderDashboard() {
     data: {
       labels: [...labels, ...portProjLabels.slice(1)],
       datasets: [
-        { label:'Portfolio Value', data:[...portData,...Array(portProjLabels.length-1).fill(null)], borderColor:C.gold, backgroundColor:'rgba(207,172,103,0.1)', fill:true, tension:0.3, pointRadius:4, pointBackgroundColor:C.gold },
-        { label:'Projected (10%/yr)', data:[...Array(labels.length-1).fill(null), portData[portData.length-1], ...portProj.slice(1)], borderColor:'rgba(207,172,103,0.5)', borderDash:[6,4], backgroundColor:'transparent', tension:0.3, pointRadius:0 },
+        { label:'Portfolio Value', data:[...portData,...Array(portProjLabels.length-1).fill(null)], borderColor:C.gold, backgroundColor:'rgba(58,123,200,0.08)', fill:true, tension:0.3, pointRadius:4, pointBackgroundColor:C.gold },
+        { label:'Projected (10%/yr)', data:[...Array(labels.length-1).fill(null), portData[portData.length-1], ...portProj.slice(1)], borderColor:'rgba(58,123,200,0.5)', borderDash:[6,4], backgroundColor:'transparent', tension:0.3, pointRadius:0 },
         { label:`FI Milestone (${FI_TARGET_YEAR})`, data:[...labels,...portProjLabels.slice(1)].map(l=>l===`Q4 ${FI_TARGET_YEAR}`?portProj[Math.round((FI_TARGET_YEAR-curYear)*4)]:null), borderColor:C.green, borderDash:[3,3], pointRadius:8, pointBackgroundColor:C.green, pointStyle:'triangle', showLine:false },
       ],
     },
@@ -3549,8 +3550,8 @@ function renderDashboard() {
     data: {
       labels: [...labels, ...Array(nwProjYears*4).fill(null).map((_,i)=>{ const yr=curYear+Math.floor((i+1)/4); return `Q${((i+1)%4)+1} ${yr}`; })],
       datasets: [
-        { label:'Net Worth', data:[...nwData,...Array(nwProjYears*4).fill(null)], borderColor:C.gold, backgroundColor:'rgba(207,172,103,0.08)', fill:true, tension:0.3, pointRadius:3, pointBackgroundColor:C.gold },
-        { label:'Projected', data:[...Array(labels.length-1).fill(null),nwData[nwData.length-1],...nwProj.slice(1)], borderColor:'rgba(207,172,103,0.45)', borderDash:[6,4], backgroundColor:'transparent', tension:0.3, pointRadius:0 },
+        { label:'Net Worth', data:[...nwData,...Array(nwProjYears*4).fill(null)], borderColor:C.gold, backgroundColor:'rgba(58,123,200,0.06)', fill:true, tension:0.3, pointRadius:3, pointBackgroundColor:C.gold },
+        { label:'Projected', data:[...Array(labels.length-1).fill(null),nwData[nwData.length-1],...nwProj.slice(1)], borderColor:'rgba(58,123,200,0.45)', borderDash:[6,4], backgroundColor:'transparent', tension:0.3, pointRadius:0 },
         { label:'Debt-Free 2030', data:[...labels, ...Array(nwProjYears*4).fill(null).map((_,i)=>{ const yr=curYear+Math.floor((i+1)/4); const q=((i+1)%4)+1; return (yr===DEBT_FREE_YEAR&&q===4)?nwProj[Math.min(nwProj.length-1,(DEBT_FREE_YEAR-curYear)*4)]:null; })], borderColor:C.green, pointRadius:8, pointBackgroundColor:C.green, pointStyle:'triangle', showLine:false },
       ],
     },
