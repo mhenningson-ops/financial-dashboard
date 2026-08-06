@@ -42,8 +42,56 @@ const SAVINGS_ACCOUNTS = [
 // ── Property expense config ────────────────────────────────────────────────────
 const PROPERTY_EXPENSE_CONFIG = [
   {
+    label:    'Bradcliff',
+    draftKey: 'brad',
+    categories: {
+      'Utilities':             'brad_util',
+      '⚡️ Utilities':         'brad_util',
+      'Repairs & Maintenance': 'brad_rm',
+      'Subscription':          'brad_subs',
+      'Appliances':            'brad_capex',
+      'Furniture':             'brad_capex',
+    },
+  },
+  {
+    label:    'Neely',
+    draftKey: 'neely',
+    categories: {
+      'Utilities':             'neely_util',
+      '⚡️ Utilities':         'neely_util',
+      'Repairs & Maintenance': 'neely_rm',
+      'Subscription':          'neely_subs',
+      'Appliances':            'neely_capex',
+      'Furniture':             'neely_capex',
+    },
+  },
+  {
+    label:    'Greenmount',
+    draftKey: 'green',
+    categories: {
+      'Utilities':             'green_util',
+      '⚡️ Utilities':         'green_util',
+      'Repairs & Maintenance': 'green_rm',
+      'Subscription':          'green_subs',
+      'Appliances':            'green_capex',
+      'Furniture':             'green_capex',
+    },
+  },
+  {
+    label:    'Holladay',
+    draftKey: 'holl',
+    categories: {
+      'Utilities':             'holl_util',
+      '⚡️ Utilities':         'holl_util',
+      'Repairs & Maintenance': 'holl_rm',
+      'Materials & Supplies':  'holl_supplies',
+      'Subscription':          'holl_subs',
+      'Appliances':            'holl_capex',
+      'Furniture':             'holl_capex',
+    },
+  },
+  {
     label:    'Broken Bow',
-    memoHint: '200 stevens',
     draftKey: 'bb',
     categories: {
       'Utilities':             'bb_util',
@@ -57,21 +105,9 @@ const PROPERTY_EXPENSE_CONFIG = [
       'Lodging Tax':           'bb_lodging_tax',
     },
   },
-  {
-    label:    'Holladay',
-    memoHint: '2123',
-    draftKey: 'holl',
-    categories: {
-      'Utilities':             'holl_util',
-      '⚡️ Utilities':         'holl_util',
-      'Repairs & Maintenance': 'holl_rm',
-      'Materials & Supplies':  'holl_supplies',
-      'Subscription':          'holl_subs',
-      'Appliances':            'holl_capex',
-      'Furniture':             'holl_capex',
-    },
-  },
 ];
+
+const NUM_PROPERTIES = PROPERTY_EXPENSE_CONFIG.length;
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 function fmt(n) {
@@ -229,7 +265,7 @@ function calcPropertyExpenses(allTxns, qStart, qEnd) {
 
       for (const prop of PROPERTY_EXPENSE_CONFIG) {
         let share = 0;
-        if (memoType === 'all') share = 1 / 5;
+        if (memoType === 'all') share = 1 / NUM_PROPERTIES;
         else if (memoType === 'both') share = 0.5;
         else if (memoType === 'bb'   && prop.draftKey === 'bb')   share = 1;
         else if (memoType === 'holl' && prop.draftKey === 'holl') share = 1;
