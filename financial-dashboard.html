@@ -1918,6 +1918,9 @@ function initValuationMode() {
       notice.style.display = '';
     }
     if (body) body.style.display = 'none';
+    // Populate field values now so propVal() reads correct prior-quarter data
+    // even when the section is never expanded before Analyze is clicked
+    setValFieldsState(p, false);
   });
 }
 
