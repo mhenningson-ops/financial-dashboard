@@ -328,6 +328,23 @@
       .h-tool { display: none; }
       .hd { display: none; }
     }
+
+    /* Source attribution badges */
+    .source-badge {
+      display: inline-block; font-size: 0.55rem; font-weight: 700;
+      letter-spacing: 0.03em; padding: 1px 5px; border-radius: 3px;
+      background: rgba(207,172,103,0.15); color: var(--gold);
+      border: 1px solid rgba(207,172,103,0.25);
+      margin-left: 4px; vertical-align: middle; cursor: help;
+    }
+
+    /* Audit tag panel */
+    .audit-section { margin-bottom: 16px; }
+    .audit-label { font-size: 0.78rem; font-weight: 600; margin-bottom: 8px; }
+    .audit-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+    .audit-table th { text-align: left; padding: 4px 6px; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+    .audit-table td { padding: 5px 6px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text-light); }
+    .audit-table tr:last-child td { border-bottom: none; }
   </style>
 </head>
 <body>
@@ -352,10 +369,12 @@
   <button class="tab-btn" onclick="switchTab('history')">History</button>
   <div style="flex:1;"></div>
   <div style="position:relative;display:flex;align-items:center;" id="data-menu-wrap">
-    <button class="tab-btn" onclick="toggleDataMenu(event)" style="color:var(--gold);border-bottom:none;">Import/Export Data ▾</button>
-    <div id="data-menu" style="display:none;position:absolute;top:100%;right:0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);min-width:140px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
-      <div onclick="exportData();closeDataMenu()" style="padding:10px 16px;font-size:0.8rem;color:var(--text-light);cursor:pointer;border-bottom:1px solid var(--border);" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background=''">⬇ Export Data</div>
-      <div onclick="document.getElementById('import-file').click();closeDataMenu()" style="padding:10px 16px;font-size:0.8rem;color:var(--text-light);cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background=''">⬆ Import Data</div>
+    <button class="tab-btn" onclick="toggleDataMenu(event)" style="color:var(--gold);border-bottom:none;">Data ▾</button>
+    <div id="data-menu" style="display:none;position:absolute;top:100%;right:0;background:var(--dark-2);border:1px solid var(--border);border-radius:var(--radius-sm);min-width:160px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
+      <div onclick="syncFromDrive();closeDataMenu()" style="padding:10px 16px;font-size:0.8rem;color:var(--text-light);cursor:pointer;border-bottom:1px solid var(--border);" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background=''">☁ Sync from Drive</div>
+      <div onclick="saveToDrive();closeDataMenu()" style="padding:10px 16px;font-size:0.8rem;color:var(--text-light);cursor:pointer;border-bottom:1px solid var(--border);" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background=''">☁ Save to Drive</div>
+      <div onclick="exportData();closeDataMenu()" style="padding:10px 16px;font-size:0.8rem;color:var(--text-muted);cursor:pointer;border-bottom:1px solid var(--border);" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background=''">⬇ Export (local)</div>
+      <div onclick="document.getElementById('import-file').click();closeDataMenu()" style="padding:10px 16px;font-size:0.8rem;color:var(--text-muted);cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background=''">⬆ Import (local)</div>
     </div>
     <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)">
   </div>
@@ -1065,6 +1084,35 @@
       <p style="font-size:0.85rem;color:var(--text-muted);">Fill out each section and click Analyze. Takes about 15–20 minutes with account logins open.</p>
     </div>
 
+    <!-- DRIVE TOOLS TOOLBAR -->
+    <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+      <button class="btn-gold-outline" onclick="runAuditTags()">
+        🔍 Audit Tags
+      </button>
+      <button class="btn-gold-outline" onclick="runPrefill()">
+        ⚡ Pre-fill from YNAB &amp; Hospitable
+      </button>
+      <div id="prefill-status" style="font-size:0.75rem;color:var(--text-muted);display:flex;align-items:center;"></div>
+    </div>
+
+    <!-- AUDIT RESULTS PANEL -->
+    <div id="audit-panel" style="display:none;margin-bottom:20px;">
+      <div class="card" style="border-color:rgba(207,172,103,0.25);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div style="font-size:0.9rem;font-weight:600;color:#fff;">Tag Audit Results</div>
+          <button onclick="document.getElementById('audit-panel').style.display='none'" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.8rem;">✕ Close</button>
+        </div>
+        <div id="audit-content"></div>
+      </div>
+    </div>
+
+    <!-- PREFILL WARNING -->
+    <div id="prefill-warning" style="display:none;margin-bottom:16px;">
+      <div style="background:rgba(230,126,34,0.12);border:1px solid rgba(230,126,34,0.3);border-radius:var(--radius-sm);padding:10px 14px;font-size:0.78rem;color:#e67e22;">
+        ⚠ <span id="prefill-warning-text"></span>
+      </div>
+    </div>
+
     <div class="info-box">
       <strong>Property Valuation:</strong> Click the ↗ link next to each estimate to open the source, then enter the value. Enter 3 recent sold comps (sqft + sold price) from the comp research. The tool calculates a weighted blended value automatically. <strong>Leave any estimate blank</strong> to exclude it from the weighting.
     </div>
@@ -1116,13 +1164,14 @@
         <div class="acc-arrow">▼</div>
       </div>
       <div class="acc-body">
+        <div class="info-box" style="margin-bottom:16px;">Enter <strong>YTD totals from Fidelity NetBenefits</strong> — this quarter's contribution is calculated automatically from prior quarters. Or enter the quarterly amount directly in the "This Quarter" column.</div>
         <table class="input-table">
-          <thead><tr><th>Account</th><th></th><th class="right">This Quarter (Actual)</th><th class="right">Next Quarter (Planned)</th></tr></thead>
+          <thead><tr><th>Account</th><th></th><th class="right">YTD (from Fidelity)</th><th class="right">This Quarter <span style="font-size:0.65rem;font-weight:400;color:var(--text-muted);">auto-calc or override</span></th><th class="right">Next Quarter (Planned)</th></tr></thead>
           <tbody>
-            <tr><td><span class="acct-tag">401(k)</span></td><td>Traditional 401(k)</td><td class="right"><input type="text" class="money-input" id="c_401k" placeholder="$0.00" /></td><td class="right"><input type="text" class="money-input" id="cn_401k" placeholder="$0.00" /></td></tr>
-            <tr><td><span class="acct-tag">Roth 401(k)</span></td><td>Roth 401(k)</td><td class="right"><input type="text" class="money-input" id="c_r401k" placeholder="$0.00" /></td><td class="right"><input type="text" class="money-input" id="cn_r401k" placeholder="$0.00" /></td></tr>
-            <tr><td><span class="acct-tag">HSA</span></td><td>Health Savings Account</td><td class="right"><input type="text" class="money-input" id="c_hsa" placeholder="$0.00" /></td><td class="right"><input type="text" class="money-input" id="cn_hsa" placeholder="$0.00" /></td></tr>
-            <tr><td><span class="acct-tag">Roth IRA</span></td><td>Roth IRA (Backdoor)</td><td class="right"><input type="text" class="money-input" id="c_ira" placeholder="$0.00" /></td><td class="right"><input type="text" class="money-input" id="cn_ira" placeholder="$0.00" /></td></tr>
+            <tr><td><span class="acct-tag">401(k)</span></td><td>Traditional 401(k)</td><td class="right"><input type="text" class="money-input" id="ytd_401k" placeholder="YTD" oninput="calcContribDelta('401k')" /></td><td class="right"><input type="text" class="money-input" id="c_401k" placeholder="$0.00" /></td><td class="right"><input type="text" class="money-input" id="cn_401k" placeholder="$0.00" /></td></tr>
+            <tr><td><span class="acct-tag">Roth 401(k)</span></td><td>Roth 401(k)</td><td class="right"><input type="text" class="money-input" id="ytd_r401k" placeholder="YTD" oninput="calcContribDelta('r401k')" /></td><td class="right"><input type="text" class="money-input" id="c_r401k" placeholder="$0.00" /></td><td class="right"><input type="text" class="money-input" id="cn_r401k" placeholder="$0.00" /></td></tr>
+            <tr><td><span class="acct-tag">HSA</span></td><td>HSA <span style="font-size:0.72rem;color:var(--text-muted);">(incl. employer)</span></td><td class="right"><input type="text" class="money-input" id="ytd_hsa" placeholder="YTD" oninput="calcContribDelta('hsa')" /></td><td class="right"><input type="text" class="money-input" id="c_hsa" placeholder="$0.00" /></td><td class="right"><input type="text" class="money-input" id="cn_hsa" placeholder="$0.00" /></td></tr>
+            <tr><td><span class="acct-tag">Roth IRA</span></td><td>Roth IRA (Backdoor)</td><td class="right"><input type="text" class="money-input" id="ytd_ira" placeholder="YTD" oninput="calcContribDelta('ira')" /></td><td class="right"><input type="text" class="money-input" id="c_ira" placeholder="$0.00" /></td><td class="right"><input type="text" class="money-input" id="cn_ira" placeholder="$0.00" /></td></tr>
           </tbody>
         </table>
       </div>
@@ -1575,7 +1624,6 @@
 
     <div style="margin-top:28px;">
       <button class="btn-primary" onclick="runReview()">Analyze &amp; Save Quarter</button>
-      <button class="btn-secondary" style="width:100%;margin-top:10px;display:block;text-align:center;" onclick="prefillDemo()">Load Q2 2026 Starting Values</button>
       <div id="draft-status" style="text-align:center;font-size:0.68rem;color:var(--text-muted);margin-top:10px;height:16px;"></div>
     </div>
 
@@ -1962,7 +2010,15 @@ function importData(event) {
         }
       }
       if (payload[STORAGE_KEY]) localStorage.setItem(STORAGE_KEY, JSON.stringify(payload[STORAGE_KEY]));
-      if (payload[DRAFT_KEY])   localStorage.setItem(DRAFT_KEY,   JSON.stringify(payload[DRAFT_KEY]));
+      if (payload[DRAFT_KEY]) {
+        // Merge: non-empty values from the import win; blank import fields preserve existing values
+        const existingDraft = JSON.parse(localStorage.getItem(DRAFT_KEY) || '{}');
+        const merged = { ...existingDraft };
+        for (const [k, v] of Object.entries(payload[DRAFT_KEY])) {
+          if (v !== '' && v !== null && v !== undefined) merged[k] = v;
+        }
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(merged));
+      }
       if (payload[STICKY_KEY])  localStorage.setItem(STICKY_KEY,  JSON.stringify(payload[STICKY_KEY]));
       event.target.value = '';
       alert('Import successful. Reloading...');
@@ -1979,6 +2035,7 @@ function importData(event) {
 const DRAFT_FIELD_IDS = [
   'r_date',
   'h_fxaix_401k','h_fxaix_r401k','h_fssnx_hsa','h_bitb_hsa','h_etha_hsa','h_iblc_hsa','h_swssx_ira','h_swisx_ira','h_vwo_ira',
+  'ytd_401k','ytd_r401k','ytd_hsa','ytd_ira',
   'c_401k','c_r401k','c_hsa','c_ira',
   'cn_401k','cn_r401k','cn_hsa','cn_ira',
   'brad_sqft','brad_zillow','brad_redfin','brad_chase','brad_bofa',
@@ -3867,7 +3924,220 @@ function clearAllData() {
   renderDashboard();
 }
 
-// ── PREFILL DEMO Q1 (prior quarter for trend arrow preview) ────────────────
+// ── DRIVE SYNC ─────────────────────────────────────────────────────────────
+async function syncFromDrive() {
+  const status = $('draft-status');
+  if (status) status.textContent = 'Syncing from Drive…';
+  try {
+    const r = await fetch('/api/data');
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const payload = await r.json();
+    if (payload[STORAGE_KEY]) localStorage.setItem(STORAGE_KEY, JSON.stringify(payload[STORAGE_KEY]));
+    if (payload[DRAFT_KEY]) {
+      const existingDraft = JSON.parse(localStorage.getItem(DRAFT_KEY) || '{}');
+      const merged = { ...existingDraft };
+      for (const [k, v] of Object.entries(payload[DRAFT_KEY])) {
+        if (v !== '' && v !== null && v !== undefined) merged[k] = v;
+      }
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(merged));
+    }
+    if (payload[STICKY_KEY])  localStorage.setItem(STICKY_KEY,  JSON.stringify(payload[STICKY_KEY]));
+    restoreDraft();
+    initSticky();
+    renderDashboard();
+    renderHistory();
+    const t = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    if (status) status.textContent = `Synced from Drive at ${t}`;
+  } catch (err) {
+    const status = $('draft-status');
+    if (status) status.textContent = `Drive sync failed: ${err.message}`;
+    console.error('[syncFromDrive]', err);
+  }
+}
+
+async function saveToDrive() {
+  const status = $('draft-status');
+  if (status) status.textContent = 'Saving to Drive…';
+  try {
+    saveDraft();
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      [STORAGE_KEY]: JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'),
+      [DRAFT_KEY]:   JSON.parse(localStorage.getItem(DRAFT_KEY)   || 'null'),
+      [STICKY_KEY]:  JSON.parse(localStorage.getItem(STICKY_KEY)  || 'null'),
+    };
+    const r = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const t = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    if (status) status.textContent = `Saved to Drive at ${t}`;
+  } catch (err) {
+    const status = $('draft-status');
+    if (status) status.textContent = `Drive save failed: ${err.message}`;
+    console.error('[saveToDrive]', err);
+  }
+}
+
+// ── PREFILL FROM YNAB + HOSPITABLE ─────────────────────────────────────────
+async function runPrefill() {
+  const pStatus = $('prefill-status');
+  const pWarn   = $('prefill-warning');
+  const pWarnTxt= $('prefill-warning-text');
+  if (pStatus) pStatus.innerHTML = '<span style="color:var(--text-muted)">⟳ Fetching from YNAB &amp; Hospitable…</span>';
+  if (pWarn)   pWarn.style.display = 'none';
+
+  const quarterEnd = $('r_date')?.value || new Date().toISOString().slice(0,10);
+
+  try {
+    const r = await fetch('/api/prefill', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ quarterEnd }),
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({ error: `HTTP ${r.status}` }));
+      throw new Error(err.error || `HTTP ${r.status}`);
+    }
+    const { draft, sources, warnings, quarter } = await r.json();
+
+    clearSourceBadges();
+    let filled = 0;
+    for (const [id, val] of Object.entries(draft)) {
+      const el = $(id);
+      if (!el) continue;
+      el.value = val;
+      filled++;
+      const src = sources[id];
+      if (src) {
+        const badge = document.createElement('span');
+        badge.className = 'source-badge';
+        badge.dataset.fieldId = id;
+        badge.textContent = src.startsWith('Hospitable') ? 'HOSP' : 'YNAB';
+        badge.title = src;
+        const wrap = el.closest('.field') || el.parentNode;
+        wrap.appendChild(badge);
+      }
+    }
+
+    saveDraft();
+
+    if (warnings?.length) {
+      if (pWarnTxt) pWarnTxt.textContent = warnings.join(' · ');
+      if (pWarn)    pWarn.style.display = '';
+    }
+
+    const t = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    if (pStatus) pStatus.innerHTML = `<span style="color:var(--green)">✓ Pre-filled ${filled} fields for ${quarter} at ${t}</span>`;
+  } catch (err) {
+    if (pStatus) pStatus.innerHTML = `<span style="color:var(--red)">✕ ${err.message}</span>`;
+    console.error('[runPrefill]', err);
+  }
+}
+
+function clearSourceBadges() {
+  document.querySelectorAll('.source-badge').forEach(b => b.remove());
+}
+
+// ── AUDIT TAGS ─────────────────────────────────────────────────────────────
+async function runAuditTags() {
+  const panel   = $('audit-panel');
+  const content = $('audit-content');
+  const pStatus = $('prefill-status');
+  if (pStatus) pStatus.innerHTML = '<span style="color:var(--text-muted)">⟳ Auditing YNAB tags…</span>';
+  if (panel)   panel.style.display = '';
+
+  const qEnd  = $('r_date')?.value || new Date().toISOString().slice(0,10);
+  const d     = new Date(qEnd + 'T12:00:00');
+  const qNum  = Math.floor(d.getMonth() / 3);
+  const qStart= new Date(d.getFullYear(), qNum * 3, 1).toISOString().slice(0,10);
+
+  if (content) content.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:8px 0;">Loading…</div>';
+
+  try {
+    const r = await fetch('/api/audit-tags', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ quarterStart: qStart, quarterEnd: qEnd }),
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({ error: `HTTP ${r.status}` }));
+      throw new Error(err.error || `HTTP ${r.status}`);
+    }
+    const { autoTagged = [], flaggedIncorrect = [], needsAttention = [], newPayees = [] } = await r.json();
+
+    let html = '';
+
+    if (autoTagged.length) {
+      html += `<div class="audit-section"><div class="audit-label" style="color:var(--green)">✓ Auto-tagged (${autoTagged.length})</div>`;
+      html += '<table class="audit-table"><tr><th>Date</th><th>Payee</th><th>Amount</th><th>Category</th><th>Memo Set</th></tr>';
+      autoTagged.forEach(t => {
+        html += `<tr><td>${t.date}</td><td>${t.payee}</td><td>${fmt$d(Math.abs(t.amount))}</td><td>${t.category}</td><td style="color:var(--green)">${t.newMemo}</td></tr>`;
+      });
+      html += '</table></div>';
+    }
+
+    if (flaggedIncorrect.length) {
+      html += `<div class="audit-section"><div class="audit-label" style="color:var(--red)">⚠ Tagged incorrectly (${flaggedIncorrect.length})</div>`;
+      html += '<table class="audit-table"><tr><th>Date</th><th>Payee</th><th>Amount</th><th>Current Memo</th><th>Expected</th></tr>';
+      flaggedIncorrect.forEach(t => {
+        html += `<tr><td>${t.date}</td><td>${t.payee}</td><td>${fmt$d(Math.abs(t.amount))}</td><td style="color:var(--red)">${t.currentMemo}</td><td style="color:var(--gold)">${t.expectedMemo}</td></tr>`;
+      });
+      html += '</table></div>';
+    }
+
+    if (needsAttention.length) {
+      html += `<div class="audit-section"><div class="audit-label" style="color:#e67e22">⚑ Needs manual tag (${needsAttention.length})</div>`;
+      html += '<table class="audit-table"><tr><th>Date</th><th>Payee</th><th>Amount</th><th>Category</th><th>Note</th></tr>';
+      needsAttention.forEach(t => {
+        html += `<tr><td>${t.date}</td><td>${t.payee}</td><td>${fmt$d(Math.abs(t.amount))}</td><td>${t.category}</td><td style="color:var(--text-muted)">${t.reason}</td></tr>`;
+      });
+      html += '</table></div>';
+    }
+
+    if (newPayees.length) {
+      html += `<div class="audit-section"><div class="audit-label" style="color:var(--text-muted)">? Unknown payees (${newPayees.length})</div>`;
+      html += '<table class="audit-table"><tr><th>Payee</th><th>Category</th><th>Count</th><th>Total</th><th>Last Date</th></tr>';
+      newPayees.forEach(p => {
+        html += `<tr><td>${p.payee}</td><td>${p.category}</td><td>${p.count}</td><td>${fmt$d(Math.abs(p.totalAmount))}</td><td>${p.latestDate}</td></tr>`;
+      });
+      html += '</table></div>';
+    }
+
+    if (!html) html = '<div style="color:var(--green);padding:8px 0;font-size:0.8rem;">✓ All property transactions are tagged correctly.</div>';
+    if (content) content.innerHTML = html;
+
+    const t = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    if (pStatus) pStatus.innerHTML = `<span style="color:var(--text-muted)">Audit complete at ${t} · ${autoTagged.length} auto-tagged · ${flaggedIncorrect.length} incorrect · ${needsAttention.length} manual · ${newPayees.length} unknown</span>`;
+  } catch (err) {
+    if (content) content.innerHTML = `<div style="color:var(--red);font-size:0.8rem;">Error: ${err.message}</div>`;
+    if (pStatus) pStatus.innerHTML = `<span style="color:var(--red)">✕ ${err.message}</span>`;
+    console.error('[runAuditTags]', err);
+  }
+}
+
+// ── YTD CONTRIBUTION DELTA ─────────────────────────────────────────────────
+function calcContribDelta(type) {
+  const ytdEl = $(`ytd_${type}`);
+  const qEl   = $(`c_${type}`);
+  if (!ytdEl || !qEl) return;
+  const ytd = parseFloat(ytdEl.value.replace(/[$,\s]/g, '')) || 0;
+  if (ytd === 0) return;
+
+  const curDateStr = $('r_date')?.value || new Date().toISOString().slice(0,10);
+  const curYear    = curDateStr.slice(0, 4);
+  const fieldId    = `c_${type}`;
+  const prevTotal  = getQuarters()
+    .filter(q => q.date?.startsWith(curYear) && q.date < curDateStr)
+    .reduce((s, q) => s + (parseFloat((q.rawInputs?.[fieldId] || '').replace(/[$,\s]/g, '')) || 0), 0);
+
+  const delta = Math.max(0, ytd - prevTotal);
+  setMoney(`c_${type}`, delta);
+}
+
+// ── PREFILL DEMO (legacy fallback — button removed) ─────────────────────────
 // ── PREFILL DEMO ───────────────────────────────────────────────────────────
 function prefillDemo() {
   // Sticky fields are never overwritten by demo — only set if not already saved
