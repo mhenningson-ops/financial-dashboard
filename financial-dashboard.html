@@ -3945,6 +3945,14 @@ function loadQuarterIntoForm(quarterLabel) {
 
   recalcAllBlended();
 
+  // If all property valuation fields are blank after loading (snapshot pre-dates
+  // the auto-populate fix), re-run initValuationMode so prior-quarter values
+  // carry forward correctly. Skip if rawInputs already has values (user entered
+  // new valuations for this quarter).
+  const anyValFilled = Object.values(PROP_VAL_FIELDS).flat()
+    .some(id => ($(id)?.value || '').replace(/[$,\s]/g, '') !== '');
+  if (!anyValFilled) initValuationMode();
+
   // Open all accordions and switch to form
   document.querySelectorAll('.acc-header').forEach(h => {
     h.classList.add('open');
