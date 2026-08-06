@@ -2641,7 +2641,8 @@ function runReview() {
     ((priorQ.properties?.bradcliff?.mortgage||0) - (props.bradcliff.mortgage||0)) +
     ((priorQ.properties?.holladay?.mortgage||0) - (props.holladay.mortgage||0)) +
     ((priorQ.properties?.brokenBow?.mortgage1||0) - (props.brokenBow.mortgage1||0)) +
-    ((priorQ.properties?.brokenBow?.mortgage2||0) - (props.brokenBow.mortgage2||0))
+    ((priorQ.properties?.brokenBow?.mortgage2||0) - (props.brokenBow.mortgage2||0)) +
+    (otherSavings.extraPrincipal || 0)
   ) : null;
 
   // Save every form field verbatim so Edit can restore the full form exactly
@@ -2851,6 +2852,7 @@ function renderReviewResults(s) {
           const pp = prevMort - curMort;
           return pp > 0 ? rdr(pnm[key]||key, fmt$(pp), 'pos') : '';
         }),
+        (s.otherSavings?.extraPrincipal||0) > 0 ? rdr('Extra Principal', fmt$(s.otherSavings.extraPrincipal), 'pos') : '',
         s.principalPaydown != null ? rdrt('Total Paydown', fmt$(s.principalPaydown), 'pos') : '',
       ].join('')
     : rdr('No prior quarter', '—', '');
@@ -3486,6 +3488,7 @@ function renderDashboard() {
           const pp = prevMort - curMort;
           return pp > 0 ? dr(propNameMap[key]||key, fmt$(pp), 'pos') : '';
         }),
+        (last.otherSavings?.extraPrincipal||0) > 0 ? dr('Extra Principal', fmt$(last.otherSavings.extraPrincipal), 'pos') : '',
         principalPaydown != null ? drt('Total Paydown', fmt$(principalPaydown), 'pos') : '',
       ].join('')
     : dr('No prior quarter', '—', '');
