@@ -1754,6 +1754,12 @@
         </table>
       </div>
 
+      <!-- Property P&L Breakdown -->
+      <div class="result-card">
+        <div class="result-title">Property P&amp;L Breakdown</div>
+        <div id="res-prop-breakdown"></div>
+      </div>
+
       <!-- Debt Paydown & Savings -->
       <div class="result-card">
         <div class="result-title"><span class="step-pill">Progress</span> Debt Paydown &amp; Savings Rate</div>
@@ -2962,7 +2968,7 @@ function renderReviewResults(s) {
   const acctGroups = {
     '401(k)': { contrib: next.c401k, keys: ['fxaix_401k'], labels: [['FXAIX','Large Cap']] },
     'Roth 401(k)': { contrib: next.r401k, keys: ['fxaix_r401k'], labels: [['FXAIX','Large Cap']] },
-    'HSA': { contrib: next.hsa, keys: ['fssnx_hsa','bitb_hsa','etha_hsa','iblc_hsa'], labels: [['FSSNX','Small Cap'],['BITB','Crypto – BTC'],['ETHA','Crypto – ETH'],['IBLC','Crypto – Infra']] },
+    'HSA': { contrib: next.hsa, keys: ['fssnx_hsa'], labels: [['FSSNX','Small Cap']] },
     'Roth IRA': { contrib: next.ira, keys: ['swssx_ira','swisx_ira','vwo_ira'], labels: [['SWSSX','Small Cap'],['SWISX','Intl Developed'],['VWO','Emerging Markets']] },
   };
 
@@ -3175,6 +3181,36 @@ function renderReviewResults(s) {
   }
   $('res-prop-returns').innerHTML = propReturnsHTML;
   $('res-prop-ops').innerHTML = propOpsHTML;
+
+  // ── Per-Property P&L Breakdown ────────────────────────────────────────────
+  const expenseLabels = {
+    pm:'Property Mgmt', platform:'Platform Fees', tax:'Property Tax (quarterly)',
+    insurance:'Insurance (quarterly)', rm:'Repairs & Maintenance', util:'Utilities',
+    supplies:'Supplies', subs:'Subscriptions', capex:'CapEx / Furniture',
+    lodgingTax:'Lodging Taxes',
+  };
+  let breakdownHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">`;
+  for (const pd of propDefs) {
+    const p = s.properties[pd.key];
+    const typeBadge = pd.type==='STR'?`style="background:rgba(230,126,34,0.15);color:var(--orange);"`:pd.type==='MTR'?`style="background:rgba(91,155,213,0.15);color:var(--blue);"`:'' ;
+    const piQ = ((p.pi||0)+(p.pi1||0)+(p.pi2||0))*3;
+    const expLines = Object.entries(p.expenses)
+      .filter(([,v])=>v>0)
+      .map(([k,v])=>`<tr><td style="padding:3px 0;color:var(--text-muted);font-size:0.78rem;">${expenseLabels[k]||k}</td><td style="text-align:right;font-size:0.78rem;" class="neg">-${fmt$d(v)}</td></tr>`)
+      .join('');
+    const piLine = piQ>0 ? `<tr><td style="padding:3px 0;color:var(--text-muted);font-size:0.78rem;">Mortgage P&amp;I (×3)</td><td style="text-align:right;font-size:0.78rem;" class="neg">-${fmt$d(piQ)}</td></tr>` : '';
+    const net = p.netCF;
+    breakdownHTML += `<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;">
+      <div style="font-size:0.78rem;font-weight:600;margin-bottom:10px;">${pd.label} <span class="acct-tag" ${typeBadge}>${pd.type}</span></div>
+      <table style="width:100%;border-collapse:collapse;">
+        <tr><td style="padding:3px 0;font-size:0.78rem;">Gross Revenue</td><td style="text-align:right;font-size:0.78rem;" class="pos">+${fmt$d(p.income.gross)}</td></tr>
+        ${expLines}${piLine}
+        <tr style="border-top:1px solid var(--border);margin-top:4px;"><td style="padding:5px 0 0;font-size:0.82rem;font-weight:600;">Net CF</td><td style="text-align:right;font-size:0.82rem;font-weight:600;padding-top:5px;" class="${net>=0?'pos':'neg'}">${net>=0?'+':''}${fmt$d(net)}</td></tr>
+      </table>
+    </div>`;
+  }
+  breakdownHTML += `</div>`;
+  $('res-prop-breakdown').innerHTML = breakdownHTML;
 
   // ── Debt Paydown & Savings Rate ───────────────────────────────────────────
   const w2Q = s.w2Quarterly || 0;
