@@ -352,6 +352,31 @@ module.exports = async (req, res) => {
     }
     set('s_other', savingsTotal, 'YNAB');
 
+    // Extra mortgage principal — 'Extra Mortgage Payment' category
+    let extraPrincipal = 0;
+    for (const t of allTxns) {
+      if (t.date < qStart || t.date > qEnd) continue;
+      const items = t.subtransactions?.length ? t.subtransactions : [t];
+      for (const item of items) {
+        if ((item.category_name || '').trim() === 'Extra Mortgage Payment') {
+          extraPrincipal += Math.abs(item.amount);
+        }
+      }
+    }
+    set('s_extra_principal', extraPrincipal / 1000, 'YNAB');
+
+    // I Bond purchases — inflows to Series I Bonds account (transfers only, excludes interest)
+    const ibondsAcct = accounts.find(a => (a.name || '').toLowerCase().includes('series i bonds'));
+    if (ibondsAcct) {
+      const ibondsPurchased = allTxns
+        .filter(t => t.date >= qStart && t.date <= qEnd
+                  && t.account_id === ibondsAcct.id
+                  && t.amount > 0
+                  && t.transfer_account_id)
+        .reduce((s, t) => s + t.amount, 0);
+      set('s_ibonds', ibondsPurchased / 1000, 'YNAB');
+    }
+
     // ── Non-mortgage debt ────────────────────────────────────────────────────
     // d_other already handled in grouped above
 
