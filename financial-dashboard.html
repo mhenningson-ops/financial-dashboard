@@ -1901,8 +1901,9 @@ const PROP_VAL_FIELDS = {
 
 let _valPriorData = {};
 
-function initValuationMode() {
-  const quarters = getQuarters();
+function initValuationMode(excludeQuarterLabel) {
+  const quarters = getQuarters()
+    .filter(q => !excludeQuarterLabel || q.quarter !== excludeQuarterLabel);
   if (quarters.length === 0) return;
   const prior = quarters[quarters.length - 1];
   if (!prior?.rawInputs) return;
@@ -3951,7 +3952,7 @@ function loadQuarterIntoForm(quarterLabel) {
   // new valuations for this quarter).
   const anyValFilled = Object.values(PROP_VAL_FIELDS).flat()
     .some(id => ($(id)?.value || '').replace(/[$,\s]/g, '') !== '');
-  if (!anyValFilled) initValuationMode();
+  if (!anyValFilled) initValuationMode(q.quarter);
 
   // Open all accordions and switch to form
   document.querySelectorAll('.acc-header').forEach(h => {
