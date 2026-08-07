@@ -1904,14 +1904,17 @@ let _valPriorData = {};
 function initValuationMode(excludeQuarterLabel) {
   const quarters = getQuarters()
     .filter(q => !excludeQuarterLabel || q.quarter !== excludeQuarterLabel);
-  if (quarters.length === 0) return;
+  console.log('[valMode] quarters after filter:', quarters.map(q=>q.quarter), 'exclude:', excludeQuarterLabel);
+  if (quarters.length === 0) { console.log('[valMode] exit: no quarters'); return; }
   const prior = quarters[quarters.length - 1];
-  if (!prior?.rawInputs) return;
+  console.log('[valMode] prior:', prior?.quarter, 'hasRawInputs:', !!prior?.rawInputs);
+  if (!prior?.rawInputs) { console.log('[valMode] exit: no rawInputs on prior'); return; }
 
   const dateVal = $('r_date')?.value;
   const d = dateVal ? new Date(dateVal + 'T12:00:00') : new Date();
   const qNum = Math.ceil((d.getMonth() + 1) / 3);
-  if (qNum === 1 || qNum === 3) return; // fresh quarter — leave blank
+  console.log('[valMode] r_date:', dateVal, 'qNum:', qNum);
+  if (qNum === 1 || qNum === 3) { console.log('[valMode] exit: Q1/Q3 fresh quarter'); return; }
 
   _valPriorData = prior.rawInputs;
   const priorDate = new Date(prior.date + 'T12:00:00');
