@@ -2908,9 +2908,9 @@ function renderReviewResults(s) {
         );
       })()}
       ${rCard('Savings Rate',
-        rSR !== null ? `<span class="${rSR>=0.20?'green':'gold'}">${(rSR*100).toFixed(1)}%</span>` : '—',
+        s.savingsRate != null ? `<span class="${s.savingsRate>=0.20?'green':'gold'}">${(s.savingsRate*100).toFixed(1)}%</span>` : '—',
         rPctBadge(rSRChg, false),
-        `<span style="color:var(--text-muted);">This Q:</span> ${s.savingsRate != null ? (s.savingsRate*100).toFixed(1)+'%' : '—'} &nbsp;·&nbsp; <span style="color:var(--text-muted);">YTD (${rYtdQNum}Q):</span> ${rSR !== null ? (rSR*100).toFixed(1)+'%' : '—'}`,
+        `<span style="color:var(--text-muted);">YTD (${rYtdQNum}Q):</span> ${rSR !== null ? (rSR*100).toFixed(1)+'%' : '—'}`,
         rdSavingsRate, 'qs-sr'
       )}
       ${rCard('Principal Paydown',
