@@ -2916,7 +2916,7 @@ function renderReviewResults(s) {
       ${rCard('Principal Paydown',
         s.principalPaydown != null ? `<span class="pos">${fmt$(s.principalPaydown)}</span>` : '<span style="color:var(--text-muted);font-size:0.85rem;">First quarter</span>',
         s.principalPaydown != null ? chgBadgeR(s.principalPaydown, prev?.principalPaydown, false) : '<div class="sum-change" style="color:var(--text-muted);opacity:0.4;">▲ $0 vs last Q</div>',
-        `<span style="color:var(--text-muted);">This Q:</span> ${s.principalPaydown != null ? fmt$(s.principalPaydown) : '—'} &nbsp;·&nbsp; <span style="color:var(--text-muted);">YTD:</span> ${fmt$(rYtdPP)}`,
+        `<span style="color:var(--text-muted);">YTD:</span> ${fmt$(rYtdPP)}`,
         rdPrincipalPaydown, 'qs-pp'
       )}
       ${rCard('Debt Ratio',
