@@ -1904,17 +1904,14 @@ let _valPriorData = {};
 function initValuationMode(excludeQuarterLabel) {
   const quarters = getQuarters()
     .filter(q => !excludeQuarterLabel || q.quarter !== excludeQuarterLabel);
-  console.log('[valMode] quarters after filter:', quarters.map(q=>q.quarter), 'exclude:', excludeQuarterLabel);
-  if (quarters.length === 0) { console.log('[valMode] exit: no quarters'); return; }
+  if (quarters.length === 0) return;
   const prior = quarters[quarters.length - 1];
-  console.log('[valMode] prior:', prior?.quarter, 'hasRawInputs:', !!prior?.rawInputs);
-  if (!prior?.rawInputs) { console.log('[valMode] exit: no rawInputs on prior'); return; }
+  if (!prior?.rawInputs) return;
 
   const dateVal = $('r_date')?.value;
   const d = dateVal ? new Date(dateVal + 'T12:00:00') : new Date();
   const qNum = Math.ceil((d.getMonth() + 1) / 3);
-  console.log('[valMode] r_date:', dateVal, 'qNum:', qNum);
-  if (qNum === 1 || qNum === 3) { console.log('[valMode] exit: Q1/Q3 fresh quarter'); return; }
+  if (qNum === 1 || qNum === 3) return; // fresh quarter — leave blank
 
   _valPriorData = prior.rawInputs;
   const priorDate = new Date(prior.date + 'T12:00:00');
@@ -3953,9 +3950,12 @@ function loadQuarterIntoForm(quarterLabel) {
   // the auto-populate fix), re-run initValuationMode so prior-quarter values
   // carry forward correctly. Skip if rawInputs already has values (user entered
   // new valuations for this quarter).
-  const anyValFilled = Object.values(PROP_VAL_FIELDS).flat()
-    .some(id => ($(id)?.value || '').replace(/[$,\s]/g, '') !== '');
-  if (!anyValFilled) initValuationMode(q.quarter);
+  // Only treat AVM fields (zillow/redfin/chase/bofa) as indicators that the user
+  // entered new valuations this quarter — sqft and comps are filled year-round
+  const anyAVMFilled = Object.keys(PROP_VAL_FIELDS)
+    .some(p => ['zillow','redfin','chase','bofa']
+      .some(f => ($(p + '_' + f)?.value || '').replace(/[$,\s]/g, '') !== ''));
+  if (!anyAVMFilled) initValuationMode(q.quarter);
 
   // Open all accordions and switch to form
   document.querySelectorAll('.acc-header').forEach(h => {
