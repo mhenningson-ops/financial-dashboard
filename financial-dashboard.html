@@ -4294,6 +4294,7 @@ async function syncFromDrive() {
     initSticky();
     renderDashboard();
     renderHistory();
+    renderMonthly();
     const t = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
     if (status) status.textContent = `Synced from Drive at ${t}`;
   } catch (err) {
@@ -4625,6 +4626,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const savedTab = localStorage.getItem('activeTab') || 'dashboard';
   switchTab(savedTab);
   if (savedTab === 'goals') renderLumpSumProjection();
+  syncFromDrive();
 });
 </script>
 </body>
