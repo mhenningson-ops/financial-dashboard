@@ -121,18 +121,18 @@ async function downloadPdfText(drive, fileId) {
 
 const SYSTEM_PROMPT = `You are analyzing Foundation Property Management (FPM) owner statements for a Memphis rental portfolio.
 
-Properties: Bradcliff, Neely, Greenmount.
+Properties: Bradcliff (5274 Bradcliff Street), Neely (5168 Neely Road), Greenmount (4277 Greenmount Avenue).
 
 Field mappings from FPM statement:
-  income.rent    = "Rent Income" line
-  income.other   = sum of all other income lines (Affordable Housing Income, Tenant damages - Owner, etc.)
-  income.gross   = income.rent + income.other
-  expenses.pm    = "Management Fees"
-  expenses.rm    = "Repairs" (includes turn/make-ready costs)
-  expenses.util  = "Utilities"
+  income.rent    = "Rent Income" (4000) + "Affordable Housing Income" (4710) combined — both are lease-based
+  income.other   = "Tenant damages - Owner" (4740) + any other non-rent income lines
+  income.gross   = income.rent + income.other  (= Total Income on statement)
+  expenses.pm    = "Management Fees" (5000)
+  expenses.rm    = "Repairs" (5100, includes turn/make-ready costs)
+  expenses.util  = "Utilities" (5290)
   expenses.other = anything else (legal/collections fees, NSF charges, adjustments, etc.)
-  netCF          = income.gross − (pm + rm + util + other)
-  endingBalance  = statement ending balance for the property
+  netCF          = Net Operating Income from statement
+  endingBalance  = ENDING BALANCE from the SELECTED PERIOD column (not Year to Date)
 
 Notes: short array of flag strings. Empty array if nothing notable. Be specific — include dollar amounts and payee/document references when present in the statement. Mark inferences from the statement alone with "(from statement)". Flag:
   - Late or missed rent (vacancy months, partial payments)
@@ -159,7 +159,7 @@ async function extractWithClaude(pdfTexts, priorMonth) {
 
   for (let attempt = 0; attempt < 2; attempt++) {
     const msg = await anthropic.messages.create({
-      model:      'claude-sonnet-4-6',
+      model:      'claude-haiku-4-5-20251001',
       max_tokens: 2048,
       system:     SYSTEM_PROMPT,
       messages:   [{ role: 'user', content: parts.join('\n\n') }],
@@ -270,9 +270,9 @@ module.exports = async (req, res) => {
     const existingLabels = new Set(existingMonths.map(m => m.month));
     const byMonth        = groupByMonth(files);
 
-    // Only process months that have an Owner Statement and aren't in the JSON yet
+    // Only process months that have a Cash Flow PDF and aren't in the JSON yet
     const toProcess = Object.values(byMonth)
-      .filter(m => m.owner && !existingLabels.has(m.month))
+      .filter(m => m.cashflow && !existingLabels.has(m.month))
       .sort((a, b) => new Date(a.date) - new Date(b.date));
 
     if (toProcess.length === 0) {

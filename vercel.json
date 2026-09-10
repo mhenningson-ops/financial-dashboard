@@ -8,5 +8,7 @@
     "api/audit-tags.js":          { "maxDuration": 30 },
     "api/process-statements.js":  { "maxDuration": 60 }
   },
-  "crons": []
+  "crons": [
+    { "path": "/api/process-statements", "schedule": "0 14 * * 1" }
+  ]
 }
