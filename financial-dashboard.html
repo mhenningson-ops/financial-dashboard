@@ -4004,7 +4004,38 @@ function renderMonthly() {
     { path: 'endingBalance',  label: 'Ending Balance',  invertBad: false },
   ];
 
-  tablesEl.innerHTML = MONTHLY_PROPS.map(p => {
+  // ── Portfolio Summary table ──
+  const summaryRows = months.map(m => {
+    const totalNOI = MONTHLY_PROPS.reduce((sum, p) => {
+      const prop = m.properties?.[p.key];
+      return prop ? sum + monthlyNetCF(prop) : sum;
+    }, 0);
+    const dist = m.distribution ?? null;
+    const res  = m.reserve ?? null;
+    return `<tr>
+      <td style="white-space:nowrap;font-weight:600;color:var(--text-light);">${m.month}</td>
+      <td class="right"><span class="${totalNOI >= 0 ? 'pos' : 'neg'}">${totalNOI < 0 ? '-' : ''}${fmt$(Math.abs(totalNOI))}</span></td>
+      <td class="right">${dist !== null ? fmt$(dist) : '<span style="color:var(--text-muted);">—</span>'}</td>
+      <td class="right">${res !== null ? fmt$(res) : '<span style="color:var(--text-muted);">—</span>'}</td>
+    </tr>`;
+  }).join('');
+
+  tablesEl.innerHTML = `<div class="result-card" style="margin-bottom:28px;">
+    <div class="result-title">Portfolio Summary</div>
+    <div style="overflow-x:auto;">
+      <table class="result-table">
+        <thead><tr>
+          <th>Month</th>
+          <th class="right">Total NOI</th>
+          <th class="right">Distribution</th>
+          <th class="right">Reserve</th>
+        </tr></thead>
+        <tbody>${summaryRows}</tbody>
+      </table>
+    </div>
+  </div>`;
+
+  tablesEl.innerHTML += MONTHLY_PROPS.map(p => {
     const propMonths = months.filter(m => m.properties?.[p.key]);
     if (propMonths.length === 0) {
       return `<div class="result-card" style="margin-bottom:20px;">

@@ -134,6 +134,10 @@ Field mappings from FPM statement:
   netCF          = Net Operating Income from statement
   endingBalance  = ENDING BALANCE from the SELECTED PERIOD column (not Year to Date)
 
+Portfolio-level fields (from Owner Statement if present, otherwise null):
+  distribution = "Total Distribution:" dollar amount (cash sent to owner this month)
+  reserve      = "Reserve" balance (owner's reserve account balance at month end)
+
 Notes: short array of flag strings. Empty array if nothing notable. Be specific — include dollar amounts and payee/document references when present in the statement. Mark inferences from the statement alone with "(from statement)". Flag:
   - Late or missed rent (vacancy months, partial payments)
   - Turnover or eviction events with associated costs
@@ -141,9 +145,12 @@ Notes: short array of flag strings. Empty array if nothing notable. Be specific 
   - Fee changes (management fee %, new charges)
   - Unusual entries in expenses.other
   - Ending balance concerns
+  - Distribution of $0 or reserve below $1,500
 
 Return ONLY valid JSON, no markdown, exactly this shape:
 {
+  "distribution": 0,
+  "reserve": 0,
   "bradcliff":  {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"endingBalance":0,"notes":[]},
   "neely":      {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"endingBalance":0,"notes":[]},
   "greenmount": {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"endingBalance":0,"notes":[]}
@@ -293,8 +300,9 @@ module.exports = async (req, res) => {
       }
 
       const priorMonth = sortedSoFar[sortedSoFar.length - 1] || null;
-      const properties = await extractWithClaude(pdfTexts, priorMonth);
-      const newEntry   = { date: monthInfo.date, month: monthInfo.month, properties };
+      const extracted  = await extractWithClaude(pdfTexts, priorMonth);
+      const { distribution = null, reserve = null, ...properties } = extracted;
+      const newEntry   = { date: monthInfo.date, month: monthInfo.month, distribution, reserve, properties };
 
       // Re-read right before writing — guards against concurrent cron invocations
       const freshData   = await readReviewFile(drive);
