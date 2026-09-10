@@ -365,9 +365,11 @@
 <div class="tab-bar">
   <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
   <button class="tab-btn" onclick="switchTab('review')">Quarterly Review</button>
+  <button class="tab-btn" onclick="switchTab('monthly')">Monthly</button>
   <button class="tab-btn" onclick="switchTab('goals')">Goals</button>
   <button class="tab-btn" onclick="switchTab('history')">History</button>
   <div style="flex:1;"></div>
+  <div id="draft-status" style="font-size:0.68rem;color:var(--text-muted);align-self:center;margin-right:12px;white-space:nowrap;"></div>
   <div style="position:relative;display:flex;align-items:center;" id="data-menu-wrap">
     <button class="tab-btn" onclick="toggleDataMenu(event)" style="color:var(--gold);border-bottom:none;">Data ▾</button>
     <div id="data-menu" style="display:none;position:absolute;top:100%;right:0;background:var(--dark-2);border:1px solid var(--border);border-radius:var(--radius-sm);min-width:160px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
@@ -1624,7 +1626,6 @@
 
     <div style="margin-top:28px;">
       <button class="btn-primary" onclick="runReview()">Analyze &amp; Save Quarter</button>
-      <div id="draft-status" style="text-align:center;font-size:0.68rem;color:var(--text-muted);margin-top:10px;height:16px;"></div>
     </div>
 
     <!-- RESULTS -->
@@ -1787,6 +1788,24 @@
 </div>
 
 <!-- ════════════════════════════════════════════
+     TAB: MONTHLY
+═════════════════════════════════════════════ -->
+<div id="tab-monthly" class="tab-content">
+  <div class="page" style="max-width:1200px;">
+    <div style="margin-bottom:28px;">
+      <h2 style="font-size:1.6rem;color:#fff;margin-bottom:4px;">Monthly Property Performance</h2>
+      <p style="font-size:0.82rem;color:var(--text-muted);">Bradcliff · Neely · Greenmount — Foundation PM owner statements</p>
+    </div>
+    <div class="chart-wrap" style="margin-bottom:28px;">
+      <div class="chart-title">Combined Monthly NOI — Memphis Portfolio</div>
+      <div class="chart-sub">Net operating income across all three FPM properties (per-property + combined)</div>
+      <div class="chart-canvas-wrap tall"><canvas id="chart-monthly-noi"></canvas></div>
+    </div>
+    <div id="monthly-tables"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
      JAVASCRIPT
 ═════════════════════════════════════════════ -->
 <script>
@@ -1883,11 +1902,12 @@ function attachMoneyFormatters() {
 
 // ── STORAGE ────────────────────────────────────────────────────────────────
 function loadData() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { quarters: [] }; }
-  catch { return { quarters: [] }; }
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { quarters: [], months: [] }; }
+  catch { return { quarters: [], months: [] }; }
 }
 function saveData(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 function getQuarters() { return loadData().quarters.sort((a,b)=>new Date(a.date)-new Date(b.date)); }
+function getMonths()   { return (loadData().months || []).sort((a,b)=>new Date(a.date)-new Date(b.date)); }
 
 // ── EXPORT / IMPORT ─────────────────────────────────────────────────────────
 // ── SEMI-ANNUAL PROPERTY VALUATIONS ────────────────────────────────────────
@@ -2165,7 +2185,7 @@ function toggleAcc(header) {
 // ── TABS ───────────────────────────────────────────────────────────────────
 function switchTab(name) {
   document.querySelectorAll('.tab-btn').forEach((b,i) => {
-    const names = ['dashboard','review','goals','history'];
+    const names = ['dashboard','review','monthly','goals','history'];
     b.classList.toggle('active', names[i] === name);
   });
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -2173,6 +2193,7 @@ function switchTab(name) {
   if (name === 'dashboard') renderDashboard();
   if (name === 'history')   renderHistory();
   if (name === 'goals')     renderLumpSumProjection();
+  if (name === 'monthly')   renderMonthly();
   localStorage.setItem('activeTab', name);
 }
 
@@ -2620,13 +2641,13 @@ function runReview() {
   // Principal paydown vs prior quarter
   const quarterLabel = getQuarter(dateStr);
   const sortedPrior = data.quarters
-    .filter(q => q.quarter !== quarterLabel)
+    .filter(q => new Date(q.date) < new Date(dateStr))
     .sort((a,b) => new Date(a.date) - new Date(b.date));
   const priorQ = sortedPrior.length > 0 ? sortedPrior[sortedPrior.length - 1] : null;
 
   // W-2 quarterly delta: YTD minus prior same-year quarter's YTD
   const priorSameYear = data.quarters
-    .filter(q => new Date(q.date).getFullYear() === currentYear && q.quarter !== quarterLabel)
+    .filter(q => new Date(q.date).getFullYear() === currentYear && new Date(q.date) < new Date(dateStr))
     .sort((a,b) => new Date(a.date) - new Date(b.date))
     .pop();
   const w2Base  = w2BaseYTD  - (priorSameYear?.w2BaseYTD  || 0);
@@ -3517,10 +3538,10 @@ function renderDashboard() {
     <div class="kpi-row-label">Performance</div>
     <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);">
       ${card('Total Income',
-        (last.w2Quarterly||0) > 0 ? fmt$(last.w2Quarterly) : '—',
+        ytdW2 > 0 ? fmt$(ytdW2) : '—',
         chgBadge(prev ? (last.w2Quarterly||0) - (prev.w2Quarterly||0) : null, false),
-        (() => { const ytdW2Sum = ytdQuarters.reduce((a,q)=>a+(q.w2Quarterly||0),0); const qn = ytdQuarters.length; const trending = qn > 0 ? ytdW2Sum*(4/qn) : 0; return `Trending annual: ${fmt$(trending)}`; })(),
-        [dr('Base W-2', fmt$(last.w2Base||0)), dr('RSU / Bonus', fmt$(last.w2Rsu||0)), dr('Spiff / Other', fmt$(last.w2Spiff||0)), drt('This Quarter', fmt$(last.w2Quarterly||0))].join(''),
+        (() => { const qn = ytdQuarters.length; const trending = qn > 0 ? ytdW2*(4/qn) : 0; return `${last.quarter}: ${fmt$(last.w2Quarterly||0)} · Trending Annual: ${fmt$(trending)}`; })(),
+        [dr('Base W-2 YTD', fmt$(last.w2BaseYTD||0)), dr('RSU / Bonus YTD', fmt$(last.w2RsuYTD||0)), dr('Spiff / Other YTD', fmt$(last.w2SpiffYTD||0)), drt('YTD Total', fmt$(ytdW2))].join(''),
         'dash-income'
       )}
       ${card('YTD Savings Rate', ytdSavingsRate !== null ? `<span class="${ytdSavingsRate>=0.20?'green':'gold'}">${(ytdSavingsRate*100).toFixed(1)}%</span>` : '—', pctBadge(srChgPts, false), `${ytdQuarters.length} quarter${ytdQuarters.length!==1?'s':''} in ${lastYear}`, dSavingsRate, 'dash-sr')}
@@ -3581,8 +3602,10 @@ function renderDashboard() {
   }
 
   const curYear = new Date(last.date).getFullYear();
+  const lastQIdx = Math.floor(new Date(last.date).getMonth() / 3); // 0=Q1,1=Q2,2=Q3,3=Q4
   const portYearsLeft = DRAWDOWN_YEAR - curYear;
-  const portProj = buildProjection(last.totalPortfolio, PORTFOLIO_RETURN, portYearsLeft, curYear);
+  const portProjAnchor = quarters.length >= 2 ? quarters[quarters.length - 2] : last;
+  const portProj = buildProjection(portProjAnchor.totalPortfolio, PORTFOLIO_RETURN, portYearsLeft, curYear);
   const portProjLabels = [];
   for (let i=0; i<=portYearsLeft*4; i++) {
     const yr = curYear + Math.floor(i/4);
@@ -3591,37 +3614,46 @@ function renderDashboard() {
   }
 
   const debtPayoffQuarters = Math.max(1, (DEBT_FREE_YEAR - curYear)*4);
-  const debtPerQ = last.totalDebt / debtPayoffQuarters;
   const nwProjYears = Math.min(10, DEBT_FREE_YEAR - curYear + 2);
-  const nwProj = [];
-  let projDebt = last.totalDebt;
-  let projPort = last.totalPortfolio;
-  let projPropVal = last.totalPropertyValue;
   const qPortRate = Math.pow(1.10, 1/4)-1;
   const qPropRate  = Math.pow(1.04, 1/4)-1;
-  for (let i=0; i<=nwProjYears*4; i++) {
-    nwProj.push(projPort + projPropVal + (last.otherAssets?.total||0) - Math.max(0,projDebt));
-    projDebt  = Math.max(0, projDebt - debtPerQ);
+
+  // Anchor to previous quarter so the latest quarter shows projected vs actual divergence
+  const nwProjAnchor = quarters.length >= 2 ? quarters[quarters.length - 2] : last;
+  const nwProjStartIdx = quarters.length >= 2 ? labels.length - 2 : labels.length - 1;
+  const nwProj = [];
+  let projDebt = nwProjAnchor.totalDebt;
+  let projPort = nwProjAnchor.totalPortfolio;
+  let projPropVal = nwProjAnchor.totalPropertyValue;
+  for (let i=0; i<=nwProjYears*4+1; i++) {
+    nwProj.push(projPort + projPropVal + (nwProjAnchor.otherAssets?.total||0) - Math.max(0,projDebt));
+    projDebt  = Math.max(0, projDebt - nwProjAnchor.totalDebt / debtPayoffQuarters);
     projPort  *= (1+qPortRate);
     projPropVal *= (1+qPropRate);
   }
 
   const cfProjYears = Math.min(10, FI_TARGET_YEAR - curYear + 3);
-  const cfProj = [last.annualRentalCashFlow];
-  let projCF = last.annualRentalCashFlow;
-  for (let i=1; i<=cfProjYears*4; i++) {
-    const yr = curYear + Math.floor(i/4);
-    if (i%4===0) {
-      projCF *= 1.035;
-      if (yr === 2027) projCF += 22000;
-      if (yr === 2030) projCF += 25000;
-    }
+  const cfProjAnchorIdx = Math.max(0, labels.length - 2);
+  const cfAnchorYear = new Date(quarters[cfProjAnchorIdx].date).getFullYear();
+  const cfAnchorQ    = Math.floor(new Date(quarters[cfProjAnchorIdx].date).getMonth() / 3);
+  const cfQOff = (yr, q) => (yr - cfAnchorYear) * 4 + (q - cfAnchorQ);
+  const CF_BRADCLIFF_PAYOFF = 754.21 * 12;                          // Q1 2027
+  const CF_HOLLADAY_REMOVE  = 4493.79;                              // Q3 2027: remove Q1-based CF
+  const CF_MEMPHIS_3_PROPS  = ((8389.55 + 10766.85) / 2) * 3;      // Q4 2027: 3 props at Neely/Greenmount avg
+  const CF_BB_REFI_SAVINGS  = (4136.72 - 2331.40) * 12;            // Q4 2027: Loan 1 refi savings
+  const cfProj = [cfData[cfProjAnchorIdx]];
+  let projCF = cfData[cfProjAnchorIdx];
+  for (let i=1; i<=cfProjYears*4 + (labels.length - 1 - cfProjAnchorIdx); i++) {
+    if (i%4===0 && projCF >= 0) projCF *= 1.035;
+    if (i === cfQOff(2027, 0)) projCF += CF_BRADCLIFF_PAYOFF;
+    if (i === cfQOff(2027, 2)) projCF -= CF_HOLLADAY_REMOVE;
+    if (i === cfQOff(2027, 3)) projCF += CF_MEMPHIS_3_PROPS + CF_BB_REFI_SAVINGS;
     cfProj.push(projCF);
   }
 
   const chartDefaults = {
     responsive: true, maintainAspectRatio: false,
-    interaction: { mode: 'nearest', intersect: false },
+    interaction: { mode: 'index', intersect: false },
     plugins: { legend: { labels: { color:'#7a7060', font:{size:11}, boxWidth:12 } } },
     scales: {
       x: { grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#7a7060',font:{size:10},maxTicksLimit:8} },
@@ -3635,37 +3667,37 @@ function renderDashboard() {
   charts.portfolio = new Chart($('chart-portfolio'), {
     type:'line',
     data: {
-      labels: [...labels, ...portProjLabels.slice(1)],
+      labels: [...labels, ...portProjLabels.slice(lastQIdx+1)],
       datasets: [
-        { label:'Portfolio Value', data:[...portData,...Array(portProjLabels.length-1).fill(null)], borderColor:C.gold, backgroundColor:'rgba(207,172,103,0.1)', fill:true, tension:0.3, pointRadius:4, pointBackgroundColor:C.gold },
-        { label:'Projected (10%/yr)', data:[...Array(labels.length-1).fill(null), portData[portData.length-1], ...portProj.slice(1)], borderColor:'rgba(207,172,103,0.5)', borderDash:[6,4], backgroundColor:'transparent', tension:0.3, pointRadius:0 },
-        { label:`FI Milestone (${FI_TARGET_YEAR})`, data:[...labels,...portProjLabels.slice(1)].map(l=>l===`Q4 ${FI_TARGET_YEAR}`?portProj[Math.round((FI_TARGET_YEAR-curYear)*4)]:null), borderColor:C.green, borderDash:[3,3], pointRadius:8, pointBackgroundColor:C.green, pointStyle:'triangle', showLine:false },
+        { label:'Actual', data:[...portData,...Array(portProjLabels.slice(lastQIdx+1).length).fill(null)], borderColor:C.gold, backgroundColor:'rgba(207,172,103,0.1)', fill:true, tension:0.3, pointRadius:4, pointBackgroundColor:C.gold },
+        { label:'Projected (10%/yr)', data:[...portProj], borderColor:'rgba(207,172,103,0.5)', borderDash:[6,4], backgroundColor:'transparent', tension:0.3, pointRadius:0 },
+        { label:`FI Milestone (${FI_TARGET_YEAR})`, data:[...labels,...portProjLabels.slice(lastQIdx+1)].map(l=>l===`Q4 ${FI_TARGET_YEAR}`?portProj[Math.min(portProj.length-1,(FI_TARGET_YEAR-curYear)*4+3)]:null), borderColor:C.green, borderDash:[3,3], pointRadius:8, pointBackgroundColor:C.green, pointStyle:'triangle', showLine:false },
       ],
     },
-    options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, tooltip:{ callbacks:{ label: ctx => ' '+fmt$(ctx.raw) } } } },
+    options: { ...chartDefaults, interaction: { mode: 'index', intersect: false }, plugins: { ...chartDefaults.plugins, tooltip:{ filter: item => item.raw !== null, callbacks:{ label: ctx => ` ${ctx.dataset.label}: ${fmt$(ctx.raw)}` } } } },
   });
 
   charts.networth = new Chart($('chart-networth'), {
     type:'line',
     data: {
-      labels: [...labels, ...Array(nwProjYears*4).fill(null).map((_,i)=>{ const yr=curYear+Math.floor((i+1)/4); return `Q${((i+1)%4)+1} ${yr}`; })],
+      labels: [...labels, ...Array(nwProjYears*4).fill(null).map((_,i)=>{ const off=lastQIdx+1+i; const yr=curYear+Math.floor(off/4); return `Q${(off%4)+1} ${yr}`; })],
       datasets: [
-        { label:'Net Worth', data:[...nwData,...Array(nwProjYears*4).fill(null)], borderColor:C.gold, backgroundColor:'rgba(207,172,103,0.08)', fill:true, tension:0.3, pointRadius:3, pointBackgroundColor:C.gold },
-        { label:'Projected', data:[...Array(labels.length-1).fill(null),nwData[nwData.length-1],...nwProj.slice(1)], borderColor:'rgba(207,172,103,0.45)', borderDash:[6,4], backgroundColor:'transparent', tension:0.3, pointRadius:0 },
-        { label:'Debt-Free 2030', data:[...labels, ...Array(nwProjYears*4).fill(null).map((_,i)=>{ const yr=curYear+Math.floor((i+1)/4); const q=((i+1)%4)+1; return (yr===DEBT_FREE_YEAR&&q===4)?nwProj[Math.min(nwProj.length-1,(DEBT_FREE_YEAR-curYear)*4)]:null; })], borderColor:C.green, pointRadius:8, pointBackgroundColor:C.green, pointStyle:'triangle', showLine:false },
+        { label:'Actual', data:[...nwData,...Array(nwProjYears*4).fill(null)], borderColor:C.gold, backgroundColor:'rgba(207,172,103,0.08)', fill:true, tension:0.3, pointRadius:3, pointBackgroundColor:C.gold },
+        { label:'Projected', data:[...Array(nwProjStartIdx).fill(null),...nwProj], borderColor:'rgba(207,172,103,0.45)', borderDash:[6,4], backgroundColor:'transparent', tension:0.3, pointRadius:0 },
+        { label:'Debt-Free 2030', data:[...labels, ...Array(nwProjYears*4).fill(null).map((_,i)=>{ const off=lastQIdx+1+i; const yr=curYear+Math.floor(off/4); const q=(off%4)+1; return (yr===DEBT_FREE_YEAR&&q===4)?nwProj[Math.min(nwProj.length-1,(DEBT_FREE_YEAR-curYear)*4+3)]:null; })], borderColor:C.green, pointRadius:8, pointBackgroundColor:C.green, pointStyle:'triangle', showLine:false },
       ],
     },
     options: { ...chartDefaults },
   });
 
-  const cfLabels = [...labels, ...Array(cfProjYears*4).fill(null).map((_,i)=>{ const yr=curYear+Math.floor((i+1)/4); return `Q${((i+1)%4)+1} ${yr}`; })];
+  const cfLabels = [...labels, ...Array(cfProjYears*4).fill(null).map((_,i)=>{ const off=lastQIdx+1+i; const yr=curYear+Math.floor(off/4); return `Q${(off%4)+1} ${yr}`; })];
   charts.cashflow = new Chart($('chart-cashflow'), {
     type:'line',
     data: {
       labels: cfLabels,
       datasets: [
         { label:'Annual Cash Flow', data:[...cfData,...Array(cfProjYears*4).fill(null)], borderColor:C.green, backgroundColor:'rgba(76,175,125,0.1)', fill:true, tension:0.3, pointRadius:3, pointBackgroundColor:C.green },
-        { label:'Projected', data:[...Array(labels.length-1).fill(null),cfData[cfData.length-1],...cfProj.slice(1)], borderColor:'rgba(76,175,125,0.5)', borderDash:[6,4], backgroundColor:'transparent', tension:0.3, pointRadius:0 },
+        { label:'Projected', data:[...Array(cfProjAnchorIdx).fill(null),...cfProj], borderColor:'rgba(76,175,125,0.5)', borderDash:[6,4], backgroundColor:'transparent', tension:0.3, pointRadius:0 },
         { label:'FI Target ($115K)', data:Array(cfLabels.length).fill(FI_TARGET_CASH), borderColor:'rgba(207,172,103,0.6)', borderDash:[3,3], pointRadius:0, borderWidth:1.5 },
       ],
     },
@@ -3783,7 +3815,7 @@ function renderDashboard() {
         { label: 'Trending Annual W-2', data: w2TrendData, borderColor: C.gold, backgroundColor: 'rgba(207,172,103,0.08)', fill: true, tension: 0.3, pointRadius: 4, pointBackgroundColor: C.gold },
       ],
     },
-    options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, tooltip: { callbacks: { label: ctx => ` ${fmt$(ctx.raw)}` } } } },
+    options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, tooltip: { callbacks: { label: ctx => ` ${fmt$(ctx.raw)}` } } }, scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, suggestedMin: 0 } } },
   });
 
   // ── Per-Property Equity Trend ─────────────────────────────────────────────
@@ -3843,6 +3875,237 @@ function renderHistory() {
       </div>
     </div>
   `).join('');
+}
+
+// ── MONTHLY ────────────────────────────────────────────────────────────────
+let chartMonthlyNOI = null;
+
+const MONTHLY_PROPS = [
+  { key: 'bradcliff',  label: 'Bradcliff',  color: '#c9a84c' },
+  { key: 'neely',      label: 'Neely',      color: '#2a5f8f' },
+  { key: 'greenmount', label: 'Greenmount', color: '#2d6b4a' },
+];
+
+function getNestedVal(obj, path) {
+  return path.split('.').reduce((o, k) => o?.[k], obj);
+}
+
+function monthlyNetCF(prop) {
+  if (prop.netCF !== undefined) return prop.netCF;
+  return (prop.income?.gross || 0)
+    - (prop.expenses?.pm    || 0)
+    - (prop.expenses?.rm    || 0)
+    - (prop.expenses?.util  || 0)
+    - (prop.expenses?.other || 0);
+}
+
+function renderMonthly() {
+  const months    = getMonths();
+  const tablesEl  = $('monthly-tables');
+  const noiCanvas = $('chart-monthly-noi');
+
+  if (chartMonthlyNOI) { chartMonthlyNOI.destroy(); chartMonthlyNOI = null; }
+
+  if (months.length === 0) {
+    if (noiCanvas) noiCanvas.style.display = 'none';
+    tablesEl.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <h2 class="empty-title">No Monthly Data Yet</h2>
+      <p class="empty-sub">Populate the <code>months</code> array in your Drive JSON (Financial Review.json) as you review each Foundation PM statement.</p>
+    </div>`;
+    return;
+  }
+  if (noiCanvas) noiCanvas.style.display = '';
+
+  // ── NOI chart ──
+  const moChartDefaults = {
+    responsive: true, maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: { legend: { labels: { color: '#a09880', font: { size: 10 }, boxWidth: 10 } } },
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#7a7060', font: { size: 10 }, maxTicksLimit: 12 } },
+      y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#7a7060', font: { size: 10 }, callback: v => (v < 0 ? '-' : '') + fmt$(Math.abs(v)) } },
+    },
+  };
+
+  const labels = months.map(m => m.month);
+
+  const combinedNOI = months.map(m =>
+    MONTHLY_PROPS.reduce((sum, p) => {
+      const prop = m.properties?.[p.key];
+      return prop ? sum + monthlyNetCF(prop) : sum;
+    }, 0)
+  );
+
+  const datasets = [
+    {
+      label: 'Combined NOI',
+      data: combinedNOI,
+      borderColor: '#cfac67', backgroundColor: 'transparent',
+      tension: 0.3, pointRadius: 4, borderWidth: 3, spanGaps: true,
+    },
+    ...MONTHLY_PROPS.map(p => ({
+      label: p.label,
+      data: months.map(m => {
+        const prop = m.properties?.[p.key];
+        return prop ? monthlyNetCF(prop) : null;
+      }),
+      borderColor: p.color, backgroundColor: 'transparent',
+      tension: 0.3, pointRadius: 3, borderWidth: 2, spanGaps: true,
+    })),
+  ];
+
+  chartMonthlyNOI = new Chart(noiCanvas, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      ...moChartDefaults,
+      plugins: {
+        ...moChartDefaults.plugins,
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw < 0 ? '-' : ''}${fmt$(Math.abs(ctx.raw || 0))}` } },
+      },
+    },
+  });
+
+  // ── Per-property tables ──
+  // 3-month rolling avg helper (uses propMonths[0..dispIdx-1])
+  function rollingAvg(propMonths, propKey, fieldPath, dispIdx) {
+    if (dispIdx < 3) return null;
+    const window = propMonths.slice(dispIdx - 3, dispIdx);
+    const vals = window.map(m => {
+      const prop = m.properties?.[propKey];
+      if (!prop) return null;
+      return fieldPath === 'netCF' ? monthlyNetCF(prop) : (getNestedVal(prop, fieldPath) ?? null);
+    }).filter(v => v !== null);
+    if (vals.length < 3) return null;
+    return vals.reduce((s, v) => s + v, 0) / 3;
+  }
+
+  function vsAvgBadge(val, avg, invertBad) {
+    if (avg === null || val === null || val === undefined || avg === 0) return '';
+    const diff = val - avg;
+    const pct  = Math.abs(diff / avg * 100);
+    if (pct < 1) return '';
+    const up  = diff > 0;
+    const good = invertBad ? !up : up; // for expenses, up is bad
+    const cls  = good ? 'pos' : 'neg';
+    return `<span class="${cls}" style="font-size:0.62rem;margin-left:3px;">${up ? '▲' : '▼'}${pct.toFixed(0)}%</span>`;
+  }
+
+  const MONEY_COLS = [
+    { path: 'income.rent',    label: 'Rent',            invertBad: false },
+    { path: 'income.other',   label: 'Other Income',    invertBad: false },
+    { path: 'income.gross',   label: 'Gross Income',    invertBad: false },
+    { path: 'expenses.pm',    label: 'Mgmt Fee',        invertBad: true  },
+    { path: 'expenses.rm',    label: 'Repairs & Maint', invertBad: true  },
+    { path: 'expenses.util',  label: 'Utilities',       invertBad: true  },
+    { path: 'expenses.other', label: 'Other Exp',       invertBad: true  },
+    { path: 'netCF',          label: 'NOI',             invertBad: false },
+    { path: 'endingBalance',  label: 'Ending Balance',  invertBad: false },
+  ];
+
+  tablesEl.innerHTML = MONTHLY_PROPS.map(p => {
+    const propMonths = months.filter(m => m.properties?.[p.key]);
+    if (propMonths.length === 0) {
+      return `<div class="result-card" style="margin-bottom:20px;">
+        <div class="result-title">${p.label}</div>
+        <p style="font-size:0.82rem;color:var(--text-muted);">No data yet.</p>
+      </div>`;
+    }
+
+    const rows = propMonths.map((m, dispIdx) => {
+      const prop   = m.properties[p.key];
+      const netCF  = monthlyNetCF(prop);
+      const hasAvg = dispIdx >= 3;
+
+      const moneyCells = MONEY_COLS.map(col => {
+        const val = col.path === 'netCF' ? netCF : getNestedVal(prop, col.path);
+        const avg = hasAvg ? rollingAvg(propMonths, p.key, col.path, dispIdx) : null;
+        const badge = vsAvgBadge(val, avg, col.invertBad);
+        if (val === undefined || val === null) return `<td class="right" style="color:var(--text-muted);">—</td>`;
+        const cls = col.path === 'netCF' ? (netCF >= 0 ? 'pos' : 'neg') : '';
+        return `<td class="right"><span class="${cls}">${val < 0 ? '-' : ''}${fmt$(Math.abs(val))}</span>${badge}</td>`;
+      });
+
+      const notes = (prop.notes || []).join('; ');
+      return `<tr>
+        <td style="white-space:nowrap;font-weight:600;color:var(--text-light);">${m.month}</td>
+        ${moneyCells.join('')}
+        <td style="font-size:0.74rem;color:var(--text-muted);max-width:220px;white-space:normal;">${notes || '—'}</td>
+      </tr>`;
+    });
+
+    return `<div class="result-card" style="margin-bottom:20px;">
+      <div class="result-title">${p.label}${propMonths.length >= 3 ? '<span style="font-family:Inter,sans-serif;font-size:0.68rem;font-weight:400;color:var(--text-muted);margin-left:12px;">▲▼ = vs. 3-mo avg</span>' : ''}</div>
+      <div style="overflow-x:auto;">
+        <table class="result-table">
+          <thead><tr>
+            <th>Month</th>
+            ${MONEY_COLS.map(c => `<th class="right">${c.label}</th>`).join('')}
+            <th>Notes</th>
+          </tr></thead>
+          <tbody>${rows.join('')}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── MONTHLY → QUARTERLY PRE-FILL ──────────────────────────────────────────
+function applyMonthlyToPrefill(quarterEndStr) {
+  const months = getMonths();
+  if (!months.length) return [];
+
+  const qEnd  = new Date(quarterEndStr + 'T12:00:00');
+  const qNum  = Math.floor(qEnd.getMonth() / 3); // 0-indexed
+  const year  = qEnd.getFullYear();
+  const qMonths = [qNum * 3, qNum * 3 + 1, qNum * 3 + 2]; // 0-indexed month numbers
+  const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const expectedLabels = qMonths.map(m => `${MONTH_NAMES[m]} ${year}`);
+
+  const FPM_PROPS = [
+    { key: 'bradcliff',  draftKey: 'brad'  },
+    { key: 'neely',      draftKey: 'neely' },
+    { key: 'greenmount', draftKey: 'green' },
+  ];
+
+  const warnings = [];
+
+  for (const { key, draftKey } of FPM_PROPS) {
+    const found = months.filter(m => {
+      const d = new Date(m.date + 'T12:00:00');
+      return d.getFullYear() === year && qMonths.includes(d.getMonth()) && m.properties?.[key];
+    });
+
+    const foundLabels = found.map(m => m.month);
+    const missing = expectedLabels.filter(l => !foundLabels.includes(l));
+    if (missing.length === 3) continue; // nothing to apply
+    if (missing.length > 0) {
+      warnings.push(`${key}: missing ${missing.join(', ')}`);
+    }
+
+    let gross = 0, pm = 0, rm = 0, util = 0, other = 0;
+    for (const m of found) {
+      const p = m.properties[key];
+      gross += p.income?.gross  || 0;
+      pm    += p.expenses?.pm   || 0;
+      rm    += p.expenses?.rm   || 0;
+      util  += p.expenses?.util || 0;
+      other += p.expenses?.other || 0;
+    }
+
+    if (found.length > 0) {
+      setMoney(`${draftKey}_rent`, gross);
+      setMoney(`${draftKey}_pm`,   pm);
+      setMoney(`${draftKey}_rm`,   rm);
+      setMoney(`${draftKey}_util`, util);
+      // monthly "other" expenses (legal/collections/adj) have no dedicated quarterly field —
+      // fold into subs so the amount isn't lost
+      if (other > 0) setMoney(`${draftKey}_subs`, other);
+    }
+  }
+
+  return warnings;
 }
 
 function deleteQuarter(quarterLabel) {
@@ -4076,10 +4339,14 @@ async function runPrefill() {
       }
     }
 
+    // Apply monthly FPM data for Bradcliff / Neely / Greenmount (overrides YNAB for those fields)
+    const monthlyWarns = applyMonthlyToPrefill(quarterEnd);
+
     saveDraft();
 
-    if (warnings?.length) {
-      if (pWarnTxt) pWarnTxt.textContent = warnings.join(' · ');
+    const allWarnings = [...(warnings || []), ...monthlyWarns];
+    if (allWarnings.length) {
+      if (pWarnTxt) pWarnTxt.textContent = allWarnings.join(' · ');
       if (pWarn)    pWarn.style.display = '';
     }
 
