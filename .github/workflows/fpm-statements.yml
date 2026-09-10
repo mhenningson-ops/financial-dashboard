@@ -1,0 +1,32 @@
+name: FPM Statement Review
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'   # Every Monday at 9 AM UTC
+  workflow_dispatch:        # Allow manual trigger from GitHub Actions UI
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run FPM statement processor
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          DRIVE_FILE_ID:               ${{ secrets.DRIVE_FILE_ID }}
+          FPM_FOLDER_ID:               ${{ secrets.FPM_FOLDER_ID }}
+          ANTHROPIC_API_KEY:           ${{ secrets.ANTHROPIC_API_KEY }}
+          RESEND_API_KEY:              ${{ secrets.RESEND_API_KEY }}
+          NOTIFY_EMAIL:                ${{ secrets.NOTIFY_EMAIL }}
+        run: node scripts/process-fpm-statements.js

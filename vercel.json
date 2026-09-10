@@ -3,6 +3,10 @@
     { "source": "/", "destination": "/financial-dashboard.html" }
   ],
   "functions": {
-    "api/*.js": { "maxDuration": 30 }
-  }
+    "api/data.js":                { "maxDuration": 30 },
+    "api/prefill.js":             { "maxDuration": 30 },
+    "api/audit-tags.js":          { "maxDuration": 30 },
+    "api/process-statements.js":  { "maxDuration": 60 }
+  },
+  "crons": []
 }
