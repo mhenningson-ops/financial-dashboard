@@ -69,13 +69,15 @@ const LONG_MONTHS  = ['january','february','march','april','may','june','july','
 
 function parseMonthFromString(str) {
   const lower = str.toLowerCase();
-  for (const [i, name] of LONG_MONTHS.entries()) {
-    const m = lower.match(new RegExp(`${name}\\s+(20\\d{2})`));
+  for (const [i, short] of SHORT_MONTHS.entries()) {
+    // Match both short ("aug") and long ("august") month names
+    const pattern = new RegExp(`\\b(${LONG_MONTHS[i]}|${short.toLowerCase()})\\b\\s+(20\\d{2})`);
+    const m = lower.match(pattern);
     if (m) {
-      const year    = parseInt(m[1]);
+      const year    = parseInt(m[2]);
       const lastDay = new Date(year, i + 1, 0);
       return {
-        month: `${SHORT_MONTHS[i]} ${year}`,
+        month: `${short} ${year}`,
         date:  lastDay.toISOString().slice(0, 10),
       };
     }
