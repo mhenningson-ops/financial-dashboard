@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "googleapis": "^144.0.0",
     "@anthropic-ai/sdk": "^0.32.0",
+    "googleapis": "^144.0.0",
     "pdf-parse": "^1.1.1",
     "resend": "^4.0.0"
+  },
+  "devDependencies": {
+    "xlsx": "^0.18.5"
   }
 }
