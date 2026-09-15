@@ -121,18 +121,22 @@ async function downloadPdfText(drive, fileId) {
 
 const SYSTEM_PROMPT = `You are analyzing Foundation Property Management (FPM) owner statements for a Memphis rental portfolio.
 
-Properties: Bradcliff, Neely, Greenmount.
+Properties: Bradcliff (5274 Bradcliff Street), Neely (5168 Neely Road), Greenmount (4277 Greenmount Avenue).
 
 Field mappings from FPM statement:
-  income.rent    = "Rent Income" line
-  income.other   = sum of all other income lines (Affordable Housing Income, Tenant damages - Owner, etc.)
-  income.gross   = income.rent + income.other
-  expenses.pm    = "Management Fees"
-  expenses.rm    = "Repairs" (includes turn/make-ready costs)
-  expenses.util  = "Utilities"
+  income.rent    = "Rent Income" (4000) + "Affordable Housing Income" (4710) combined — both are lease-based
+  income.other   = "Tenant damages - Owner" (4740) + any other non-rent income lines
+  income.gross   = income.rent + income.other  (= Total Income on statement)
+  expenses.pm    = "Management Fees" (5000)
+  expenses.rm    = "Repairs" (5100, includes turn/make-ready costs)
+  expenses.util  = "Utilities" (5290)
   expenses.other = anything else (legal/collections fees, NSF charges, adjustments, etc.)
-  netCF          = income.gross − (pm + rm + util + other)
-  endingBalance  = statement ending balance for the property
+  netCF          = Net Operating Income from statement
+  endingBalance  = ENDING BALANCE from the SELECTED PERIOD column (not Year to Date)
+
+Portfolio-level fields (from Owner Statement if present, otherwise null):
+  distribution = "Total Distribution:" dollar amount (cash sent to owner this month)
+  reserve      = "Reserve" balance (owner's reserve account balance at month end)
 
 Notes: short array of flag strings. Empty array if nothing notable. Be specific — include dollar amounts and payee/document references when present in the statement. Mark inferences from the statement alone with "(from statement)". Flag:
   - Late or missed rent (vacancy months, partial payments)
@@ -141,9 +145,12 @@ Notes: short array of flag strings. Empty array if nothing notable. Be specific 
   - Fee changes (management fee %, new charges)
   - Unusual entries in expenses.other
   - Ending balance concerns
+  - Distribution of $0 or reserve below $1,500
 
 Return ONLY valid JSON, no markdown, exactly this shape:
 {
+  "distribution": 0,
+  "reserve": 0,
   "bradcliff":  {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"endingBalance":0,"notes":[]},
   "neely":      {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"endingBalance":0,"notes":[]},
   "greenmount": {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"endingBalance":0,"notes":[]}
@@ -159,7 +166,7 @@ async function extractWithClaude(pdfTexts, priorMonth) {
 
   for (let attempt = 0; attempt < 2; attempt++) {
     const msg = await anthropic.messages.create({
-      model:      'claude-sonnet-4-6',
+      model:      'claude-haiku-4-5-20251001',
       max_tokens: 2048,
       system:     SYSTEM_PROMPT,
       messages:   [{ role: 'user', content: parts.join('\n\n') }],
@@ -280,8 +287,9 @@ async function main() {
     }
 
     const priorMonth = sortedSoFar[sortedSoFar.length - 1] || null;
-    const properties = await extractWithClaude(pdfTexts, priorMonth);
-    const newEntry   = { date: monthInfo.date, month: monthInfo.month, properties };
+    const extracted  = await extractWithClaude(pdfTexts, priorMonth);
+    const { distribution = null, reserve = null, ...properties } = extracted;
+    const newEntry   = { date: monthInfo.date, month: monthInfo.month, distribution, reserve, properties };
 
     // Re-read before writing — idempotency guard
     const freshData   = await readReviewFile(drive);
@@ -300,7 +308,7 @@ async function main() {
 
     // Email is best-effort — month is already safely written if this throws
     try {
-      const hadFlags = Object.values(properties).some(p => p.notes?.length > 0);
+      const hadFlags = Object.values(properties).some(p => typeof p === 'object' && p.notes?.length > 0);
       const subject  = hadFlags
         ? `⚠ FPM Review — ${monthInfo.month}: items flagged`
         : `✓ FPM Review — ${monthInfo.month}: all clear`;
