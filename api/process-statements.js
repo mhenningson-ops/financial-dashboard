@@ -168,11 +168,11 @@ async function extractWithClaude(pdfTexts, priorMonth) {
   for (let attempt = 0; attempt < 2; attempt++) {
     const msg = await anthropic.messages.create({
       model:      'claude-haiku-4-5-20251001',
-      max_tokens: 2048,
+      max_tokens: 4096,
       system:     SYSTEM_PROMPT,
       messages:   [{ role: 'user', content: parts.join('\n\n') }],
     });
-    const raw = msg.content[0].text.trim();
+    const raw = msg.content[0].text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
     try {
       return JSON.parse(raw);
     } catch {
