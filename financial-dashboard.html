@@ -1131,6 +1131,9 @@
             <label>As of Date</label>
             <input type="date" id="r_date" />
           </div>
+          <div class="field" style="display:flex;align-items:flex-end;">
+            <button class="btn-secondary" onclick="startNewQuarter()" style="white-space:nowrap;">+ New Quarter</button>
+          </div>
         </div>
       </div>
     </div>
@@ -2118,8 +2121,32 @@ function restoreDraft() {
     if (el && draft[id] !== undefined && draft[id] !== '') el.value = draft[id];
   });
   recalcAllBlended();
+  setFormReadOnly(false);
   const status = $('draft-status');
   if (status) status.textContent = 'Draft restored — pick up where you left off.';
+}
+
+function startNewQuarter() {
+  if (!confirm('Clear all form fields and start a new quarter?')) return;
+  // Calculate next quarter end
+  const today = new Date();
+  const m = today.getMonth(); // 0-indexed
+  let qEnd;
+  if (m < 3)       qEnd = new Date(today.getFullYear(), 2, 31);  // Mar 31
+  else if (m < 6)  qEnd = new Date(today.getFullYear(), 5, 30);  // Jun 30
+  else if (m < 9)  qEnd = new Date(today.getFullYear(), 8, 30);  // Sep 30
+  else             qEnd = new Date(today.getFullYear(), 11, 31); // Dec 31
+  const iso = qEnd.toISOString().split('T')[0];
+  // Clear draft and form
+  clearDraft();
+  DRAFT_FIELD_IDS.forEach(id => { const el = $(id); if (el) el.value = ''; });
+  $('r_date').value = iso;
+  setFormReadOnly(false);
+  $('review-results').style.display = 'none';
+  initValuationMode();
+  saveDraft();
+  const status = $('draft-status');
+  if (status) status.textContent = `New quarter started — as of ${iso}. Sync from Drive to pre-fill.`;
 }
 
 function clearDraft() {
