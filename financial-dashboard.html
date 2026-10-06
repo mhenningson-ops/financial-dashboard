@@ -1934,7 +1934,23 @@ function initValuationMode(excludeQuarterLabel) {
   const dateVal = $('r_date')?.value;
   const d = dateVal ? new Date(dateVal + 'T12:00:00') : new Date();
   const qNum = Math.ceil((d.getMonth() + 1) / 3);
-  if (qNum === 1 || qNum === 3) return; // fresh quarter — leave blank
+  if (qNum === 1 || qNum === 3) {
+    // Fresh valuation quarter — ensure sections are expanded and editable
+    Object.keys(PROP_VAL_FIELDS).forEach(p => {
+      const notice = $(`${p}_val_notice`);
+      const body = $(`${p}_val_body`);
+      if (notice) { notice.innerHTML = ''; notice.style.display = 'none'; }
+      if (body) body.style.display = '';
+      PROP_VAL_FIELDS[p].forEach(id => {
+        const el = $(id);
+        if (!el) return;
+        el.removeAttribute('readonly');
+        el.style.opacity = '';
+        el.style.cursor = '';
+      });
+    });
+    return;
+  }
 
   _valPriorData = prior.rawInputs;
   const priorDate = new Date(prior.date + 'T12:00:00');
