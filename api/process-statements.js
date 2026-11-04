@@ -124,16 +124,21 @@ const SYSTEM_PROMPT = `You are analyzing Foundation Property Management (FPM) ow
 
 Properties: Bradcliff (5274 Bradcliff Street), Neely (5168 Neely Road), Greenmount (4277 Greenmount Avenue).
 
-Field mappings from FPM statement:
-  income.rent    = "Rent Income" (4000) + "Affordable Housing Income" (4710) combined — both are lease-based
-  income.other   = "Tenant damages - Owner" (4740) + any other non-rent income lines
-  income.gross   = income.rent + income.other  (= Total Income on statement)
+Field mappings — use SELECTED PERIOD column only for all amounts, never Year to Date:
+  income.rent    = "Rent Income" (4000) + "Affordable Housing Income" (4710) SUMMED — if only AHI appears and Rent Income is $0, income.rent = AHI amount; if both appear, income.rent = 4000 + 4710
+  income.other   = "Tenant damages - Owner" (4740) SELECTED PERIOD amount only (not YTD) + any other non-rent income lines
+  income.gross   = income.rent + income.other  (= Total Income on statement; verify this equals your sum)
   expenses.pm    = "Management Fees" (5000)
   expenses.rm    = "Repairs" (5100, includes turn/make-ready costs)
   expenses.util  = "Utilities" (5290)
   expenses.other = anything else (legal/collections fees, NSF charges, adjustments, etc.)
-  netCF          = Net Operating Income from statement
+  netCF          = Net Operating Income from statement SELECTED PERIOD column (not Year to Date)
   endingBalance  = ENDING BALANCE from the SELECTED PERIOD column (not Year to Date)
+
+CRITICAL RULES:
+  - income.rent MUST include both 4000 and 4710 amounts. Never leave income.rent at $0 if AHI (4710) has a non-zero SELECTED PERIOD amount.
+  - income.other uses the SELECTED PERIOD amount for each line, not the YTD column. If a line shows $0 in the period column but has a YTD value, use $0.
+  - income.gross must equal income.rent + income.other exactly. If it does not, recheck your extraction.
 
 Portfolio-level fields (from Owner Statement if present, otherwise null):
   distribution = "Total Distribution:" dollar amount (cash sent to owner this month)
