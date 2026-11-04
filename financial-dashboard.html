@@ -166,6 +166,25 @@
     .pos { color: var(--green); } .neg { color: var(--red); } .muted { color: var(--text-muted); }
     .gold { color: var(--gold); } .green { color: var(--green); }
 
+    /* ── MONTHLY NOTES ── */
+    .note-chip { position: relative; cursor: help; border-bottom: 1px dotted var(--text-muted); display: inline; }
+    .note-chip::after {
+      content: attr(data-full);
+      position: absolute; bottom: calc(100% + 4px); left: 0;
+      background: #2a2520; color: #e8dcc8;
+      padding: 7px 11px; border-radius: 4px;
+      font-size: 0.72rem; white-space: normal;
+      min-width: 220px; max-width: 340px; width: max-content;
+      z-index: 999; border: 1px solid #3d3630;
+      pointer-events: none; opacity: 0; transition: opacity 0.15s;
+      line-height: 1.5;
+    }
+    .note-chip:hover::after { opacity: 1; }
+    .note-chip.expanded { border-bottom: none; cursor: default; }
+    .note-chip.expanded::after { display: none; }
+    .note-more { font-size: 0.65rem; color: var(--gold); cursor: pointer; margin-left: 4px; white-space: nowrap; }
+    .note-more:hover { text-decoration: underline; }
+
     /* ── HISTORY ── */
     .history-grid { display: grid; gap: 16px; }
     .hist-card { background: var(--dark-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; }
@@ -4101,11 +4120,31 @@ function renderMonthly() {
         return `<td class="right"><span class="${cls}">${val < 0 ? '-' : ''}${fmt$(Math.abs(val))}</span>${badge}</td>`;
       });
 
-      const notes = (prop.notes || []).join('; ');
+      const rawNotes = prop.notes || [];
+      let notesHtml;
+      if (!rawNotes.length) {
+        notesHtml = '—';
+      } else {
+        const TRUNC = 60;
+        const makeChip = (n) => {
+          const full = n.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+          if (n.length <= TRUNC) return `<span>${n}</span>`;
+          const short = n.slice(0, TRUNC) + '…';
+          return `<span class="note-chip" data-full="${full}" onclick="this.classList.toggle('expanded');this.textContent=this.classList.contains('expanded')?this.dataset.full:'${short.replace(/'/g,"\\'")}'">${short}</span>`;
+        };
+        const chips = rawNotes.map(makeChip);
+        if (chips.length === 1) {
+          notesHtml = chips[0];
+        } else {
+          const extras = chips.slice(1).map(c => `<span class="note-extra" style="display:none;">${c}</span>`).join('');
+          const toggle = `<span class="note-more" onclick="const td=this.closest('td');td.querySelectorAll('.note-extra').forEach(e=>{e.style.display=e.style.display==='none'?'block':'none'});this.textContent=this.textContent.startsWith('+')?'▲ less':'+${rawNotes.length-1} more'">+${rawNotes.length-1} more</span>`;
+          notesHtml = chips[0] + toggle + extras;
+        }
+      }
       return `<tr>
         <td style="white-space:nowrap;font-weight:600;color:var(--text-light);">${m.month}</td>
         ${moneyCells.join('')}
-        <td style="font-size:0.74rem;color:var(--text-muted);max-width:220px;white-space:normal;">${notes || '—'}</td>
+        <td style="font-size:0.74rem;color:var(--text-muted);max-width:240px;white-space:normal;line-height:1.6;">${notesHtml}</td>
       </tr>`;
     });
 
