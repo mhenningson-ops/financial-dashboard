@@ -167,7 +167,7 @@
     .gold { color: var(--gold); } .green { color: var(--green); }
 
     /* ── MONTHLY NOTES ── */
-    .note-chip { position: relative; cursor: help; border-bottom: 1px dotted var(--text-muted); display: inline; }
+    .note-chip { position: relative; cursor: pointer; display: inline; }
     .note-chip::after {
       content: attr(data-full);
       position: absolute; bottom: calc(100% + 4px); left: 0;
@@ -180,10 +180,14 @@
       line-height: 1.5;
     }
     .note-chip:hover::after { opacity: 1; }
-    .note-chip.expanded { border-bottom: none; cursor: default; }
-    .note-chip.expanded::after { display: none; }
+    .note-chip .n-full, .note-extra, .note-more .n-less { display: none; }
+    body.notes-expanded .note-chip { cursor: default; }
+    body.notes-expanded .note-chip::after { display: none; }
+    body.notes-expanded .note-chip .n-short, body.notes-expanded .note-more .n-more { display: none; }
+    body.notes-expanded .note-chip .n-full, body.notes-expanded .note-more .n-less { display: inline; }
+    body.notes-expanded .note-extra { display: block; }
     .note-more { font-size: 0.65rem; color: var(--gold); cursor: pointer; margin-left: 4px; white-space: nowrap; }
-    .note-more:hover { text-decoration: underline; }
+    .note-more:hover { opacity: 0.8; }
 
     /* ── HISTORY ── */
     .history-grid { display: grid; gap: 16px; }
@@ -3948,6 +3952,8 @@ const MONTHLY_PROPS = [
   { key: 'greenmount', label: 'Greenmount', color: '#2d6b4a' },
 ];
 
+function toggleAllNotes() { document.body.classList.toggle('notes-expanded'); }
+
 function getNestedVal(obj, path) {
   return path.split('.').reduce((o, k) => o?.[k], obj);
 }
@@ -4126,18 +4132,18 @@ function renderMonthly() {
         notesHtml = '—';
       } else {
         const TRUNC = 60;
+        const esc = (t) => t.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
         const makeChip = (n) => {
-          const full = n.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
-          if (n.length <= TRUNC) return `<span>${n}</span>`;
-          const short = n.slice(0, TRUNC) + '…';
-          return `<span class="note-chip" data-full="${full}" onclick="this.classList.toggle('expanded');this.textContent=this.classList.contains('expanded')?this.dataset.full:'${short.replace(/'/g,"\\'")}'">${short}</span>`;
+          if (n.length <= TRUNC) return `<span>${esc(n)}</span>`;
+          const short = esc(n.slice(0, TRUNC)) + '…';
+          return `<span class="note-chip" data-full="${esc(n)}" onclick="toggleAllNotes()"><span class="n-short">${short}</span><span class="n-full">${esc(n)}</span></span>`;
         };
         const chips = rawNotes.map(makeChip);
         if (chips.length === 1) {
           notesHtml = chips[0];
         } else {
-          const extras = chips.slice(1).map(c => `<span class="note-extra" style="display:none;">${c}</span>`).join('');
-          const toggle = `<span class="note-more" onclick="const td=this.closest('td');td.querySelectorAll('.note-extra').forEach(e=>{e.style.display=e.style.display==='none'?'block':'none'});this.textContent=this.textContent.startsWith('+')?'▲ less':'+${rawNotes.length-1} more'">+${rawNotes.length-1} more</span>`;
+          const extras = chips.slice(1).map(c => `<span class="note-extra">${c}</span>`).join('');
+          const toggle = `<span class="note-more" onclick="toggleAllNotes()"><span class="n-more">+${rawNotes.length-1} more</span><span class="n-less">▲ less</span></span>`;
           notesHtml = chips[0] + toggle + extras;
         }
       }
@@ -4155,7 +4161,7 @@ function renderMonthly() {
           <thead><tr>
             <th>Month</th>
             ${MONEY_COLS.map(c => `<th class="right">${c.label}</th>`).join('')}
-            <th>Notes</th>
+            <th>Notes <span class="note-more" onclick="toggleAllNotes()"><span class="n-more">expand all</span><span class="n-less">collapse all</span></span></th>
           </tr></thead>
           <tbody>${rows.join('')}</tbody>
         </table>
