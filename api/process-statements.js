@@ -133,7 +133,6 @@ Field mappings — use SELECTED PERIOD column only for all amounts, never Year t
   expenses.util  = "Utilities" (5290)
   expenses.other = anything else (legal/collections fees, NSF charges, adjustments, etc.)
   netCF          = Net Operating Income from statement SELECTED PERIOD column (not Year to Date)
-  endingBalance  = ENDING BALANCE from the SELECTED PERIOD column (not Year to Date)
 
 CRITICAL RULES:
   - income.rent MUST include both 4000 and 4710 amounts. Never leave income.rent at $0 if AHI (4710) has a non-zero SELECTED PERIOD amount.
@@ -144,22 +143,26 @@ Portfolio-level fields (from Owner Statement if present, otherwise null):
   distribution = "Total Distribution:" dollar amount (cash sent to owner this month)
   reserve      = "Reserve" balance (owner's reserve account balance at month end)
 
-Notes: short array of flag strings. Empty array if nothing notable. Be specific — include dollar amounts and payee/document references when present in the statement. Mark inferences from the statement alone with "(from statement)". Flag:
-  - Late or missed rent (vacancy months, partial payments)
+Notes: short array of flag strings — ONLY for things out of the ordinary for that property. Default is an empty array; most properties in most months should have none. Be specific — include dollar amounts and payee/document references when present in the statement. Flag only:
+  - Late, missed, or partial rent; vacancy
   - Turnover or eviction events with associated costs
-  - Maintenance spikes vs prior month
-  - Fee changes (management fee %, new charges)
+  - Repairs or other expenses well above that property's normal run rate
+  - Fee changes (management fee %, new charges, credits/reversals)
   - Unusual entries in expenses.other
-  - Ending balance concerns
-  - Distribution of $0 or reserve below $1,500
+  - Distribution of $0 or reserve below $1,500 (portfolio level — attach to one property only)
+Do NOT write notes that:
+  - Describe a normal month ("stable", "full rent collected", "only expense was management fee")
+  - Explain how income is composed — Rent Income + Affordable Housing Income (MHA) splitting is normal and expected for MHA tenants
+  - Restate figures already captured in the numeric fields
+  - Speculate about anomalies in YTD columns
 
 Return ONLY valid JSON, no markdown, exactly this shape:
 {
   "distribution": 0,
   "reserve": 0,
-  "bradcliff":  {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"endingBalance":0,"notes":[]},
-  "neely":      {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"endingBalance":0,"notes":[]},
-  "greenmount": {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"endingBalance":0,"notes":[]}
+  "bradcliff":  {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"notes":[]},
+  "neely":      {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"notes":[]},
+  "greenmount": {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"notes":[]}
 }`;
 
 async function extractWithClaude(pdfTexts, priorMonth) {
@@ -221,8 +224,7 @@ function buildEmailHtml(monthLabel, properties, hadFlags) {
         Other ${fmtMoney(p.expenses.other)}
       </td>
       <td style="padding:12px 16px;vertical-align:top;border-bottom:1px solid #e5e7eb;text-align:right;white-space:nowrap;">
-        <strong style="font-size:1.05em;color:${p.netCF >= 0 ? '#15803d' : '#b91c1c'};">${fmtMoney(p.netCF)}</strong><br>
-        <span style="font-size:0.8em;color:#6b7280;">Ending ${fmtMoney(p.endingBalance)}</span>
+        <strong style="font-size:1.05em;color:${p.netCF >= 0 ? '#15803d' : '#b91c1c'};">${fmtMoney(p.netCF)}</strong>
       </td>
     </tr>`;
   }).join('');

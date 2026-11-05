@@ -181,11 +181,11 @@
     }
     .note-chip:hover::after { opacity: 1; }
     .note-chip .n-full, .note-extra, .note-more .n-less { display: none; }
-    body.notes-expanded .note-chip { cursor: default; }
-    body.notes-expanded .note-chip::after { display: none; }
-    body.notes-expanded .note-chip .n-short, body.notes-expanded .note-more .n-more { display: none; }
-    body.notes-expanded .note-chip .n-full, body.notes-expanded .note-more .n-less { display: inline; }
-    body.notes-expanded .note-extra { display: block; }
+    .notes-expanded .note-chip { cursor: default; }
+    .notes-expanded .note-chip::after { display: none; }
+    .notes-expanded .note-chip .n-short, .notes-expanded .note-more .n-more { display: none; }
+    .notes-expanded .note-chip .n-full, .notes-expanded .note-more .n-less { display: inline; }
+    .notes-expanded .note-extra { display: block; }
     .note-more { font-size: 0.65rem; color: var(--gold); cursor: pointer; margin-left: 4px; white-space: nowrap; }
     .note-more:hover { opacity: 0.8; }
 
@@ -3952,7 +3952,7 @@ const MONTHLY_PROPS = [
   { key: 'greenmount', label: 'Greenmount', color: '#2d6b4a' },
 ];
 
-function toggleAllNotes() { document.body.classList.toggle('notes-expanded'); }
+function toggleAllNotes(el) { el.closest('.result-card').classList.toggle('notes-expanded'); }
 
 function getNestedVal(obj, path) {
   return path.split('.').reduce((o, k) => o?.[k], obj);
@@ -4069,7 +4069,7 @@ function renderMonthly() {
     { path: 'expenses.util',  label: 'Utilities',       invertBad: true  },
     { path: 'expenses.other', label: 'Other Exp',       invertBad: true  },
     { path: 'netCF',          label: 'NOI',             invertBad: false },
-    { path: 'endingBalance',  label: 'Ending Balance',  invertBad: false },
+    { path: 'cumCF',          label: 'Cumulative NOI',  invertBad: false },
   ];
 
   // ── Portfolio Summary table ──
@@ -4112,17 +4112,19 @@ function renderMonthly() {
       </div>`;
     }
 
+    let cumCF = 0;
     const rows = propMonths.map((m, dispIdx) => {
       const prop   = m.properties[p.key];
       const netCF  = monthlyNetCF(prop);
+      cumCF += netCF || 0;
       const hasAvg = dispIdx >= 3;
 
       const moneyCells = MONEY_COLS.map(col => {
-        const val = col.path === 'netCF' ? netCF : getNestedVal(prop, col.path);
-        const avg = hasAvg ? rollingAvg(propMonths, p.key, col.path, dispIdx) : null;
+        const val = col.path === 'netCF' ? netCF : col.path === 'cumCF' ? cumCF : getNestedVal(prop, col.path);
+        const avg = hasAvg && col.path !== 'cumCF' ? rollingAvg(propMonths, p.key, col.path, dispIdx) : null;
         const badge = vsAvgBadge(val, avg, col.invertBad);
         if (val === undefined || val === null) return `<td class="right" style="color:var(--text-muted);">—</td>`;
-        const cls = col.path === 'netCF' ? (netCF >= 0 ? 'pos' : 'neg') : '';
+        const cls = (col.path === 'netCF' || col.path === 'cumCF') ? (val >= 0 ? 'pos' : 'neg') : '';
         return `<td class="right"><span class="${cls}">${val < 0 ? '-' : ''}${fmt$(Math.abs(val))}</span>${badge}</td>`;
       });
 
@@ -4136,14 +4138,14 @@ function renderMonthly() {
         const makeChip = (n) => {
           if (n.length <= TRUNC) return `<span>${esc(n)}</span>`;
           const short = esc(n.slice(0, TRUNC)) + '…';
-          return `<span class="note-chip" data-full="${esc(n)}" onclick="toggleAllNotes()"><span class="n-short">${short}</span><span class="n-full">${esc(n)}</span></span>`;
+          return `<span class="note-chip" data-full="${esc(n)}" onclick="toggleAllNotes(this)"><span class="n-short">${short}</span><span class="n-full">${esc(n)}</span></span>`;
         };
         const chips = rawNotes.map(makeChip);
         if (chips.length === 1) {
           notesHtml = chips[0];
         } else {
           const extras = chips.slice(1).map(c => `<span class="note-extra">${c}</span>`).join('');
-          const toggle = `<span class="note-more" onclick="toggleAllNotes()"><span class="n-more">+${rawNotes.length-1} more</span><span class="n-less">▲ less</span></span>`;
+          const toggle = `<span class="note-more" onclick="toggleAllNotes(this)"><span class="n-more">+${rawNotes.length-1} more</span><span class="n-less">▲ less</span></span>`;
           notesHtml = chips[0] + toggle + extras;
         }
       }
@@ -4161,7 +4163,7 @@ function renderMonthly() {
           <thead><tr>
             <th>Month</th>
             ${MONEY_COLS.map(c => `<th class="right">${c.label}</th>`).join('')}
-            <th>Notes <span class="note-more" onclick="toggleAllNotes()"><span class="n-more">expand all</span><span class="n-less">collapse all</span></span></th>
+            <th>Notes <span class="note-more" onclick="toggleAllNotes(this)"><span class="n-more">expand all</span><span class="n-less">collapse all</span></span></th>
           </tr></thead>
           <tbody>${rows.join('')}</tbody>
         </table>
