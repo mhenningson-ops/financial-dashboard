@@ -4069,7 +4069,7 @@ function renderMonthly() {
     { path: 'expenses.util',  label: 'Utilities',       invertBad: true  },
     { path: 'expenses.other', label: 'Other Exp',       invertBad: true  },
     { path: 'netCF',          label: 'NOI',             invertBad: false },
-    { path: 'cumCF',          label: 'Cumulative NOI',  invertBad: false },
+    { path: 'endingBalance',  label: 'Ending Balance',  invertBad: false },
   ];
 
   // ── Portfolio Summary table ──
@@ -4112,19 +4112,17 @@ function renderMonthly() {
       </div>`;
     }
 
-    let cumCF = 0;
     const rows = propMonths.map((m, dispIdx) => {
       const prop   = m.properties[p.key];
       const netCF  = monthlyNetCF(prop);
-      cumCF += netCF || 0;
       const hasAvg = dispIdx >= 3;
 
       const moneyCells = MONEY_COLS.map(col => {
-        const val = col.path === 'netCF' ? netCF : col.path === 'cumCF' ? cumCF : getNestedVal(prop, col.path);
-        const avg = hasAvg && col.path !== 'cumCF' ? rollingAvg(propMonths, p.key, col.path, dispIdx) : null;
+        const val = col.path === 'netCF' ? netCF : getNestedVal(prop, col.path);
+        const avg = hasAvg ? rollingAvg(propMonths, p.key, col.path, dispIdx) : null;
         const badge = vsAvgBadge(val, avg, col.invertBad);
         if (val === undefined || val === null) return `<td class="right" style="color:var(--text-muted);">—</td>`;
-        const cls = (col.path === 'netCF' || col.path === 'cumCF') ? (val >= 0 ? 'pos' : 'neg') : '';
+        const cls = col.path === 'netCF' ? (netCF >= 0 ? 'pos' : 'neg') : '';
         return `<td class="right"><span class="${cls}">${val < 0 ? '-' : ''}${fmt$(Math.abs(val))}</span>${badge}</td>`;
       });
 

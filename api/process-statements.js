@@ -133,6 +133,7 @@ Field mappings — use SELECTED PERIOD column only for all amounts, never Year t
   expenses.util  = "Utilities" (5290)
   expenses.other = anything else (legal/collections fees, NSF charges, adjustments, etc.)
   netCF          = Net Operating Income from statement SELECTED PERIOD column (not Year to Date)
+  endingBalance  = per-property ENDING BALANCE from the Cash Flow (per property) report, SELECTED PERIOD column (running trust balance for that property)
 
 CRITICAL RULES:
   - income.rent MUST include both 4000 and 4710 amounts. Never leave income.rent at $0 if AHI (4710) has a non-zero SELECTED PERIOD amount.
@@ -160,9 +161,9 @@ Return ONLY valid JSON, no markdown, exactly this shape:
 {
   "distribution": 0,
   "reserve": 0,
-  "bradcliff":  {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"notes":[]},
-  "neely":      {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"notes":[]},
-  "greenmount": {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"notes":[]}
+  "bradcliff":  {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"endingBalance":0,"notes":[]},
+  "neely":      {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"endingBalance":0,"notes":[]},
+  "greenmount": {"income":{"rent":0,"other":0,"gross":0},"expenses":{"pm":0,"rm":0,"util":0,"other":0},"netCF":0,"endingBalance":0,"notes":[]}
 }`;
 
 async function extractWithClaude(pdfTexts, priorMonth) {
@@ -224,7 +225,8 @@ function buildEmailHtml(monthLabel, properties, hadFlags) {
         Other ${fmtMoney(p.expenses.other)}
       </td>
       <td style="padding:12px 16px;vertical-align:top;border-bottom:1px solid #e5e7eb;text-align:right;white-space:nowrap;">
-        <strong style="font-size:1.05em;color:${p.netCF >= 0 ? '#15803d' : '#b91c1c'};">${fmtMoney(p.netCF)}</strong>
+        <strong style="font-size:1.05em;color:${p.netCF >= 0 ? '#15803d' : '#b91c1c'};">${fmtMoney(p.netCF)}</strong><br>
+        <span style="font-size:0.8em;color:#6b7280;">Ending ${fmtMoney(p.endingBalance)}</span>
       </td>
     </tr>`;
   }).join('');

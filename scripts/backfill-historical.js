@@ -169,9 +169,7 @@ function aggregate(txns) {
         income:   { rent: round2(m.rent), other: round2(m.other_income), gross },
         expenses: { pm, rm, util, other },
         netCF,
-        // Derived running total of PM trust cash from the old system's records — NOT a
-        // statement value. FPM statements (Aug 2026+) have no per-property balance.
-        derivedRunningBalance: round2(runningBalance[p]),
+        endingBalance: round2(runningBalance[p]),
         notes: [],
       };
       totalDraw += m.draw;
